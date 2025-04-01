@@ -1,0 +1,42 @@
+{% extends "email/email_base.html.twig" %}
+
+{% block title %}Account Deletion Request | DOCKontrol{% endblock %}
+{% block header %}Confirm Your Account Deletion{% endblock %}
+
+{% block stylesheet %}
+    {{ parent() }}
+    <style>
+        .header {
+            background-color: #dc3545;
+        }
+        .content h2 {
+            color: #dc3545;
+        }
+        .content a {
+            display: inline-block;
+            background-color: #dc3545;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .content a:hover {
+            background-color: #b02a37;
+        }
+        .footer a {
+            color: #dc3545;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2>Hello {{ user.name }},</h2>
+    <p>We received a request to delete your account. To proceed, please confirm this action by clicking the button below.</p>
+
+    <div class="button-container">
+        <a href="{{ confirmDeletionURL }}" target="_blank">Confirm Account Deletion</a>
+    </div>
+    <p>This link will expire in 1 hour. If you do not confirm within this time, your account will not be deleted.</p>
+{% endblock %}

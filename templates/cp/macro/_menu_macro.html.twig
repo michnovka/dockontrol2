@@ -1,0 +1,81 @@
+{% macro render_menu(items) %}
+    <ul class="navbar-nav ms-md-auto">
+        {% for item in items %}
+            {% if item.role is not defined or is_granted(item.role) %}
+                <li class="nav-item {% if item.children is defined %} dropdown {% endif %} {% if item.switch_theme_option is defined %} theme-option {% endif %}"
+                        {% if item.switch_theme_option is defined %} data-theme-value="{{ item.switch_theme_option }}" {% endif %}>
+
+                    {% if item.switch_theme_option is defined and item.tooltip_text is defined %}
+                        {{ _self.render_theme_switch_button(item) }}
+                    {% else %}
+                        {{ _self.render_nav_item(item) }}
+                    {% endif %}
+
+                    {% if item.children is defined %}
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% for child in item.children %}
+                                {% if child.role is not defined or is_granted(child.role) %}
+                                    {{ _self.render_child_item(child) }}
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro render_theme_switch_button(item) %}
+    <button type="button" class="nav-link" data-bs-theme-value="{{ item.switch_theme_option }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{{ item.tooltip_text }}">
+        <i class="{{ item.icon }}"></i>
+        <span class="ms-1 d-lg-none fs-7">{{ item.label }}</span>
+    </button>
+{% endmacro %}
+
+{% macro render_nav_item(item) %}
+    <a href="{{ item.path }}" class="nav-link d-flex align-items-center {% if item.is_active %} active {% endif %}"
+            {% if item.children is defined %} aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="{{ item.label }}" {% endif %}>
+
+        {% if item.icon is defined %}
+            <i class="{{ item.icon }} fs-7 {% if item.icon_show_always is not defined %} d-lg-none {% endif %}"></i>
+        {% endif %}
+
+        <span class="ms-2 {% if item.icon_show_always is not defined %} ms-lg-0 {% endif %} {% if item.hide_text_on_desktop is defined %} d-lg-none {% endif %}">
+            {{ item.label }}
+        </span>
+    </a>
+{% endmacro %}
+
+{% macro render_child_item(child) %}
+    <li {% if child.children is defined %} id="{{ child.id }}" class="dropdown" {% endif %}>
+        <a href="{{ child.path }}"
+           class="{% if child.children is defined %} btn btn-link text-decoration-none d-flex align-items-center justify-content-between {% endif %} dropdown-item {% if child.is_active %} active {% endif %}"
+                {% if child.sub_menu_toggle_id is defined %}
+            id="{{ child.sub_menu_toggle_id }}"
+            type="button"
+            aria-expanded="false"
+                {% endif %}>
+
+           {% if child.icon is defined %}
+               <i class="{{ child.icon }} fs-7"></i>
+           {% endif %}
+
+            <span>{{ child.label }}</span>
+
+            {% if child.special_icon_class is defined %}
+                <span class="ms-2">
+                    <i class="{{ child.special_icon_class }}"></i>
+                </span>
+            {% endif %}
+        </a>
+
+        {% if child.children is defined %}
+            <ul class="dropdown-menu dropdown-menu-left">
+                {% for sub_child in child.children %}
+                    {{ _self.render_child_item(sub_child) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}

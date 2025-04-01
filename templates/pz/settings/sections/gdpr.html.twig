@@ -1,0 +1,252 @@
+<div class="d-flex justify-content-end">
+    <a href="javascript:void(0)" class="btn btn-sm btn-primary" id="request-account-deletion">{{ 'dockontrol.settings.gdpr.account_deletion_btn'|trans }}</a>
+</div>
+<div class="card mt-2">
+    <div class="card-body px-2">
+        <p><strong>{{ 'dockontrol.settings.gdpr.last_updated'|trans }}</strong>: 2025-03-01</p>
+        <p>{{ 'dockontrol.settings.gdpr.introduction'|trans }}</p>
+
+        <h6>{{ 'dockontrol.settings.gdpr.data_overview'|trans }}</h6>
+        <ul>
+            <li>{{ 'dockontrol.settings.gdpr.data_basic_info'|trans }}</li>
+            <li>{{ 'dockontrol.settings.gdpr.data_access_logs'|trans }}</li>
+        </ul>
+
+        <hr>
+        <h6>{{ 'dockontrol.settings.gdpr.convenience_text'|trans }}</h6>
+            <ul>
+                <li><b>{{ 'dockontrol.settings.gdpr.download_complete_data'|trans }}: </b> {{ 'dockontrol.settings.gdpr.download_complete_data_info'|trans }}</li>
+                <li><b>{{ 'dockontrol.settings.gdpr.update_personal_data'|trans }}: </b> {{ 'dockontrol.settings.gdpr.update_personal_data_info'|trans({'%go_to_profile_link%': path('dockontrol_settings_my_profile')})|raw }}</li>
+                <li><b>{{ 'dockontrol.settings.gdpr.delete_account'|trans }}: </b> {{ 'dockontrol.settings.gdpr.delete_account_info'|trans }}</li>
+
+            </ul>
+        <h6>{{ 'dockontrol.settings.gdpr.contact_info'|trans }}</h6>
+        <h6>{{ 'dockontrol.settings.gdpr.privacy_policy_text'|trans({'%privacy_policy_link%': path('dockontrol_terms_of_service')})|raw }}</h6>
+        <hr>
+        <h6>{{ 'dockontrol.settings.gdpr.personal_data_in_dockontrol'|trans }}</h6>
+        <ul>
+            <li><b>{{ 'dockontrol.settings.gdpr.personal_info.full_name'|trans }}:</b> {{ app.user.name }}</li>
+            <li><b>{{ 'dockontrol.settings.gdpr.personal_info.email'|trans }}:</b> {{ app.user.email }}</li>
+            <li><b>{{ 'dockontrol.settings.gdpr.personal_info.phone_number'|trans }}:</b> {{ app.user.phone }}</li>
+            <li><b>{{ 'dockontrol.settings.gdpr.personal_info.building'|trans }}:</b> {{ app.user.apartment.building.name }}</li>
+            <li><b>{{ 'dockontrol.settings.gdpr.personal_info.apartment'|trans }}:</b> {{ app.user.apartment.name }}</li>
+            <li><b>{{ 'dockontrol.settings.gdpr.personal_info.account_creation_date'|trans }}:</b> {{ app.user.createdTime|date('Y-m-d') }}</li>
+        </ul>
+
+        <div class="card">
+            <div class="card-header m-0 p-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">{{ 'dockontrol.settings.gdpr.access_summary.recent_activity_logs'|trans }}</h6>
+                <a href="{{ path('dockontrol_export_data', {'logType': 'action_queue_logs'}) }}" class="btn btn-sm btn-primary">{{ 'dockontrol.settings.gdpr.download_action_log_btn'|trans }}</a>
+            </div>
+            <div class="card-body m-0 p-0">
+                <div class="table-responsive rounded">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                        <tr>
+                            <th>{{ 'dockontrol.settings.gdpr.access_summary.recent_activity_logs_table.header_action'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.gdpr.access_summary.recent_activity_logs_table.header_status'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.gdpr.access_summary.recent_activity_logs_table.header_time_start'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.gdpr.access_summary.recent_activity_logs_table.header_time_executed'|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for actionQueue in lastUserActionLogs %}
+                            <tr>
+                                <td>{{ actionQueue.action.friendlyName }}</td>
+                                <td>{{ actionQueue|action_queue_status_badge }}</td>
+                                <td>{{ actionQueue.timeStart|format('Y-m-d H:i:s') }}</td>
+                                <td>{{ actionQueue.timeExecuted is not empty ? actionQueue.timeExecuted|format('Y-m-d H:i:s') : 'N/A' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4">{{ 'dockontrol.settings.gdpr.access_summary.recent_activity_logs_table.no_result'|trans }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-2">
+            <div class="card-header m-0 p-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">{{ 'dockontrol.settings.gdpr.access_summary.recent_camera_access_logs'|trans }}</h6>
+                <a href="{{ path('dockontrol_export_data', {'logType': 'camera_logs'}) }}" class="btn btn-sm btn-primary">{{ 'dockontrol.settings.gdpr.download_camera_log_btn'|trans }}</a>
+            </div>
+            <div class="card-body m-0 p-0">
+                <div class="table-responsive rounded">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                        <tr>
+                            <th>{{ 'dockontrol.settings.gdpr.access_summary.recent_camera_access_logs_table.header_camera'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.gdpr.access_summary.recent_camera_access_logs_table.header_time'|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cameraLog in lastUserCameraLogs %}
+                            <tr>
+                                <td>{{ cameraLog.camera.friendlyName }}</td>
+                                <td>{{ cameraLog.time|format('Y-m-d H:i:s') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="2">{{ 'dockontrol.settings.gdpr.access_summary.recent_activity_logs_table.no_result'|trans }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-2">
+            <div class="card-header m-0 p-2">
+                <h6 class="mb-0">{{ 'dockontrol.settings.gdpr.associated_accounts.title'|trans }}</h6>
+            </div>
+            <div class="card-body m-0 p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'dockontrol.settings.apartment.listing.name'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.apartment.listing.email'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.apartment.listing.phone'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.apartment.listing.enabled'|trans }}</th>
+                            <th>{{ 'dockontrol.settings.apartment.listing.time_created'|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for associatedUserAccount in associatedUserAccounts %}
+                            <tr>
+                                <td>{{ associatedUserAccount.name }}</td>
+                                <td>
+                                    {{ associatedUserAccount.email }}
+                                    {% if associatedUserAccount.emailVerified %}
+                                        <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail verified">
+                                    {% else %}
+                                        <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail not verified">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    +{{ associatedUserAccount.phoneCountryPrefix }}{{ associatedUserAccount.phone }}
+                                    {% if associatedUserAccount.phoneVerified %}
+                                        <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone verified">
+                                    {% else %}
+                                        <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone not verified">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill bg-{{ associatedUserAccount.enabled ? 'success' : 'danger' }}">{{ associatedUserAccount.enabled ? 'Yes' : 'No' }}</span>
+                                </td>
+                                <td>{{ associatedUserAccount.createdTime|date('Y-m-d H:i:s') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6">{{ 'dockontrol.settings.apartment.listing.no_data'|trans }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="account-delete-request-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="account-delete-request-form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-white mb-0">
+                        {{ 'dockontrol.settings.gdpr.account_deletion_btn'|trans }}
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>{{ 'dockontrol.settings.gdpr.delete_account_modal.description'|trans }}</p>
+                    <strong>
+                        <ul>
+                            <li id="delete-account-email"></li>
+                        </ul>
+                    </strong>
+                    <p>{{ 'dockontrol.settings.apartment.delete_tenant_modal.confirmation_message'|trans }}</p>
+                    <hr>
+                    <h6 class="font-weight-semibold">{{ 'dockontrol.settings.gdpr.delete_account_modal.info_text'|trans }}</h6>
+                    <input type="email" class="confirm-email form-control" id="confirm-email"/>
+                    <span class="validation-invalid-label incorrect_code d-none">{{ 'dockontrol.settings.apartment.delete_tenant_modal.incorrect_email'|trans }}</span>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>
+                    <input type="hidden" class="_csrf_token_account_deletion_request" name="_csrf_token_account_deletion_request" id="_csrf_token_account_deletion_request" value="{{ csrf_token("deleteaccountrequest") }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                    <button type="submit" class="btn bg-danger approve-the-request text-white" id="submit-btn">
+                        <span class="spinner-border spinner-border-sm d-none" id="btn-spinner" role="status" aria-hidden="true"></span>
+                        {{ 'dockontrol.global.modals.approve_the_deletion_button'|trans }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let requestAccountDeletionBtn = document.getElementById('request-account-deletion');
+        let requestAccountDeletionModal = new bootstrap.Modal(document.getElementById('account-delete-request-modal'));
+        let requestAccountDeletionForm = document.getElementById('account-delete-request-form');
+        let userEmail = "{{ app.user.email }}";
+        let requestAccountDeleteURL = "{{ path('dockontrol_account_deletion_request') }}";
+        let buttonSpinner = document.getElementById('btn-spinner');
+        let submitBtn = document.getElementById('submit-btn');
+
+        requestAccountDeletionBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            requestAccountDeletionForm.reset();
+            document.getElementById('delete-account-email').innerText = userEmail;
+            requestAccountDeletionModal.show();
+        });
+
+        requestAccountDeletionForm.addEventListener('submit', (e) => {
+           e.preventDefault();
+           let email = document.getElementById('confirm-email').value;
+           let csrfToken = document.getElementById('_csrf_token_account_deletion_request').value;
+           let formData = new FormData();
+           formData.append('_csrf', csrfToken);
+
+           if (email !== userEmail) {
+               requestAccountDeletionForm.querySelector('.incorrect_code').classList.remove('d-none');
+               setTimeout(() => {
+                   requestAccountDeletionForm.querySelector('.incorrect_code').classList.add('d-none');
+               }, 2500);
+           } else {
+               submitBtn.setAttribute('disabled', 'disabled');
+               buttonSpinner.classList.remove('d-none');
+               fetch(requestAccountDeleteURL, {
+                   method: 'POST',
+                   body: formData,
+                   headers: {
+                       "X-Requested-With": "XMLHttpRequest"
+                   }
+               }).then((response) => {
+                   return response.json();
+               }).then((res) => {
+                   if (res.success) {
+                       location.reload();
+                   } else {
+                       requestAccountDeletionForm.querySelector('.generic_error').textContent = res.errorMessage;
+                       requestAccountDeletionForm.querySelector('.generic_error').classList.remove('d-none');
+                       submitBtn.removeAttribute('disabled');
+                       buttonSpinner.classList.add('d-none');
+                       setTimeout(() => {
+                           requestAccountDeletionForm.querySelector('.generic_error').classList.add('d-none');
+                       }, 2500);
+                   }
+               });
+           }
+        });
+    });
+</script>

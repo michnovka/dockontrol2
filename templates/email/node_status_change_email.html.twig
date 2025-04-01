@@ -1,0 +1,32 @@
+{% extends "email/email_base.html.twig" %}
+
+{% block title %}DOCKontrol | Node Status Change{% endblock %}
+{% block header %}DOCKontrol Node Status Change{% endblock %}
+
+{% block stylesheet %}
+    {{ parent() }}
+    <style>
+        .content a {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2>Hello {{ user.name }},</h2>
+    <p>DOCKontrol node: {{ dockontrolNode.name }}</p>
+    <p>Building: {{ dockontrolNode.building.name }}</p>
+    <p>Is now: {{ currentStatus.readable }}</p>
+    <p>Old status: {{ oldStatus.readable }}</p>
+    <p>Time of this change: {{ dockontrolNode.lastMonitorCheckTime|format('Y-m-d H:i:s') }}</p>
+    <p>Last ping time: {{ dockontrolNode.lastPingTime|format('Y-m-d H:i:s') }}</p>
+    <p>This is an automated message, do not reply to it.</p>
+    <p>DOCKontrol</p>
+{% endblock %}

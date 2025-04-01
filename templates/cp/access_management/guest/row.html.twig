@@ -1,0 +1,28 @@
+<tr>
+    <td>{{ guest.user.name }}</td>
+    <td>{{ guest.user.apartment ?  guest.user.apartment.name : 'N/A' }}</td>
+    <td>{{ guest|guest_status_badge }}</td>
+    <td>{{ guest.created|time_tooltip }}</td>
+    <td>{{ guest.expires|time_tooltip }}</td>
+    <td>
+        {% if guest.enabled %}
+            <span class="badge rounded-pill bg-success">Yes</span>
+        {% else %}
+            <span class="badge rounded-pill bg-danger">No</span>
+        {% endif %}
+    </td>
+    <td>{{ guest.remainingActions < 0 ? 'Unlimited' : guest.remainingActions }}</td>
+    <td>{{ guest.timeLastAction is not null ? guest.timeLastAction|time_tooltip : 'N/A' }}</td>
+    <td>
+        {% if guest.enabled %}
+            <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-guest-pass-btn" data-guest-pass-id="{{ guest.hash }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                <i class="bi bi-trash"></i>
+            </a>
+        {% else %}
+            <a href="javascript:void(0)" class="text-decoration-none fs-6 text-info restore-guest-pass-btn" data-guest-pass-id="{{ guest.hash }}" data-bs-toggle="tooltip" data-bs-original-title="Restore">
+                <i class="bi bi-bootstrap-reboot"></i>
+            </a>
+        {% endif %}
+
+    </td>
+</tr>

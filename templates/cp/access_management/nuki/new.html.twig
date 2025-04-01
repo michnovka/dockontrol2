@@ -1,0 +1,18 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Nuki{% endblock %}
+{% set active = 'nukis' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_nukis'), 'title': 'Nukis'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+{% block content %}
+    {% include 'cp/access_management/nuki/form.html.twig' %}
+{% endblock %}

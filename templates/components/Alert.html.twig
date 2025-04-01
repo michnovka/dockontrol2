@@ -1,0 +1,11 @@
+<div class="alert alert-{{ type }} border-0 alert-dismissible fade show">
+    <div class="alert-inner">
+        {{ message }}
+    </div>
+    {% if show_closable_button is not defined %}
+        {% set show_closable_button = true %}
+    {% endif %}
+    {% if show_closable_button %}
+        <button type="button" class="btn-close close-alert-btn" data-bs-dismiss="alert"></button>
+    {% endif %}
+</div>

@@ -1,0 +1,11 @@
+<tr>
+    <td>{{ loginLog.id }}</td>
+    <td>{{ loginLog.time.format('Y-m-d H:i:s') }}</td>
+    <td>{{ loginLog.user.email|lower }}</td>
+    <td>{{ loginLog.ip }}</td>
+    <td>{{ loginLog.browser }}</td>
+    <td>{{ loginLog.platform }}</td>
+    <td>
+        <span class="badge rounded-pill bg-{{ loginLog.fromRememberMe ? 'success' : 'danger' }}">{{ loginLog.fromRememberMe ? 'Yes' : 'No' }}</span>
+    </td>
+</tr>

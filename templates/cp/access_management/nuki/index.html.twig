@@ -1,0 +1,123 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Nukis | Access Management{% endblock %}
+{% set active = 'nukis' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'title': 'Nukis'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_access_management_nuki_new'),
+        'title': 'Create New Nuki',
+    }
+] %}
+{% block content %}
+    {% include 'cp/access_management/nuki/filter.html.twig' %}
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>{{ knp_pagination_sortable(nukis, 'Id', 'n.id') }}</th>
+                    <th>{{ knp_pagination_sortable(nukis, 'User', 'u.name') }}</th>
+                    <th>Name</th>
+                    <th>DOCKontrol Node Nuki API Server</th>
+                    <th>Username</th>
+                    <th>Can Lock</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for nuki in nukis %}
+                    {% include 'cp/access_management/nuki/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan=" {% if is_granted('ROLE_SUPER_ADMIN') %} 9 {% else %} 7 {% endif %}">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': nukis}) }}
+    </div>
+    <div class="modal fade" id="delete_nuki_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_nuki_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Nuki
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following nuki is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_nuki_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect username.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_nuki" name="_csrf_token_nuki" id="_csrf_token_nuki" value="{{ csrf_token("nukicsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-nuki text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let deleteNukiBtns = document.querySelectorAll('.delete-nuki-btn');
+        let deleteNukiModal = new bootstrap.Modal(document.getElementById('delete_nuki_modal'), {});
+        let deleteNukiForm = document.getElementById('delete_nuki_form');
+
+        deleteNukiBtns.forEach((el) => {
+           el.addEventListener('click', (e) => {
+               let nukiId = el.dataset.nukiId;
+               document.getElementById('delete_nuki_name').textContent = el.dataset.nukiName;
+               deleteNukiModal.show();
+
+               deleteNukiForm.addEventListener('submit', (e) => {
+                   e.preventDefault();
+                   let csrfToken = document.getElementById('_csrf_token_nuki').value;
+                   let deleteNukiURL = "{{ path('cp_access_management_nuki_delete', {'id': '__ID__'}) }}";
+                   deleteNukiURL = deleteNukiURL.replace('__ID__', nukiId);
+                   let formData = new FormData();
+                   formData.append('_csrf', csrfToken);
+
+                   fetch(deleteNukiURL, {
+                       method: 'POST',
+                       body: formData
+                   }).then((response) => {
+                       return response.json();
+                   }).then((res) => {
+                       if (res.status) {
+                           document.location.reload();
+                       } else {
+                           document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                           document.querySelector('.generic_error').classList.remove('d-none');
+                           setTimeout(function() {
+                               document.querySelector('.generic_error').classList.add('d-none');
+                           }, 2500);
+                       }
+                   });
+               });
+           });
+        });
+    </script>
+{% endblock %}

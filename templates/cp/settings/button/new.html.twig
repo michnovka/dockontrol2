@@ -1,0 +1,19 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Button{% endblock %}
+{% set active = 'buttons' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_button'),
+        'title': 'Buttons'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/button/form.html.twig' %}
+{% endblock %}

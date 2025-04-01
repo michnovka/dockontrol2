@@ -1,0 +1,136 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Groups | Access Management{% endblock %}
+{% set active = 'groups' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'title': 'Groups'
+    }
+] %}
+
+{% set actions = [
+    {
+        'link': path('cp_access_management_group_new'),
+        'title': 'Create New Group',
+    }
+] %}
+{% block content %}
+    <div class="card mb-2">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>{{ knp_pagination_sortable(groups, 'Name', 'g.name') }}</th>
+                <th>Users</th>
+                <th>As Default Group for Buildings</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for group in groups %}
+                {% include 'cp/access_management/group/row.html.twig' %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No records found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': groups}) }}
+
+    </div>
+    <div class="modal fade" id="delete_group_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_group_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Group
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following group is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_group_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the group, which you want to delete.</h6>
+                        <input type="text" class="confirm-group-name form-control" id="confirm-group-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect group name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_group" name="_csrf_token_group" id="_csrf_token_group" value="{{ csrf_token("groupcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-group text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let deleteBtns = document.querySelectorAll('.delete-group-btn');
+            let deleteForm = document.getElementById('delete_group_form');
+            let deleteModal = new bootstrap.Modal(document.getElementById('delete_group_modal'), {});
+
+            deleteBtns.forEach((el) => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    let groupName = this.getAttribute('data-name');
+                    let groupId = this.getAttribute('data-id');
+                    document.getElementById('delete_group_name').innerText = groupName;
+                    deleteModal.show();
+
+                    deleteForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        let confirmGroupName = document.getElementById('confirm-group-name').value;
+                        if (confirmGroupName !== groupName) {
+                            document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                            }, 2500);
+                        } else {
+                            let deleteURL = '{{ path('cp_access_management_group_delete', {'id': '__ID__'}) }}';
+                            deleteURL = deleteURL.replace('__ID__', groupId);
+                            let _csrf = document.getElementById('_csrf_token_group').value;
+                            let formData = new FormData();
+                            formData.append('_csrf', _csrf);
+                            fetch(deleteURL, {
+                                method: 'POST',
+                                body: formData
+                            }).then((res) => {
+                                return res.json();
+                            }).then((response) => {
+                                if (response.status) {
+                                    deleteModal.hide();
+                                    window.location.reload();
+                                } else {
+                                    document.querySelector('.generic_error').innerHTML = response.errorMessage;
+                                    document.querySelector('.generic_error').classList.remove('d-none');
+                                    setTimeout(function() {
+                                        document.querySelector('.generic_error').classList.add('d-none');
+                                    }, 2500)
+                                }
+                            })
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,14 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(signupCodeForm) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-12">
+                {{ form_row(signupCodeForm.apartment) }}
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Create Signup Code</button>
+            </div>
+        </div>
+    </div>
+    {{ form_end(signupCodeForm) }}
+</div>

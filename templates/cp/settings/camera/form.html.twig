@@ -1,0 +1,259 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(cameraForm) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-4">
+                {{ form_row(cameraForm.nameId) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(cameraForm.friendlyName) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(cameraForm.permissionRequired) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(cameraForm.dockontrolNode) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(cameraForm.dockontrolNodePayload) }}
+            </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-2 text-start">
+                <button class="btn btn-primary w-100">{{ show_submit_label|default('Create Camera') }}</button>
+            </div>
+            {{ form_end(cameraForm) }}
+        </div>
+    </div>
+</div>
+
+{% if camera is defined and camera is not null %}
+    <div class="modal fade" id="backup_camera_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info">
+                    <h6 class="card-title text-white">
+                        Manage Backup Cameras
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body p-2">
+                    {{ form_start(cameraBackupForm) }}
+                    {{ form_widget(cameraBackupForm) }}
+
+                    <div class="col-md-12 text-end">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Backup Camera</button>
+                    </div>
+                    {{ form_end(cameraBackupForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="edit_camera_backup_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info">
+                    <h6 class="card-title text-white">
+                        Edit Camera Backup
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body" id="edit-modal-form">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete_camera_backup_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_camera_backup_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Camera Backup
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following camera backup is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_camera_backup_id"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="delete_camera_backup_csrf" name="delete_camera_backup_csrf" id="delete_camera_backup_csrf" value="{{ csrf_token('camerabackup') }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-none">
+        <div class="card-body p-2">
+            <div class="d-flex justify-content-between">
+                <p class="card-title">Camera Backups</p>
+                <button type="button" class="btn btn-sm btn-primary" id="add-backup-camera-btn" data-toggle="modal" data-target="#backup_camera_modal">
+                    Create New Camera Backup
+                </button>
+            </div>
+            <div class="table-responsive rounded">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>DOCKontrol Node</th>
+                        <th>DOCKontrol Node Payload</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cameraBackup in camera.cameraBackups %}
+                        <tr>
+                            <td>{{ cameraBackup.id }}</td>
+                            <td>{{ cameraBackup.dockontrolNode.name }}</td>
+                            <td>{{ cameraBackup.dockontrolNodePayload |json_encode }}</td>
+                            <td class="text-end">
+                                <a href="#" class="text-decoration-none fs-6 text-body edit-backup-camera-btn" data-camera-backup-id="{{ cameraBackup.id }}" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-backup-camera-btn" data-camera-backup-id="{{ cameraBackup.id }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No result found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let backupCameraModal = new bootstrap.Modal(document.getElementById('backup_camera_modal'), {});
+        let addBackupCameraBtn = document.getElementById('add-backup-camera-btn');
+
+        addBackupCameraBtn.addEventListener('click', (e) => {
+            backupCameraModal.show();
+        });
+
+        let invalidFeedback = document.getElementById('backup_camera_modal').querySelector('.invalid-feedback');
+
+        if (invalidFeedback !== null) {
+            let isVisible = window.getComputedStyle(invalidFeedback).getPropertyValue('display') !== 'none' &&
+                window.getComputedStyle(invalidFeedback).getPropertyValue('visibility') !== 'hidden';
+
+            if (isVisible) {
+                backupCameraModal.show();
+            }
+        }
+
+        let deleteCameraBackupBtns = document.querySelectorAll('.delete-backup-camera-btn');
+        let deleteCameraBackupModal = new bootstrap.Modal(document.getElementById('delete_camera_backup_modal'), {});
+        let deleteCameraBackupForm = document.getElementById('delete_camera_backup_form');
+
+        deleteCameraBackupBtns.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let cameraBackupId = el.getAttribute('data-camera-backup-id');
+                let cameraBackupInfo = document.getElementById('delete_camera_backup_id');
+                cameraBackupInfo.innerText = cameraBackupId;
+                deleteCameraBackupModal.show();
+
+                deleteCameraBackupForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let csrfToken = document.getElementById('delete_camera_backup_csrf').value;
+                    let deleteURL = "{{ path('cp_settings_camera_backup_delete', {'id': '__ID__'}) }}";
+                    deleteURL = deleteURL.replace('__ID__', cameraBackupId);
+                    let formData = new FormData();
+                    formData.append('_csrf', csrfToken);
+                    fetch(deleteURL, {
+                        body: formData,
+                        method: 'POST'
+                    }).then((response) => {
+                        return response.json();
+                    }).then((res) => {
+                        if (res.status) {
+                            deleteCameraBackupModal.hide();
+                            window.location.reload();
+                        } else {
+                            document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                            document.querySelector('.generic_error').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.generic_error').classList.add('d-none');
+                            }, 2500)
+                        }
+                    });
+                });
+            });
+        });
+
+        let editCameraBackupBtns = document.querySelectorAll('.edit-backup-camera-btn');
+        let editCameraBackupModal = new bootstrap.Modal(document.getElementById('edit_camera_backup_modal'), {});
+
+        editCameraBackupBtns.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let cameraBackupId = el.getAttribute('data-camera-backup-id');
+                let formContent = document.getElementById('edit-modal-form');
+                formContent.innerHTML = '';
+                let formContentURL = "{{ path('cp_settings_camera_backup_edit_popup', {'id': '__ID__'}) }}";
+                formContentURL = formContentURL.replace('__ID__', cameraBackupId);
+                fetch(formContentURL).then((response) => {
+                    return response.json();
+                }).then((res) => {
+                    formContent.innerHTML = res.content;
+                    editCameraBackupModal.show();
+                    const dockontrolNodeEl = document.querySelector('.edit-camera-backup-dockontrol-node');
+                    new Choices(dockontrolNodeEl, {
+                        allowHTML: true,
+                        searchEnabled: false,
+                        searchChoices: false,
+                    })
+                    let editCameraBackupForm = document.getElementById('edit-camera-backup-form');
+                    editCameraBackupForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        let formData = new FormData(e.target);
+                        let editCameraBackupURL = "{{ path('cp_settings_camera_backup_edit', {'id': '__ID__'}) }}";
+                        editCameraBackupURL = editCameraBackupURL.replace('__ID__', cameraBackupId);
+                        fetch(editCameraBackupURL, {
+                            'method': 'POST',
+                            'body': formData,
+                        }).then((response) => {
+                            return response.json();
+                        }).then((res) => {
+                            if (res.success) {
+                                location.reload();
+                            } else {
+                                document.getElementById('edit_camera_backup_modal').querySelector('.generic_error').innerHTML = res.errorMessage;
+                                document.getElementById('edit_camera_backup_modal').querySelector('.generic_error').classList.remove('d-none');
+                                setTimeout(function() {
+                                    document.querySelector('.generic_error').classList.add('d-none');
+                                }, 2500);
+                            }
+                        });
+                    });
+                })
+            });
+        });
+    });
+</script>
+{% endif %}

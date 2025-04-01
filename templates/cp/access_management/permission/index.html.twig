@@ -1,0 +1,133 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Permissions | Access Management{% endblock %}
+{% set active = 'permissions' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management'),
+    },
+    {
+        'title': 'Permissions'
+    }
+] %}
+
+{% set actions = [
+    {
+        'link': path('cp_access_management_permission_new'),
+        'title': 'Create New Permission',
+    }
+] %}
+{% block content %}
+<div class="card mb-2">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>{{ knp_pagination_sortable(permissions, 'Name', 'p.name') }}</th>
+                <th>{{ knp_pagination_sortable(permissions, 'Name Pretty', 'p.namePretty') }}</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for permission in permissions %}
+                {% include 'cp/access_management/permission/row.html.twig' %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No records found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': permissions}) }}
+</div>
+    <div class="modal fade" id="delete_permission_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_permission_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Permission
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following permission is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_permission_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the permission, which you want to delete.</h6>
+                        <input type="text" class="confirm-permission-name form-control" id="confirm-permission-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect permission name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_permission" name="_csrf_token_permission" id="_csrf_token_permission" value="{{ csrf_token("permissioncsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-permission text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let deleteBtns = document.querySelectorAll('.delete-permission-btn');
+            let deleteForm = document.getElementById('delete_permission_form');
+            let deleteModal = new bootstrap.Modal(document.getElementById('delete_permission_modal'), {});
+
+            deleteBtns.forEach((el) => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    let permissionName = this.getAttribute('data-name');
+                    document.getElementById('delete_permission_name').innerText = permissionName;
+                    deleteModal.show();
+
+                    deleteForm.addEventListener('submit', function (e) {
+                       e.preventDefault();
+                       let confirmPermissionName = document.getElementById('confirm-permission-name').value;
+                       if (confirmPermissionName !== permissionName) {
+                           document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                           setTimeout(function() {
+                               document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                           }, 2500);
+                       } else {
+                           let deleteURL = '{{ path('cp_access_management_permission_delete', {'name': '__NAME__'}) }}';
+                           deleteURL = deleteURL.replace('__NAME__', permissionName);
+                           let _csrf = document.getElementById('_csrf_token_permission').value;
+                           let formData = new FormData();
+                           formData.append('_csrf', _csrf);
+                           fetch(deleteURL, {
+                               method: 'POST',
+                               body: formData
+                           }).then((res) => {
+                               return res.json();
+                           }).then((response) => {
+                               if (response.status) {
+                                   deleteModal.hide();
+                                   window.location.reload();
+                               } else {
+                                   document.querySelector('.generic_error').innerHTML = response.errorMessage;
+                                   document.querySelector('.generic_error').classList.remove('d-none');
+                                   setTimeout(function() {
+                                       document.querySelector('.generic_error').classList.add('d-none');
+                                   }, 2500)
+                               }
+                           })
+                       }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}

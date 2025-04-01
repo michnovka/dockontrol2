@@ -1,0 +1,548 @@
+{% extends 'pz/pz_base.html.twig' %}
+
+{% block title %} {{ 'dockontrol.home.home'|trans }}{% endblock %}
+{% set buttonColorEnum = enum("\\App\\Entity\\Enum\\ButtonStyle") %}
+{% set pageTitle = 'DOCKontrol'%}
+{% set formSubmitBtn = false %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/button-icons-animation.css') }}">
+{% endblock %}
+{% block linkpreloads %}
+    <link rel="preload" href="{{ asset('assets/images/camera_not_found.jpg') }}" as="image" fetchpriority="low" crossorigin="anonymous">
+    <link rel="preload" href="{{ asset('assets/images/loading-bg.jpg') }}" as="image" fetchpriority="low" crossorigin="anonymous">
+{% endblock %}
+{% block content %}
+    <div class="card border-0 shadow-none container-md">
+        {% if hasNodesWhichAreNotOnline %}
+            {% if hasAdminBeenNotified %}
+                <div class="alert alert-warning border-0 alert-dismissible fade show mt-2" role="alert">
+                    <strong>{{ 'dockontrol.home.has_admin_been_notified.title'|trans }}</strong> {{ 'dockontrol.home.has_admin_been_notified.message'|trans }}
+                    <button type="button" class="btn-close close-alert-btn" data-bs-dismiss="alert"></button>
+                </div>
+            {% else %}
+                <div class="alert alert-danger fade show mt-2" role="alert">
+                    <strong>{{ 'dockontrol.home.not_admin_been_notified.title'|trans }}</strong> {{ 'dockontrol.home.not_admin_been_notified.message'|trans }}
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if isGuest %}
+            {% set checkCarEnterExitAllowedAndShow = app.user.user.carEnterExitAllowed and app.user.user.carEnterExitShow %}
+        {% else %}
+            {% set checkCarEnterExitAllowedAndShow = app.user.carEnterExitAllowed and app.user.carEnterExitShow %}
+        {% endif %}
+        {% include 'pz/common/messages.html.twig' %}
+        {% if not isGuest %}
+            {% if not app.user.emailVerified %}
+                <div class="alert alert-warning fade show" role="alert">
+                    <strong>{{ 'dockontrol.home.email_not_verified.title'|trans }}</strong> {{ 'dockontrol.home.email_not_verified.message'|trans }}
+                    {{ app.user.lastEmailSentTime|show_verification_link }}
+                </div>
+                <input type="hidden" id="email-verification-csrf" value="{{ csrf_token('dockontrolrequestemailverification') }}">
+            {% endif %}
+            {% for announcement in announcements %}
+                <div class="alert announcement-alert alert-dismissible fade show mt-2" role="alert">
+                    <h6 class="fw-medium">{{ announcement.subject }}</h6>
+                    <hr>
+                    <span class="mb-0">{{ announcement.content }}</span>
+                    <button type="button" class="btn-close close-alert-btn" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% include 'pz/common/floating_message_alert.html.twig' %}
+
+        {% if checkCarEnterExitAllowedAndShow  %}
+            <div class="row main">
+                <div class="col-md-6 mt-2">
+                    <div class="input-group mb-2">
+                        <twig:Button name="action"
+                                     id="enter"
+                                     value="enter"
+                                     customStyle="{{ buttonColorEnum.BLUE }}"
+                                     text="{{ 'dockontrol.home.buttons.car_enter'|trans|upper }}"
+                                     formSubmitButton="{{ false }}"
+                                     carActions="{{ true }}"
+                        >
+                        </twig:Button>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-2">
+                    <div class="input-group mb-2">
+                        <twig:Button name="action"
+                                     id="exit"
+                                     value="exit"
+                                     customStyle="{{ buttonColorEnum.RED }}"
+                                     text="{{ 'dockontrol.home.buttons.car_exit'|trans|upper }}"
+                                     formSubmitButton="{{ false }}"
+                                     carActions="{{ true }}"
+                        >
+                        </twig:Button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% set modalButtons = {} %}
+        {% if customSortingGroups is defined and customSortingGroups is not null %}
+            {% for customSortingGroup in customSortingGroups %}
+                {% if not customSortingGroup.isGroupForModal %}
+                    <div class="row main mt-3">
+                        {% if customSortingGroup.name is not null %}
+                            <div class="col-md-12">
+                                <h4 class="text-center fw-400">{{ customSortingGroup.name }}</h4>
+                            </div>
+                        {% endif %}
+                        {% for sortingGroup in customSortingGroup.customSortingElements %}
+                            <div class="{% if customSortingGroup.columnSize == 1  %} col-md-12 {% elseif customSortingGroup.columnSize == 2 %} col-md-6 {% else %} col-md-4 {% endif %} mt-2">
+                                <div class="input-group mb-2">
+                                {% set buttonName = sortingGroup.button.name %}
+                                {% set nameSpecification = nameConflicts[buttonName] > 1 ? sortingGroup.button.nameSpecification|upper : '' %}
+                                {% set buttonText = sortingGroup.customName ? sortingGroup.customName|upper : buttonName|upper ~ ' ' ~  nameSpecification %}
+                                <twig:Button
+                                        name="{{ sortingGroup.button.action.name }}"
+                                        buttonObj="{{ sortingGroup.button }}"
+                                        customStyle="{{ sortingGroup.customButtonStyle }}"
+                                        customName="{{ sortingGroup.customName ? sortingGroup.customName|upper : '' }}"
+                                        id="{{ sortingGroup.button.id }}"
+                                        value="{{ sortingGroup.button.name }}"
+                                        text="{{ buttonText|translate_button_text|upper }}"
+                                        formSubmitButton="{{ formSubmitBtn }}"
+                                        allowCamera="{{ is_granted('ROLE_TENANT') and camerasShow }}"
+                                        actionButton="{{ true }}"
+                                        allow1min="{{ sortingGroup.allow1MinOpen }}"
+                                        customAllow1min="{{ sortingGroup.allow1MinOpen }}"
+                                >
+                                </twig:Button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {% if customSortingGroup.customSortingElements|length > 0 %}
+                        {% for sortingElement in customSortingGroup.customSortingElements %}
+                            {% set parentButtonId = customSortingGroup.isGroupForModal.button.id %}  {# Get the parent button ID #}
+                            {% set customName = sortingElement.customName %}
+                            {% set customColor = sortingElement.customButtonStyle %}
+                            {% set button = sortingElement.button.id %}
+                            {% set sortIndex = sortingElement.sortIndex %}
+                            {% set sortingData = sortingElement %}
+                            {% if modalButtons[parentButtonId] is not defined %}
+                                {% set modalButtons = modalButtons|merge({(parentButtonId): []}) %}
+                            {% endif %}
+                            {% set modalButtons = modalButtons|merge({(parentButtonId): modalButtons[parentButtonId]|merge([sortingData])}) %}
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% else %}
+
+            <div class="row main mt-2">
+                {% if gateButtons|length > 0 %}
+                    <div class="col-md-12">
+                        <h5 class="text-center fw-400">{{ 'dockontrol.home.gates'|trans }}</h5>
+                    </div>
+
+                    {% for gateButton in gateButtons %}
+                        <div class="col-md-6 mt-2">
+                            <div class="input-group mb-2">
+                                {% set buttonName = gateButton.name %}
+                                {% set buttonText = buttonName ~ ' ' ~ (nameConflicts[buttonName] > 1 ? gateButton.nameSpecification|upper : '') %}
+                                <twig:Button
+                                        buttonObj="{{ gateButton }}"
+                                        id="{{ gateButton.action.name }}_options"
+                                        name="{{ buttonName }}"
+                                        text="{{ buttonText|translate_button_text|upper }}"
+                                        formSubmitButton="{{ formSubmitBtn }}"
+                                        allowCamera="{{ is_granted('ROLE_TENANT') and camerasShow }}"
+                                        allow1min="{{ gateButton.allow1MinOpen }}"
+                                        actionButton="{{ true }}"
+                                >
+                                </twig:Button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="row main mt-2">
+                {% if entranceButtons|length > 0 %}
+                    <div class="col-md-12">
+                        <h5 class="text-center fw-400">{{ 'dockontrol.home.entrances'|trans }}</h5>
+                    </div>
+
+                    {% for entranceButton in entranceButtons %}
+                        <div class="col-md-4 mt-2">
+                            <div class="input-group mb-2">
+                                {% set buttonName = entranceButton.name %}
+                                {% set buttonText = buttonName ~ ' ' ~ (nameConflicts[buttonName] > 1 ? entranceButton.nameSpecification|upper : '') %}
+                                <twig:Button
+                                        buttonObj="{{ entranceButton }}"
+                                        name="{{ buttonName }}"
+                                        text="{{ buttonText|translate_button_text|upper }}"
+                                        id="{{ entranceButton.action.name }}_options"
+                                        formSubmitButton="{{ formSubmitBtn }}"
+                                        allowCamera="{{ is_granted('ROLE_TENANT') and camerasShow }}"
+                                        actionButton="{{ true }}"
+                                        allow1min="{{ entranceButton.allow1MinOpen }}"
+                                >
+                                </twig:Button>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% for elevatorButton in elevatorButtons %}
+                        <div class="col-md-4 mt-2">
+                            <div class="input-group mb-2">
+                                {% set buttonName = elevatorButton.name %}
+                                {% set buttonText = buttonName ~ ' ' ~ (nameConflicts[buttonName] > 1 ? elevatorButton.nameSpecification|upper : '') %}
+                                <twig:Button
+                                        buttonObj="{{ elevatorButton }}"
+                                        name="{{ buttonName }}"
+                                        id="{{ elevatorButton.action.name }}"
+                                        text="{{ buttonText|translate_button_text|upper }}"
+                                        value="unlock_{{ elevatorButton.id }}"
+                                        formSubmitButton="{{ formSubmitBtn }}"
+                                        actionButton="{{ true }}"
+                                        allow1min="{{ elevatorButton.allow1MinOpen }}"
+                                >
+                                </twig:Button>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% for multiButton in  multiButtons %}
+                        <div class="col-md-4 mt-2">
+                            <div class="input-group mb-2">
+                                {% set buttonName = multiButton.name %}
+                                {% set buttonText = buttonName ~ ' ' ~ (nameConflicts[buttonName] > 1 ? multiButton.nameSpecification|upper : '') %}
+                                <twig:Button
+                                        buttonObj="{{ multiButton }}"
+                                        id="{{ multiButton.action.name }}_options"
+                                        name="{{ buttonName|upper }}"
+                                        text="{{ buttonText|translate_button_text|upper }}"
+                                        formSubmitButton="{{ formSubmitBtn }}"
+                                        allowCamera="{{ is_granted('ROLE_TENANT') and camerasShow }}"
+                                        actionButton="{{ true }}"
+                                        allow1min="{{ multiButton.allow1MinOpen }}"
+                                >
+                                </twig:Button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_ADMIN') or is_granted('ROLE_TENANT') %}
+            <div class="row main mt-2">
+                {% if nukis|length > 0 %}
+                    <div class="col-md-12">
+                        <h5 class="text-center fw-400">{{ 'dockontrol.home.nuki'|trans }}</h5>
+                    </div>
+
+                    {% for nuki in nukis %}
+                        <div class="{% if nuki.canLock %} col-md-6 {% else%} col-md-12 {% endif %} mt-2">
+                            <div class="input-group mb-2">
+                                <twig:Button name="action"
+                                             id="nuki_unlock_{{ nuki.name }}"
+                                             value="nuki_unlock_{{ nuki.name }}"
+                                             text="{{ 'dockontrol.home.buttons.unlock'|trans|upper }} {{ nuki.name|upper }}"
+                                             formSubmitButton="{{ formSubmitBtn }}"
+                                             nukiButton="{{ true }}"
+                                             nukiId="{{ nuki.id }}"
+                                             pinEnabled="{{ nuki.pin is not empty }}"
+                                >
+                                </twig:Button>
+                            </div>
+                        </div>
+                        {% if nuki.canLock %}
+                        <div class="col-md-6 mt-2">
+                            <div class="input-group mb-2">
+                                <twig:Button name="action"
+                                             id="nuki_lock_{{ nuki.name }}"
+                                             value="nuki_lock_{{ nuki.name }}"
+                                             text="{{ 'dockontrol.home.buttons.lock'|trans|upper }} {{ nuki.name|upper }}"
+                                             formSubmitButton="{{ formSubmitBtn }}"
+                                             nukiButton="{{ true }}"
+                                             nukiIsLock="{{ true }}"
+                                             nukiId="{{ nuki.id }}"
+                                             pinEnabled="{{ nuki.pin is not empty }}"
+                                >
+                                </twig:Button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% if hasMissingButtons %}
+                <p class="fw-bold mt-3 text-center">{{ 'dockontrol.home.has_missing_button'|trans }}</p>
+            {% endif %}
+        {% elseif is_granted('ROLE_GUEST') %}
+            <h4 class="text-center"><span>{{ 'dockontrol.home.legenda.heading'|trans }}</span></h4>
+            <div class="text-left">
+                <p>{{ 'dockontrol.home.legenda.description'|trans }}</p>
+                <p><strong>{{ 'dockontrol.home.legenda.car_enter_exit.car_enter_exit'|trans }}</strong> - {{ 'dockontrol.home.legenda.car_enter_exit.message'|trans }}</p>
+                <p><strong>{{ 'dockontrol.home.legenda.guest_and_entrances.guest_and_entrances'|trans }}</strong> - {{ 'dockontrol.home.legenda.guest_and_entrances.message'|trans }}</p>
+            </div>
+        {% endif %}
+        {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_ADMIN') or is_granted('ROLE_TENANT') and app.user.nukis|length > 0 %}
+            <div class="modal fade" id="password2-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-secondary">
+                            <h5 class="modal-title mb-0" id="exampleModalLongTitle">
+                                {{ 'dockontrol.settings.nuki.setup_password2_modal.title'|trans }}
+                            </h5>
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="add_password2_form">
+                            <div class="modal-body">
+                                <p class="text-muted">
+                                    {{ 'dockontrol.settings.nuki.setup_password2_modal.description'|trans }}
+                                </p>
+
+                                <div class="mb-2">
+                                    <input type="password" id="password2" class="form-control"
+                                           placeholder="{{ 'dockontrol.settings.nuki.setup_password2_modal.password2'|trans }}"
+                                           autocomplete="new-password" required>
+                                </div>
+
+                                <div>
+                                    <input type="password" id="repeat_password2" class="form-control"
+                                           placeholder="{{ 'dockontrol.settings.nuki.setup_password2_modal.repeat_password2'|trans }}"
+                                           autocomplete="new-password" required>
+                                </div>
+
+                                <div>
+                                            <span class="validation-invalid-label incorrect_password text-danger d-none">
+                                                {{ 'dockontrol.settings.nuki.messages.passwords_do_not_match'|trans }}
+                                            </span>
+                                    <span class="validation-invalid-label generic_error text-danger d-none">
+                                                {{ 'dockontrol.settings.nuki.messages.can_not_use_this_password_because_it_is_current_password'|trans }}
+                                            </span>
+                                </div>
+
+                                <input type="hidden" id="password2_nuki_csrf" value="{{ csrf_token('nukicsrf') }}">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'dockontrol.settings.nuki.setup_password2_modal.close_button'|trans }}</button>
+                                <button type="submit" class="btn btn-primary" id="savePassword">{{ 'dockontrol.settings.nuki.setup_password2_modal.save_button'|trans }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% include 'pz/common/pin_modal.html.twig' %}
+        {% endif %}
+        <div class="modal fade show" id="camera-modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h6 class="card-title text-white m-0 p-0" id="camera-modal-title"></h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-0">
+{#                        <img src="{{ asset('assets/images/loading.jpg') }}" alt="Loading..." class="img-fluid" id="loading-img">#}
+
+                        <div id="img-container" class="d-none"></div>
+                        <div id="loading-element">
+                        </div>
+
+                        <div class="pause-overlay" id="pause-overlay">
+                            <div class="paused_container d-none" id="paused-container">
+                                <img src="{{ asset('assets/images/pause.svg') }}" width="50">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer m-0 p-0">
+                        <div class="row d-flex w-100 modal-buttons">
+                            <div class="col-md-6 m-0 p-1">
+                                <twig:Button
+                                        id="single_open"
+                                        customStyle="{{ buttonColorEnum.BLUE }}"
+                                        text="Single Open"
+                                        formSubmitButton="{{ false }}"
+                                        name="single_open"
+                                        allow1min="{{ false }}"
+                                />
+                            </div>
+                            <div class="col-md-6 m-0 p-1">
+                                <twig:Button
+                                        id="one_minute_open"
+                                        name="one_minute_open"
+                                        customStyle="{{ buttonColorEnum.RED }}"
+                                        text="Open For 1 Min"
+                                        formSubmitButton="{{ false }}"
+                                        allow1min="{{ true }}"
+                                />
+                            </div>
+                        </div>
+
+                        {% for buttonId, buttonElements in modalButtons %}
+                            <div id="modal_btn_{{ buttonId }}" class="d-none row d-flex w-100 custom-modal-buttons">
+                                {% for sortingGroup in buttonElements %}
+                                    <div class="{% if sortingGroup.customSortingGroup.columnSize == 2 %} col-md-6 {% else %} col-md-12 {% endif %} m-0 p-1">
+                                        <twig:Button
+                                                name="{{ sortingGroup.button.action.name }}"
+                                                buttonObj="{{ sortingGroup.button }}"
+                                                customStyle="{{ sortingGroup.customButtonStyle }}"
+                                                customName="{{ sortingGroup.customName ? sortingGroup.customName|upper : '' }}"
+                                                id="{{ sortingGroup.button.id }}"
+                                                value="{{ sortingGroup.button.name }}"
+                                                text="{{ sortingGroup.customName ? sortingGroup.customName|upper : sortingGroup.button.name|upper }}"
+                                                formSubmitButton="{{ false }}"
+                                                allowCamera="{{ false }}"
+                                                actionButton="{{ true }}"
+                                                allow1min="{{ sortingGroup.allow1MinOpen }}"
+                                                customAllow1min="{{ sortingGroup.allow1MinOpen }}"
+                                        >
+                                        </twig:Button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not app.user.timeTosAccepted %}
+        <div class="modal fade show" id="tos-modal" tabindex="-1" aria-labelledby="tosModalLabel" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center">{{ 'dockontrol.home.tos_modal.card_title'|trans }}</h5>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p>{{ 'dockontrol.home.tos_modal.info_text'|trans }}
+                            <a href="{{ path('dockontrol_terms_of_service') }}" target="_blank">{{ 'dockontrol.home.tos_modal.card_title'|trans }}</a>.
+                        </p>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button class="btn btn-primary me-3" id="accept-tos">{{ 'dockontrol.home.tos_modal.accept'|trans }}</button>
+                            <a href="https://european-union.europa.eu" class="btn btn-danger">{{ 'dockontrol.home.tos_modal.do_not_accept'|trans }}</a>
+                        </div>
+                        <input type="hidden" value="{{ csrf_token('toscsrf') }}" id="tos_csrf">
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="modal fade" id="btn-hold-info-modal" tabindex="-1" aria-labelledby="btn-hold-info-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="btn-hold-info-label">{{ 'dockontrol.home.btn_hold_info_modal.title'|trans }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ 'dockontrol.home.btn_hold_info_modal.info_text'|trans }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'dockontrol.settings.nuki.setup_password2_modal.close_button'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let executeButtonURL;
+        let buttonPressType;
+        let carEnterURL;
+        let carExitURL;
+        let validatePassword2URL;
+        let acceptTermsURL;
+        let nukiEngageURL;
+        let webauthnGetArgsURL;
+        let webauthnProcessGetURL;
+        {% if isGuest %}
+            {% set hash = app.request.attributes.get('hash') %}
+            executeButtonURL = "{{ path('dockontrol_guest_button_execute', {'hash': hash, 'id': '__ID__'}) }}"
+            buttonPressType = "{{ app.user.user.buttonPressType.readable }}";
+            carEnterURL = "{{ path('dockontrol_guest_car_enter_exit', {'hash': hash, 'which': 'enter'}) }}";
+            carExitURL = "{{ path('dockontrol_guest_car_enter_exit', {'hash': hash, 'which': 'exit'}) }}";
+            acceptTermsURL = "{{ path('dockontrol_guest_accept_terms_of_service', {'hash': hash}) }}";
+        {% else %}
+            executeButtonURL = "{{ path('dockontrol_button_execute', {'id': '__ID__'}) }}";
+            buttonPressType = "{{ app.user.buttonPressType.readable }}";
+            carEnterURL = "{{ path('dockontrol_car_enter_exit', {'which': 'enter'}) }}";
+            carExitURL = "{{ path('dockontrol_car_enter_exit', {'which': 'exit'}) }}";
+            validatePassword2URL = "{{ path('pz_validate_nuki_password2') }}";
+            acceptTermsURL = "{{ path('dockontrol_accept_terms_of_service') }}";
+            nukiEngageURL = "{{ path('dockontrol_nuki_engage', {'id': '__ID__'}) }}";
+            webauthnGetArgsURL = "{{ path('dockontrol_webauthn_get_args') }}";
+            webauthnProcessGetURL = "{{ path('dockontrol_webauthn_process_get_and_engage', {'id': '__ID__'}) }}";
+        {% endif %}
+        let timeoutMessage = "{{ 'dockontrol.home.messages.timout_message'|trans }}";
+        let operationCancelledMessage = "{{ 'dockontrol.home.messages.operation_cancelled'|trans }}";
+        let fetchCameraUuidURL = "{{ path('dockontrol_camera_get_camera_session') }}";
+        let viewCameraURL = "{{ path('dockontrol_camera_view', {'cameraId': '__ID__', 'cameraSessionId': '__CAMERA_SESSION_ID__'}) }}";
+        let buttonCSRF = "{{ buttonCSRF }}";
+    </script>
+    <script src="{{ asset('assets/js/pin-modal.js') }}"></script>
+    <script src="{{ asset('assets/js/webauthn_common.js') }}"></script>
+    <script src="{{ asset('assets/js/button.js') }}"></script>
+    <script src="{{ asset('assets/js/camera-button.js') }}"></script>
+    <script src="{{ asset('assets/js/jsOTP.js') }}"></script>
+    <script src="{{ asset('assets/js/base32.min.js') }}"></script>
+    {% if not isGuest %}
+        {% if not app.user.emailVerified %}
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                let emailVerificationElement = document.getElementById('send-verification-mail');
+                let csrfTokenElement = document.getElementById('email-verification-csrf');
+                if (emailVerificationElement !== null && csrfTokenElement !== null) {
+                    emailVerificationElement.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let csrfToken = csrfTokenElement.value;
+                        let spinnerElement = document.createElement('div');
+                        spinnerElement.className = 'spinner-border spinner-border-sm text-body d-none';
+                        spinnerElement.role = "status";
+                        spinnerElement.innerHTML = '<span class="visually-hidden">Loading...</span>';
+                        emailVerificationElement.parentElement.appendChild(spinnerElement);
+                        emailVerificationElement.classList.add('d-none');
+                        spinnerElement.classList.remove('d-none');
+                        let formData = new FormData();
+                        formData.append('_csrf', csrfToken);
+                        fetch('{{ path('dockontrol_request_email_verification') }}', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(() => {
+                            window.location.reload();
+                        });
+                    });
+                }
+            });
+        </script>
+        {% endif %}
+    {% endif %}
+    {% if not app.user.timeTosAccepted %}
+        <script>
+            let acceptTosBtn = document.getElementById('accept-tos');
+            acceptTosBtn.addEventListener('click', (e) => {
+               e.preventDefault();
+               let csrfToken = document.getElementById('tos_csrf').value;
+               let formData = new FormData();
+               formData.append('_csrf', csrfToken);
+
+               fetch(acceptTermsURL, {
+                   method: 'POST',
+                   body: formData,
+               }).then((res) => {
+                   return res.json();
+               }).then((response) => {
+                   if (response.success) {
+                       location.reload();
+                   }
+               })
+            });
+        </script>
+    {% endif %}
+{% endblock %}

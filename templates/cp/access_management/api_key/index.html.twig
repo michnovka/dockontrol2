@@ -1,0 +1,225 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}API Keys | Access Management{% endblock %}
+
+{% set active = 'api_keys' %}
+
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'title': 'API Keys'
+    }
+] %}
+
+{% set actions = [
+    {
+        'link': path('cp_access_management_api_keys_new'),
+        'title': 'Create New API Key',
+    }
+] %}
+
+{% block content %}
+{% include 'cp/access_management/api_key/filter.html.twig' %}
+<div class="card mt-3 mb-2">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>{{ knp_pagination_sortable(apiKeys, 'User', 'u.name') }}</th>
+                <th>Public Key</th>
+                <th>{{ knp_pagination_sortable(apiKeys, 'Name', 'ak.name') }}</th>
+                <th>{{ knp_pagination_sortable(apiKeys, 'Time Created', 'ak.timeCreated') }}</th>
+                <th>{{ knp_pagination_sortable(apiKeys, 'Time Last Used', 'ak.timeLastUsed') }}</th>
+                <th class="text-end">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for apiKey in apiKeys %}
+                {% include 'cp/access_management/api_key/row.html.twig' %}
+            {% else %}
+                <tr>
+                    <td colspan="13">No records found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': apiKeys}) }}
+</div>
+
+<div class="modal fade" id="delete_api_key_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="delete_api_key_form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-white">
+                        Delete API Key
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>The following API key is about to be deleted:</p>
+                    <strong>
+                        <ul>
+                            <li id="delete_api_key_hash"></li>
+                        </ul>
+                    </strong>
+                    <p>Are you sure you want to proceed?</p>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                    <input type="hidden" class="_csrf_token_api_key_delete" name="_csrf_token_api_key_delete" id="_csrf_token_api_key_delete" value="{{ csrf_token('apikeycsrf') }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-danger approve-the-deletion-for-signup-code text-white">Approve the Deletion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    {% if showPrivateKeyFirstTime %}
+        <div class="position-absolute top-0 end-0 p-3" style="z-index: 11">
+            <div id="copy_link_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="bg-success toast-header text-white" id="dock-toast">
+                    <strong class="me-auto">DOCKontrol</strong>
+                    <button type="button" class="btn-close text-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <span id="message"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="view_api_keys_modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form action="" method="post">
+                        <div class="modal-header bg-info">
+                            <h6 class="card-title text-white">
+                                Generated API Keys
+                            </h6>
+                            <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                                <span aria-hidden="true"></span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <label for="public-api-key">Public key</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="{{ apiKeyFromSession.publicKey }}" placeholder="public API key" id="public-api-key" aria-label="public API key" aria-describedby="basic-addon2" readonly>
+                                <div class="input-group-append cursor-pointer" id="copy-public-key" data-bs-toggle="tooltip" data-bs-original-title="Copy to clipboard">
+                                <span class="input-group-text rounded-start-0" id="copy-public-key-icon">
+                                    <i class="bi bi-clipboard2"></i>
+                                </span>
+                                </div>
+                            </div>
+
+                            <label for="public-api-key">Private key</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="secret API key" value="{{ apiKeyFromSession.privateKey }}" id="secret-api-key" aria-label="secret API key" aria-describedby="basic-addon2" readonly>
+                                <div class="input-group-append cursor-pointer" id="copy-secret-key" data-bs-toggle="tooltip" data-bs-original-title="Copy to clipboard">
+                                <span class="input-group-text rounded-start-0" id="copy-secret-key-icon">
+                                    <i class="bi bi-clipboard2"></i>
+                                </span>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning mt-3 mb-0" role="alert">
+                                <strong>Important:</strong> The private key will only be shown this one time. Please copy it before closing this window.
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let deleteAPIKeyButtons = document.querySelectorAll('.delete-api-key-btn');
+            let deleteAPIKeyForm = document.getElementById('delete_api_key_form');
+            let deleteAPIKeyModal = new bootstrap.Modal(document.getElementById('delete_api_key_modal'), {});
+
+            deleteAPIKeyButtons.forEach((el) => {
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    let deleteSignupCodeHash = el.getAttribute('data-api-key-hash');
+                    let csrfToken = document.getElementById('_csrf_token_api_key_delete').value;
+                    document.getElementById('delete_api_key_hash').innerHTML = deleteSignupCodeHash;
+                    deleteAPIKeyModal.show();
+                    deleteAPIKeyForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        let formData = new FormData();
+                        formData.append('_csrf', csrfToken);
+
+                        let deleteURL = "{{ path('cp_access_management_api_keys_delete', {'publicKey': '__HASH__'}) }}";
+                        deleteURL = deleteURL.replace('__HASH__', deleteSignupCodeHash);
+
+                        fetch(deleteURL, {
+                            method: 'POST',
+                            body: formData
+                        }).then((response) => {
+                            return response.json();
+                        }).then((res) => {
+                            if (res.status) {
+                                document.location.reload();
+                            } else {
+                                document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                                document.querySelector('.generic_error').classList.remove('d-none');
+                                setTimeout(function () {
+                                    document.querySelector('.generic_error').classList.add('d-none');
+                                }, 2500);
+                            }
+                        });
+                    });
+                });
+            });
+
+            {% if showPrivateKeyFirstTime %}
+                function showAPIKeyModal () {
+                    let showAPIKeyModal = new bootstrap.Modal(document.getElementById('view_api_keys_modal'), {});
+                    let copyPublicKeyButton = document.getElementById('copy-public-key');
+                    let copySecretKeyButton = document.getElementById('copy-secret-key');
+
+                    showAPIKeyModal.show();
+
+                    copyPublicKeyButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let publicKey = document.getElementById('public-api-key').value;
+                        copyKeyToClipBoard(publicKey, 'Public key copied to clipboard.');
+                    });
+
+                    copySecretKeyButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let secretKey = document.getElementById('secret-api-key').value;
+                        copyKeyToClipBoard(secretKey, 'Private key copied to clipboard.');
+                    });
+                }
+
+                async function copyKeyToClipBoard(contentToCopy, message) {
+                    try {
+                        await navigator.clipboard.writeText(contentToCopy);
+                        document.getElementById('message').innerHTML = message;
+                        let toastEl = document.getElementById('copy_link_toast');
+                        new bootstrap.Toast(toastEl).show();
+                    } catch (err) {
+                        console.log('error: ', err)
+                    }
+                }
+
+                showAPIKeyModal();
+            {% endif %}
+        });
+    </script>
+{% endblock %}

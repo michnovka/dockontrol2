@@ -1,0 +1,88 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Edit | Nuki{% endblock %}
+{% set active = 'nukis' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_nukis'), 'title': 'Nukis'
+    },
+    {
+      'title': nuki.name
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+{% block content %}
+    {% include 'cp/access_management/nuki/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+
+    <div class="modal fade" id="remove_nuki_pin_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="remove_nuki_pin_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Remove Nuki PIN
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Are you sure you want to remove nuki pin?</p>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_nuki" name="_csrf_token_nuki" id="_csrf_token_nuki" value="{{ csrf_token('nukicsrf') }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger text-white">Approve</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let removeNukiPinBtn = document.getElementById('remove-pin');
+        let removeNukiModal = new bootstrap.Modal(document.getElementById('remove_nuki_pin_modal'), {});
+        let removeNukiForm = document.getElementById('remove_nuki_pin_form');
+
+        removeNukiPinBtn.addEventListener('click', () => {
+            removeNukiModal.show();
+        });
+
+        removeNukiForm.addEventListener('submit', (e) => {
+           e.preventDefault();
+            let nukiId = removeNukiPinBtn.dataset.nukiId;
+            let csrfToken = document.getElementById('_csrf_token_nuki').value;
+            let removeNukiPinURL = "{{ path('cp_access_management_nuki_remove_pin', {'id': '__ID__'}) }}";
+            removeNukiPinURL = removeNukiPinURL.replace('__ID__', nukiId);
+
+            let formData = new FormData();
+            formData.append('_csrf', csrfToken);
+
+            fetch(removeNukiPinURL, {
+                method: 'POST',
+                body: formData
+            }).then((response) => {
+                return response.json();
+            }).then((res) => {
+                if (res.status) {
+                    document.location.reload();
+                } else {
+                    document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                    document.querySelector('.generic_error').classList.remove('d-none');
+                    setTimeout(function() {
+                        document.querySelector('.generic_error').classList.add('d-none');
+                    }, 2500);
+                }
+            });
+        });
+    </script>
+{% endblock %}

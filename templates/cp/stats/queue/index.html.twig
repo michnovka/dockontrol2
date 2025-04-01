@@ -1,0 +1,40 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Queue | Stats{% endblock %}
+{% set active = 'queue' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Stats', 'link': path('cp_stats')
+    },
+    {
+        'title': 'Queues'
+    }
+] %}
+{% block content %}
+{% include 'cp/stats/queue/filter.html.twig' %}
+<div class="card mt-2 mb-2">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Time Start</th>
+                <th>Time Executed</th>
+            </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for actionQueue in actionQueues %}
+                {% include 'cp/stats/queue/row.html.twig' %}
+            {% else %}
+                <tr>
+                    <td colspan="5">No records found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% include 'cp/common/custom_pagination.html.twig' %}
+    </div>
+</div>
+{% endblock %}

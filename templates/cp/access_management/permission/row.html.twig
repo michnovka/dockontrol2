@@ -1,0 +1,12 @@
+<tr>
+    <td>{{ permission.name }}</td>
+    <td>{{ permission.namePretty }}</td>
+    <td class="text-end">
+        <a href="{{ path('cp_access_management_permission_edit', {'name': permission.name}) }}" class="fs-6 text-decoration-none text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="#" class="delete-permission-btn text-danger text-decoration-none fs-6" data-name="{{ permission.name }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

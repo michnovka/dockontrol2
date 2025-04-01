@@ -1,0 +1,109 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(form) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_row(form.id) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_label(form.name) }}
+                <div class="input-group">
+                    {{ form_widget(form.name) }}
+                    <span class="input-group-text bg-transparent" data-bs-toggle="tooltip" data-bs-html="true" title="{{ translation_help }}">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                {{ form_label(form.nameSpecification) }}
+                <div class="input-group">
+                    {{ form_widget(form.nameSpecification) }}
+                    <span class="input-group-text bg-transparent" data-bs-toggle="tooltip" data-bs-html="true" title="{{ translation_help }}">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.type) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.allow1MinOpen) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.action) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.permission) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.sortIndex) }}
+            </div>
+
+            <div class="col-md-3">
+                {{ form_row(form.buttonStyle) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.icon) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.camera1) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.camera2) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.camera3) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.camera4) }}
+            </div>
+
+            <div class="col-md-6"></div>
+            <div class="col-md-2 text-start">
+                <button class="btn btn-primary w-100" id="save-btn">{{ show_submit_label|default('Create Button') }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+       let buttonIdElement = document.getElementById('button_id');
+       let addedErrorElement = false;
+       let saveBtn = document.getElementById('save-btn');
+       let errorElement;
+       buttonIdElement.addEventListener('focusout', () => {
+           if (buttonIdElement.value !== '') {
+               let checkButtonIdURL = '{{ path('cp_settings_button_is_exist') }}';
+               let formData = new FormData();
+               formData.append('buttonId', buttonIdElement.value);
+               fetch(checkButtonIdURL, {
+                   body: formData,
+                   method: 'POST'
+               }).then(function (response) {
+                   return response.json();
+               }).then(function (result) {
+                  if (result.buttonExist) {
+                      errorElement = document.createElement('div');
+                      errorElement.className = 'invalid-feedback d-block';
+                      errorElement.id = 'btn_exist_error';
+                      errorElement.innerText = 'Button Id already Exist';
+                      if (!addedErrorElement) {
+                          buttonIdElement.after(errorElement);
+                          addedErrorElement = true;
+                      } else {
+                          document.getElementById('btn_exist_error').className = 'invalid-feedback d-block';
+                      }
+                      saveBtn.setAttribute('disabled', 'true');
+                  } else {
+                      if (addedErrorElement) {
+                          saveBtn.removeAttribute('disabled');
+                          document.getElementById('btn_exist_error').className = 'invalid-feedback d-none';
+                      }
+                  }
+               });
+           }
+       })
+    });
+</script>

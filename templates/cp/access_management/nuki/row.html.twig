@@ -1,0 +1,20 @@
+<tr>
+    <td>{{ nuki.id }}</td>
+    <td>{{ nuki.user.name }}</td>
+    <td>{{ nuki.name }}</td>
+    <td>{{ nuki.dockontrolNukiApiServer }}</td>
+    <td>{{ nuki.username }}</td>
+    <td>
+        <span class="badge {% if nuki.canLock %} bg-success {% else %} bg-danger {% endif %}">
+            {{ nuki.canLock ? 'Yes' : 'No' }}
+        </span>
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_access_management_nuki_edit', {'id': nuki.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-nuki-btn" data-nuki-name="{{ nuki.name }}" data-nuki-id="{{ nuki.id }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

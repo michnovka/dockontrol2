@@ -1,0 +1,80 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(nukiForm) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_row(nukiForm.name) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(nukiForm.user) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(nukiForm.username) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(nukiForm.password1, {'attr': {'autocomplete': 'new-password'}}) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(nukiForm.dockontrolNukiApiServer) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(nukiForm.canLock) }}
+            </div>
+            {% if nuki is defined and is_granted('ROLE_SUPER_ADMIN') %}
+                <div class="col-md-3">
+                    {{ form_label(nukiForm.pin) }}
+                    <div class="input-group">
+                        {{ form_widget(nukiForm.pin) }}
+                        <span class="input-group-text bg-transparent cursor-pointer" id="remove-pin" data-bs-toggle="tooltip" data-bs-original-title="Remove PIN" data-nuki-id="{{ nuki.id }}">
+                            <i class="bi bi-trash"></i>
+                        </span>
+                    </div>
+                    {{ form_errors(nukiForm.pin) }}
+
+                    {% if nuki.pin is not empty %}
+                        <span class="badge bg-success">Set</span>
+                    {% else %}
+                        <span class="badge bg-danger">Not Set</span>
+                    {% endif %}
+                </div>
+            {% elseif is_granted('ROLE_SUPER_ADMIN') %}
+                <div class="col-md-3">
+                    {{ form_row(nukiForm.pin) }}
+                </div>
+            {% endif %}
+            <div class="{% if is_granted('ROLE_SUPER_ADMIN') %} col-md-3 {% else %} col-md-6 {% endif %}"></div>
+            <div class="col-md-2 text-start mt-2">
+                <button type="submit" id="save-nuki" class="btn btn-primary w-100">{{ show_submit_label|default('Create Nuki') }}</button>
+            </div>
+        </div>
+    </div>
+    {{ form_end(nukiForm) }}
+</div>
+
+<script>
+    let nukiPinElement = document.getElementById('nuki_pin');
+    if (nukiPinElement) {
+        nukiPinElement.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+            console.log( e.target.value)
+
+            if (e.target.value.length < 4 || e.target.value.length > 8) {
+                let errorElement = document.createElement('div');
+                errorElement.className = 'invalid-feedback d-block';
+                errorElement.id = 'pin-error-element';
+                errorElement.innerHTML = 'Pin length must be greater than or equal to 4 and less than or equal to 8.';
+
+                if (document.getElementById('pin-error-element') === null) {
+                    document.getElementById('nuki_pin').parentElement.after(errorElement);
+                }
+                document.getElementById('save-nuki').setAttribute('disabled', 'disabled');
+            } else {
+                document.getElementById('save-nuki').removeAttribute('disabled');
+                if (document.getElementById('pin-error-element') !== null) {
+                    document.getElementById('pin-error-element').remove();
+                    nukiPinElement.classList.remove('is-invalid');
+                }
+            }
+        });
+    }
+</script>

@@ -1,0 +1,53 @@
+let editConfigKeyButtons = document.querySelectorAll('.edit-config-key');
+let deleteConfigKeyButtons = document.querySelectorAll('.delete-config-key');
+let deleteConfigForm = document.getElementById('delete_config_form');
+let deleteConfigModal = new bootstrap.Modal(document.getElementById('delete_config_modal'), {});
+
+editConfigKeyButtons.forEach((a) => {
+    a.addEventListener('click', function (e) {
+        e.preventDefault();
+        let editKey = this.getAttribute('data-config');
+        document.getElementById("edit_"+editKey).classList.remove('d-none');
+        document.getElementById("text_"+editKey).classList.add('d-none');
+
+        document.getElementById("cancel_btn_"+editKey).addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById("edit_"+editKey).classList.add('d-none');
+            document.getElementById("text_"+editKey).classList.remove('d-none');
+        });
+    });
+});
+
+deleteConfigKeyButtons.forEach((a) => {
+    a.addEventListener('click', function (e) {
+        e.preventDefault();
+        let deleteKey = this.getAttribute('data-config');
+        document.getElementById('config_name').innerHTML = deleteKey;
+        deleteConfigModal.show();
+        deleteConfigForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            let data = new FormData();
+            let csrfToken = document.getElementById('_csrf_token_config_setting').value;
+            data.append('_csrf', csrfToken);
+            let deleteConfigURL = "{{ path('cp_settings_config_option_delete', {'key': '__KEY__'}) }}";
+            deleteConfigURL = deleteConfigURL.replace('__KEY__', deleteKey);
+            fetch(deleteConfigURL, {
+                method: 'POST',
+                body: data
+            }).then(function (response) {
+                return response.json();
+            }).then(function (json) {
+                if (json.success) {
+                    deleteConfigModal.hide();
+                    window.location.reload();
+                } else {
+                    document.querySelector('.generic_error').innerHTML = json.message;
+                    document.querySelector('.generic_error').classList.remove('d-none');
+                    setTimeout(function () {
+                        document.querySelector('.generic_error').classList.add('d-none');
+                    }, 2500);
+                }
+            });
+        });
+    });
+});

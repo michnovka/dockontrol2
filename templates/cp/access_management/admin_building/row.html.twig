@@ -1,0 +1,17 @@
+<tr>
+    <td>
+        <a href="{{ path('cp_access_management_user_edit', {'id': admin.id}) }}" class="nav-link show-underline-hover">
+            {{ admin.name }}
+        </a>
+    </td>
+    <td>
+        {% for building in admin.adminBuildings %}
+            <span class="badge bg-secondary">{{ building.name }}</span>
+        {% endfor %}
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_access_management_admin_building_edit', {'id': admin.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+    </td>
+</tr>

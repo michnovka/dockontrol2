@@ -1,0 +1,37 @@
+{% if is_granted('IS_IMPERSONATOR') %}
+    <p class="text-end m-0 p-0">
+        <span>Impersonated By {{ app.token.originalToken.user.email }}</span>
+    </p>
+{% endif %}
+<nav aria-label="breadcrumb">
+    {% if breadcrumbs is defined %}
+        <div class="d-flex justify-content-between">
+            <div class="breadcrumb">
+                <a href="{{ path('cp_dashboard') }}" class="breadcrumb-item py-2 text-decoration-none text-body hover-primary breadcrumb-components">
+                    <i class="bi bi-house-door"></i>
+                </a>
+
+                {% for breadcrumb in breadcrumbs %}
+                    <span class="breadcrumb-separator">/</span>
+                    {% if breadcrumb.link is defined %}
+                        <a href="{{ breadcrumb.link }}" class="breadcrumb-item py-2 text-decoration-none text-body hover-primary breadcrumb-components">
+                            {{ breadcrumb.title }}
+                        </a>
+                    {% else %}
+                        <span class="breadcrumb-item active py-2">{{ breadcrumb.title }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if actions is defined %}
+                <div class="breadcrumb-item text-end vertical-middle breadcrumb-action-button">
+                    {% for action in actions %}
+                        <a href="{{ action.link }}" class="btn btn-primary {{ action.class is defined ? action.class : ''}}">
+                            {{ action.title }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</nav>

@@ -1,0 +1,20 @@
+<tr>
+    <td>{{ userActionLog.id }}</td>
+    <td>{{ userActionLog.time.format('Y-m-d H:i:s') }}</td>
+    <td>
+        {% if userActionLog.user is not null %}
+            <a href="{{ path('cp_logs_user_action_log', {
+                user_action_log_filter: {
+                    'user': userActionLog.user.id
+                }
+            }) }}">
+                {{ userActionLog.user.name }}
+            </a>
+        {% else %}
+            System
+        {% endif %}
+    </td>
+    <td>
+         {{ userActionLog.description }}
+    </td>
+</tr>

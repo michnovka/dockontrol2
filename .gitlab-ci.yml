@@ -1,0 +1,122 @@
+# This file is a template, and might need editing before it works on your project.
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+#
+# You can copy and paste this template into a new `.gitlab-ci.yml` file.
+# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
+#
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+
+stages:          # List of stages for jobs, and their order of execution
+  - prechecks
+  - setup
+  - code_quality
+  - test_suite
+
+image: git.astrill.com:5050/docker-hub/php8.2-with-composer:8.4
+
+cache:
+  key: composer-cache
+  paths:
+    - vendor/
+    - var/
+
+check_css_js_env_version:
+  stage: prechecks
+  script:
+    - echo "Checking if CSS/JS changes were accompanied by DOCKONTROL_VERSION update in .env..."
+    - |
+      # Determine the base commit for diff.
+      if [ -n "$CI_MERGE_REQUEST_ID" ]; then
+          echo "This is a merge request. Using target branch '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME' for diff..."
+          git fetch origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+          BASE_SHA=$(git merge-base HEAD origin/"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME")
+      else
+          if [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+              BASE_SHA=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+              echo "No previous commit detected. Using the empty tree as BASE_SHA."
+          else
+              BASE_SHA=$CI_COMMIT_BEFORE_SHA
+          fi
+      fi
+
+      echo "Base SHA: $BASE_SHA"
+
+      # List files changed between the base and current commit.
+      CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$CI_COMMIT_SHA")
+      echo "Changed files: $CHANGED_FILES"
+
+      # Check for any CSS or JS changes.
+      if echo "$CHANGED_FILES" | grep -E '\.(css|js)$'; then
+          echo "Detected changes in CSS/JS files."
+          # Retrieve the DOCKONTROL_VERSION value in the current .env file.
+          CURRENT_VERSION=$(grep -E '^DOCKONTROL_VERSION=' .env | head -n1 || echo "")
+          # Retrieve the DOCKONTROL_VERSION value from the .env file in BASE_SHA.
+          BASE_VERSION=$(git show "$BASE_SHA":.env 2>/dev/null | grep -E '^DOCKONTROL_VERSION=' | head -n1 || echo "")
+          echo "Current DOCKONTROL_VERSION: $CURRENT_VERSION"
+          echo "Base DOCKONTROL_VERSION: $BASE_VERSION"
+          if [ "$CURRENT_VERSION" = "$BASE_VERSION" ]; then
+              echo "ERROR: CSS/JS changes detected but DOCKONTROL_VERSION has not been updated in .env."
+              exit 1
+          else
+              echo "DOCKONTROL_VERSION was updated in .env."
+          fi
+      else
+          echo "No CSS/JS changes detected; skipping DOCKONTROL_VERSION check."
+      fi
+
+composer_install:
+  stage: setup
+  script:
+    - rm -rf vendor
+    - rm -rf var
+    - php /usr/local/bin/composer.phar install
+  only:
+    changes:
+      - 'composer.lock'
+      - '.gitlab-ci.yml'
+
+  dependencies:
+    - check_css_js_env_version
+
+test_phpcs:
+  stage: code_quality
+  script:
+    - php /usr/local/bin/composer.phar install
+    - vendor/bin/phpcs --no-cache
+  dependencies:
+    - composer_install
+
+test_psalm:
+  stage: code_quality
+  script:
+    - php /usr/local/bin/composer.phar install
+    - vendor/bin/psalm --config=psalm.xml --no-cache
+  dependencies:
+    - composer_install
+
+test_phpunit:
+  stage: test_suite
+  services:
+    - name: mariadb:10.11
+      alias: mysql_test
+  variables:
+    MYSQL_DATABASE: dockontrol_test
+    MYSQL_ROOT_PASSWORD: dockontrol
+    MYSQL_USER: dockontrol_user
+    MYSQL_PASSWORD: dockontrol
+    DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql_test/dockontrol?serverVersion=10.11.10-MariaDB&charset=utf8mb4&collate=utf8mb4_general_ci"
+  script:
+    - php /usr/local/bin/composer.phar install
+    - php /usr/local/bin/composer.phar test
+  dependencies:
+    - composer_install

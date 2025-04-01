@@ -1,0 +1,326 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Cameras | Settings{% endblock %}
+{% set active = 'cameras' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Cameras'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_camera_new'),
+        'title': 'Create New Camera',
+    },
+    {
+        'link': path('cp_settings_camera_show_all'),
+        'title': 'View All at Once',
+    }
+] %}
+
+{% block content %}
+    <div class="card mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>{{ knp_pagination_sortable(cameras, 'Name', 'c.nameId') }}</th>
+                        <th>{{ knp_pagination_sortable(cameras, 'Friendly Name', 'c.friendlyName') }}</th>
+                        <th>{{ knp_pagination_sortable(cameras, 'Permission Required', 'p.name') }}</th>
+                        <th>{{ knp_pagination_sortable(cameras, 'DOCKontrol Node', 'd.name') }}</th>
+                        <th>{{ knp_pagination_sortable(cameras, 'Status', 'd.status') }}</th>
+                        <th>DOCKontrol Node Payload</th>
+                        <th>{{ knp_pagination_sortable(cameras, 'Camera Backups', 'cameraBackups') }}</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for camera in cameras %}
+                    {% include 'cp/settings/camera/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="4">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': cameras}) }}
+    </div>
+
+    <div class="modal fade" id="delete_camera_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_camera_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Camera
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following camera is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_camera_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the camera, which you want to delete.</h6>
+                        <input type="text" class="confirm-camera-name form-control" id="confirm-camera-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect camera name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_camera" name="_csrf_token_camera" id="_csrf_token_camera" value="{{ csrf_token("cameracsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-camera text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="preview_camera_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h6 class="card-title text-white">
+                        Camera Overview
+                    </h6>
+                    <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body p-0">
+                    <img id="img-content" class="card-img img-fluid d-none" alt="Camera Img">
+                    <img src="{{ asset('assets/images/loading.jpg') }}" alt="Loading..." class="card-img img-fluid" id="loading-img">
+
+                    <div class="pause-overlay" id="pause-overlay">
+                        <div class="paused_container d-none" id="paused-container">
+                            <img src="{{ asset('assets/images/pause.svg') }}" width="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    const deleteCameraBtns = document.querySelectorAll('.delete-camera-btn');
+    const deleteCameraModal = new bootstrap.Modal(document.getElementById('delete_camera_modal'));
+    const deleteCameraForm = document.getElementById('delete_camera_form');
+    const confirmCameraNameInput = document.getElementById('confirm-camera-name');
+    const cameraNameDisplay = document.getElementById('delete_camera_name');
+    const incorrectCodeLabel = document.querySelector('.validation-invalid-label.incorrect_code');
+    const genericErrorLabel = document.querySelector('.generic_error');
+    const previewCameraBtns = document.querySelectorAll('.preview-camera-btn');
+    const previewCameraModal = new bootstrap.Modal(document.getElementById('preview_camera_modal'));
+    const loadingImg = document.getElementById('loading-img');
+    const imgContent = document.getElementById('img-content');
+    const pausedContainer = document.getElementById('paused-container');
+    const pauseOverlay = document.getElementById('pause-overlay');
+
+    let cameraName;
+    let ongoingRequests = [];
+    let idleTimeout;
+    let isPaused = false;
+    let cameraElement;
+    let isFetching = false; // Added
+    let fetchTimeout; // Added
+    let cameraSessionId = null;
+
+	let cameraTimeoutMilliseconds = 500;
+
+    const hidden = document.hidden !== undefined ? "hidden" :
+        document.msHidden !== undefined ? "msHidden" :
+            document.webkitHidden !== undefined ? "webkitHidden" : null;
+
+    const visibilityChange = hidden ? (hidden === "hidden" ? "visibilitychange" : (hidden === "msHidden" ? "msvisibilitychange" : "webkitvisibilitychange")) : null;
+
+    document.addEventListener(visibilityChange, detectIdle, false);
+
+    function detectIdle() {
+        if (!isPaused) {
+            isPaused = document[hidden];
+        }
+    }
+
+    function showError(message) {
+        genericErrorLabel.innerHTML = message;
+        genericErrorLabel.classList.remove('d-none');
+        setTimeout(() => genericErrorLabel.classList.add('d-none'), 2500);
+    }
+
+    function handleFetchError(err) {
+        if (err.name !== 'AbortError') {
+            console.error("Error fetching camera feed:", err);
+        }
+        loadingImg.classList.add('d-none');
+        isFetching = false; // Added
+    }
+
+    function fetchNextImage() {
+        if (isFetching) return; // Added
+        isFetching = true; // Added
+
+        if (cameraSessionId === null) {
+            cameraSessionId = fetchCameraUuid();
+            pauseStream();
+        }
+
+        const cameraName = cameraElement.getAttribute('data-camera-name');
+        let showCameraURL = "{{ path('dockontrol_camera_view', {'cameraId': '__ID__', 'cameraSessionId': '__CAMERA_SESSION_ID__'}) }}";
+        showCameraURL = showCameraURL.replace('__ID__', cameraName);
+        showCameraURL = showCameraURL.replace('__CAMERA_SESSION_ID__', cameraSessionId);
+
+        const startTime = Date.now();
+        const controller = new AbortController();
+        ongoingRequests.push(controller);
+
+        detectIdle();
+        if (isPaused) {
+            pauseStream();
+            isFetching = false; // Added
+            return;
+        }
+
+        fetch(showCameraURL, { method: 'POST', signal: controller.signal })
+            .then(res => res.blob())
+            .then((img) => {
+                const objectURL = URL.createObjectURL(img);
+                loadingImg.classList.add('d-none');
+                imgContent.setAttribute('src', objectURL);
+                imgContent.classList.remove('d-none');
+
+                const loadDuration = Date.now() - startTime;
+                const remainingTime = loadDuration < cameraTimeoutMilliseconds ? cameraTimeoutMilliseconds - loadDuration : 0;
+
+                if (fetchTimeout) {
+                    clearTimeout(fetchTimeout); // Added
+                }
+
+                isFetching = false; // Added
+
+                fetchTimeout = setTimeout(fetchNextImage, remainingTime); // Modified
+            })
+            .catch((err) => {
+                isFetching = false; // Added
+                handleFetchError(err);
+            });
+    }
+
+    function fetchCameraUuid() {
+        const cameraName = cameraElement.getAttribute('data-camera-name');
+        const getCameraSessionURL = "{{ path('dockontrol_camera_get_camera_session') }}";
+        let formData = new FormData();
+        formData.append('cameras', JSON.stringify([cameraName]));
+        fetch(getCameraSessionURL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    cameraSessionId = response.camera_session_id;
+                }
+            });
+
+        return cameraSessionId;
+    }
+
+    function stopStream() {
+        ongoingRequests.forEach(controller => controller.abort());
+        ongoingRequests = [];
+        clearTimeout(idleTimeout);
+        if (fetchTimeout) {
+            clearTimeout(fetchTimeout); // Added
+            fetchTimeout = null; // Added
+        }
+        isFetching = false; // Added
+    }
+
+    function pauseStream() {
+        stopStream();
+        isPaused = true;
+        pausedContainer.classList.remove('d-none');
+    }
+
+    function resumeStream() {
+        isPaused = false;
+        pausedContainer.classList.add('d-none');
+        fetchNextImage();
+    }
+
+    deleteCameraBtns.forEach((el) => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            cameraName = el.getAttribute('data-camera-name');
+            cameraNameDisplay.innerText = cameraName;
+            deleteCameraModal.show();
+        });
+    });
+
+    deleteCameraForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const confirmCameraName = confirmCameraNameInput.value;
+
+        if (confirmCameraName !== cameraName) {
+            incorrectCodeLabel.classList.remove('d-none');
+            setTimeout(() => incorrectCodeLabel.classList.add('d-none'), 2500);
+        } else {
+            const deleteCameraURL = "/admin/settings/camera/__ID__/delete".replace('__ID__', cameraName);
+            const csrfToken = document.getElementById('_csrf_token_camera').value;
+            const formData = new FormData();
+            formData.append('_csrf', csrfToken);
+
+            fetch(deleteCameraURL, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status) {
+                        deleteCameraModal.hide();
+                        window.location.reload();
+                    } else {
+                        showError(response.errorMessage);
+                    }
+                });
+        }
+    });
+
+    previewCameraBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            cameraElement = btn;
+            imgContent.classList.add('d-none');
+            loadingImg.classList.remove('d-none');
+            previewCameraModal.show();
+            detectIdle();
+            stopStream(); // Added
+            fetchCameraUuid();
+            fetchTimeout = setTimeout(fetchNextImage, cameraTimeoutMilliseconds); // Modified
+        });
+    });
+
+    previewCameraModal._element.addEventListener('hidden.bs.modal', () => {
+        isPaused = false;
+        stopStream();
+        imgContent.classList.add('d-none');
+        loadingImg.classList.remove('d-none');
+        if (!pausedContainer.classList.contains('d-none')) {
+            pausedContainer.classList.add('d-none')
+        }
+        cameraSessionId = null;
+    });
+
+    pauseOverlay.addEventListener('click', () => {
+        isPaused ? resumeStream() : pauseStream();
+    });
+</script>
+{% endblock %}

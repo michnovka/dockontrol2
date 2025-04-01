@@ -1,0 +1,31 @@
+meilisearch:
+    url: 'http://%env(MEILISEARCH_LISTEN_IP)%:%env(MEILISEARCH_LISTEN_PORT)%:' # URL of the Meilisearch server (mandatory)
+    api_key: '%env(MEILISEARCH_API_KEY)%' # API key to access the Meilisearch server (mandatory)
+    prefix: '%env(MEILISEARCH_PREFIX)%'
+    indices:
+        # Define entities or documents that should be indexed to Meilisearch.
+        # See https://github.com/meilisearch/meilisearch-symfony/wiki/configure-searchable-data
+        - name: user_action_logs
+          class: App\Entity\Log\UserActionLog
+          settings:
+            filterableAttributes:
+              - admin
+              - time
+            searchableAttributes:
+              - description
+            sortableAttributes:
+              - time
+
+        - name: cron_logs
+          class: App\Entity\Log\CronLog
+          settings:
+            filterableAttributes:
+              - timeStart
+              - timeEnd
+              - cronGroup
+              - output
+            searchableAttributes:
+              - cronType
+            sortableAttributes:
+              - timeStart
+              - timeEnd

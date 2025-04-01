@@ -1,0 +1,18 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Group{% endblock %}
+{% set active = 'groups' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_groups') ,'title': 'Groups'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+{% block content %}
+    {% include 'cp/access_management/group/form.html.twig' %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | API Key{% endblock %}
+{% set active = 'api_keys' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_api_keys'), 'title': 'API Keys'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/access_management/api_key/form.html.twig' %}
+{% endblock %}

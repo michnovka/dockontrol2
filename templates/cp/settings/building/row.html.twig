@@ -1,0 +1,23 @@
+<tr>
+    <td>{{ building.building.name }}</td>
+    <td>{{ building.building.defaultGroup is not null ? building.building.defaultGroup.name : 'N/A' }}</td>
+    <td>
+        {% if building.apartments %}
+        <a href="{{ path('cp_settings_apartment', {
+            apartment_filter: {
+                'building': building.building.id
+            }
+        }) }}" class="nav-link show-underline-hover px-2 text-primary">{{ building.apartments }}</a>
+        {% else %}
+            N/A
+        {% endif %}
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_settings_building_edit', {'id': building.building.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-building-btn" data-building-id="{{ building.building.id }}" data-building-name="{{ building.building.name }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

@@ -1,0 +1,21 @@
+<tr>
+    <td>{{ action.name }}</td>
+    <td>{{ action.friendlyName }}</td>
+    <td>
+        <span class="badge bg-light border-start border-3 text-body rounded-start-0 {{ action.type.getBadgeClass }}">{{ action.type.readable }}</span>
+    </td>
+    <td>{{ action.dockontrolNode ? action.dockontrolNode.name : 'N/A' }}</td>
+    <td>{{ action.dockontrolNode ? action.dockontrolNode|dockontrol_node_status_indicator }}</td>
+    <td>{{ action.actionPayload|json_encode }}</td>
+    <td>{{ action.actionQueueCronGroup is not empty ? action.actionQueueCronGroup.name : 'N/A' }}</td>
+    <td>{{ action.actionBackupDockontrolNodes|length }}</td>
+    <td class="text-end">
+        <a href="{{ path('cp_settings_action_edit', {'name': action.name}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-action-btn" data-action-name="{{ action.name }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+
+</tr>

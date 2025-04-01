@@ -1,0 +1,26 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(guestPassForm) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_row(guestPassForm.user) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(guestPassForm.expires) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(guestPassForm.remainingActions) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(guestPassForm.defaultLanguage) }}
+            </div>
+            <div class="col-md-12">
+                {{ form_row(guestPassForm.note) }}
+            </div>
+            <div class="col-md-2 text-start">
+                <button type="submit" class="btn btn-primary w-100">Create Guest</button>
+            </div>
+        </div>
+    </div>
+    {{ form_end(guestPassForm) }}
+</div>

@@ -1,0 +1,158 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Access Management{% endblock %}
+{% set active = 'admin_buildings' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management',
+    }
+] %}
+
+{% block content %}
+    <div class="row">
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+            <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                        <h6 class="mb-0">Admin Buildings</h6>
+                        <a href="{{ path('cp_access_management_admin_building') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to Admin Buildings
+                        </a>
+                    </div>
+                    <div class="card-body p-3">
+                        <p class="text-muted mb-0">
+                            Manage building access and user assignments efficiently. Configure access rules at the building level, allocate apartments to users or groups,
+                            and monitor access history across multiple buildings. Ideal for administrators overseeing multiple locations and user assignments.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">API Keys</h6>
+                    <a href="{{ path('cp_access_management_api_keys') }}"
+                       class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                        Take me to API Keys
+                    </a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted mb-0">
+                        Generate and manage secure authentication keys for external system integrations. Control access permissions, monitor usage,
+                        and ensure secure third-party interactions while maintaining system integrity.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+            <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                        <h6 class="mb-0">Groups</h6>
+                        <a href="{{ path('cp_access_management_groups') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to Groups
+                        </a>
+                    </div>
+                    <div class="card-body p-3">
+                        <p class="text-muted mb-0">
+                            Organize users into roles or teams for efficient access control. Assign specific permissions to groups, simplify bulk management,
+                            and create custom groups tailored to your organization's needs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Guests</h6>
+                    <a href="{{ path('cp_access_management_guests') }}"
+                       class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                        Take me to Guests
+                    </a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted mb-0">
+                        Manage temporary users with limited, role-based access to specific features. Set time-limited credentials, monitor activities,
+                        and automatically disable expired accounts for enhanced security.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+            <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                        <h6 class="mb-0">Permissions</h6>
+                        <a href="{{ path('cp_access_management_permission') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to Permissions
+                        </a>
+                    </div>
+                    <div class="card-body p-3">
+                        <p class="text-muted mb-0">
+                            Control user, group, and guest activities through precise permission settings. Define specific actions allowed for each role
+                            and maintain comprehensive oversight of access rights across the platform.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Signup Codes</h6>
+                    <a href="{{ path('cp_access_management_signup_code') }}"
+                       class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                        Take me to Signup Codes
+                    </a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted mb-0">
+                        Streamline user onboarding with prefilled registration details and automatic assignments.
+                        Generate temporary codes that expire after 7 days, ensuring secure and efficient new user registration.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Users</h6>
+                    <a href="{{ path('cp_access_management_users') }}"
+                       class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                        Take me to Users
+                    </a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted mb-0">
+                        Access comprehensive user management tools to monitor activity, update details, and manage access levels.
+                        Group users by buildings and maintain secure control over all user accounts.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+            <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                        <h6 class="mb-0">User Deletion Request</h6>
+                        <a href="{{ path('cp_access_management_user_deletion_requests') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to User Deletion Request
+                        </a>
+                    </div>
+                    <div class="card-body p-3">
+                        <p class="text-muted mb-0">
+                            Review and manage user account deletion requests. Ensure security by verifying each request before approval or rejection.
+                            Keep track of pending and processed requests efficiently.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

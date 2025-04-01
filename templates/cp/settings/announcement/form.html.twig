@@ -1,0 +1,24 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(form) }}
+    <div class="row">
+        <div class="col-md-4">
+            {{ form_row(form.startTime)}}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.endTime)}}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.building)}}
+        </div>
+        <div class="col-md-12">
+            {{ form_row(form.subject)}}
+        </div>
+        <div class="col-md-12">
+            {{ form_row(form.content)}}
+        </div>
+        <div class="col-md-2 text-start">
+            <button class="btn btn-primary w-100">{{ show_submit_label|default('Create Announcement') }}</button>
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>

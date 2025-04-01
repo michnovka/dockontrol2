@@ -1,0 +1,22 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Edit | Announcement {% endblock %}
+{% set active = 'announcements' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_announcement'),
+        'title': 'Announcement'
+    },
+    {
+        'title': announcement.subject
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/announcement/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+{% endblock %}

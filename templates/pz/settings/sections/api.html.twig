@@ -1,0 +1,342 @@
+<div class="card shadow">
+    <div class="card-header p-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">{{ 'dockontrol.settings.api.api_keys.card_title'|trans }}</h6>
+            <a href="javascript:void(0)" class="btn btn-sm btn-primary" id="add-api-key-btn">{{ 'dockontrol.settings.api.api_keys.create_new_api_key'|trans }}</a>
+        </div>
+    </div>
+    <div class="carb-body">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>{{ 'dockontrol.settings.api.api_keys.listing.name'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.api.api_keys.listing.public_key'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.api.api_keys.listing.time_created'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.api.api_keys.listing.time_last_used'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="api-keys-tbody">
+                    {% for apiKey in app.user.apiKeys %}
+                        <tr>
+                            <td>{{ apiKey.name }}</td>
+                            <td>{{ apiKey.publicKey }}</td>
+                            <td>{{ apiKey.timeCreated|time_tooltip }}</td>
+                            <td>{{ apiKey.timeLastUsed ? apiKey.timeLastUsed|time_tooltip : 'N/A' }}</td>
+                            <td>
+                                <a href="#" class="text-decoration-none fs-6 text-danger delete-api-key-btn" data-api-key-hash="{{ apiKey.publicKey }}" data-bs-toggle="tooltip" data-bs-original-title="{{ 'dockontrol.global.delete_button_tooltip'|trans }}">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+                        {% else %}
+                        <tr id="no-data">
+                            <td colspan="5">{{ 'dockontrol.settings.api.api_keys.listing.no_api_keys_found'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mt-2">
+    <div class="card-header p-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">{{ 'dockontrol.settings.api.actions.card_title'|trans }}</h6>
+        </div>
+    </div>
+    <div class="carb-body">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>{{ 'dockontrol.settings.api.actions.listing.action_id'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.api.actions.listing.action_name'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.api.actions.listing.allow_1min_open'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% if app.user.isCarEnterExitAllowed %}
+                            <tr>
+                                <td>{{ 'dockontrol.settings.api.actions.action_type.enter'|trans }}</td>
+                                <td>{{ 'dockontrol.home.buttons.car_enter'|trans }}</td>
+                                <td>
+                                    <span class="badge bg-danger">
+                                        {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.no'|trans }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'dockontrol.settings.api.actions.action_type.exit'|trans }}</td>
+                                <td>{{ 'dockontrol.home.buttons.car_exit'|trans }}</td>
+                                <td>
+                                    <span class="badge bg-danger">
+                                        {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.no'|trans }}
+                                    </span>
+                                </td>                            </tr>
+                        {% endif %}
+                        {% for button in userButtons %}
+                            <tr>
+                                <td>{{ button.action.name }}</td>
+                                <td>{{ button.action.friendlyName }}</td>
+                                <td>
+                                    {% if button.allow1minOpen %}
+                                        <span class="badge bg-success">
+                                            {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.yes'|trans }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.no'|trans }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="position-absolute top-0 end-0 p-3" style="z-index: 11">
+    <div id="copy_link_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="bg-success toast-header text-white" id="dock-toast">
+            <strong class="me-auto">{{ 'dockontrol.logo'|trans }}</strong>
+            <button type="button" class="btn-close text-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <span id="message"></span>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add_api_key_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="add_api_key_form">
+                <div class="modal-header bg-primary">
+                    <h6 class="mb-0 text-white">
+                        {{ 'dockontrol.settings.api.api_keys.create_modal.title'|trans }}
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <label for="api-key-name" class="font-weight-semibold">{{ 'dockontrol.settings.api.api_keys.create_modal.description'|trans }}</label>
+                    <input type="text" class="api-key-name form-control" id="api-key-name"/>
+                    <span class="validation-invalid-label incorrect_code d-none">{{ 'dockontrol.settings.api.api_keys.create_modal.incorrect_id_message'|trans }}</span>
+                    <span class="validation-invalid-label generic_error d-none">{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>
+                    <input type="hidden" class="_csrf_token_api_key_add" name="_csrf_token_api_key_add" id="_csrf_token_api_key_add" value="{{ csrf_token("apikeycsrf") }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                    <button type="submit" class="btn bg-primary text-white">{{ 'dockontrol.settings.api.api_keys.create_modal.add_button'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if showPrivateKeyFirstTime %}
+    <div class="modal fade" id="view_api_keys_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post">
+                    <div class="modal-header bg-info">
+                        <h6 class="mb-0 text-white">
+                            {{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.title'|trans }}
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <label for="public-api-key">{{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.public_key_label'|trans }}</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ apiKeyFromSession.publicKey }}" placeholder="{{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.public_key_input_placeholder'|trans }}" id="public-api-key" aria-label="public API key" aria-describedby="basic-addon2" readonly>
+                            <div class="input-group-append cursor-pointer" id="copy-public-key" data-bs-toggle="tooltip" data-bs-original-title="{{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.copy_to_clipboard_tooltip'|trans }}">
+                            <span class="input-group-text rounded-start-0" id="copy-public-key-icon">
+                                <i class="bi bi-clipboard2"></i>
+                            </span>
+                            </div>
+                        </div>
+
+                        <label for="public-api-key">{{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.private_key_label'|trans }}</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="{{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.private_key_input_placeholder'|trans }}" value="{{ apiKeyFromSession.privateKey }}" id="private-api-key" aria-label="private API key" aria-describedby="basic-addon2" readonly>
+                            <div class="input-group-append cursor-pointer" id="copy-secret-key" data-bs-toggle="tooltip" data-bs-original-title="{{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.copy_to_clipboard_tooltip'|trans }}">
+                            <span class="input-group-text rounded-start-0" id="copy-secret-key-icon">
+                                <i class="bi bi-clipboard2"></i>
+                            </span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mt-3 mb-0" role="alert">
+                            <strong>{{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.warning_message.important'|trans }}</strong> {{ 'dockontrol.settings.api.api_keys.generate_api_keys_modal.warning_message.text'|trans }}
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
+<div class="modal fade" id="delete_api_key_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="delete_api_key_form">
+                <div class="modal-header bg-danger">
+                    <h6 class="mb-0 text-white">
+                        {{ 'dockontrol.settings.api.api_keys.delete_modals.title'|trans }}
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>{{ 'dockontrol.settings.api.api_keys.delete_modals.description'|trans }}</p>
+                    <strong>
+                        <ul>
+                            <li id="delete_api_key_hash"></li>
+                        </ul>
+                    </strong>
+                    <p>{{ 'dockontrol.settings.api.api_keys.delete_modals.warning_message'|trans }}</p>
+                    <span class="validation-invalid-label generic_error d-none">{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>
+                    <input type="hidden" class="_csrf_token_api_key_delete" name="_csrf_token_api_key_delete" id="_csrf_token_api_key_delete" value="{{ csrf_token('apikeycsrf') }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                    <button type="submit" class="btn bg-danger approve-the-deletion-for-signup-code text-white">{{ 'dockontrol.global.modals.approve_the_deletion_button'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let addAPIKeyBtn = document.getElementById('add-api-key-btn');
+        let addAPIKeyModal = new bootstrap.Modal(document.getElementById('add_api_key_modal'), {});
+        let addAPIKeyForm = document.getElementById('add_api_key_form');
+
+        addAPIKeyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            addAPIKeyModal.show();
+
+            addAPIKeyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let name = document.getElementById('api-key-name').value;
+                let csrfToken = document.getElementById('_csrf_token_api_key_add').value;
+                let addAPIKeyURL = "{{ path('dockontrol_api_key_new') }}";
+                let formData = new FormData();
+                formData.append('name', name);
+                formData.append('_csrf', csrfToken);
+
+                fetch(addAPIKeyURL, {
+                    method: 'POST',
+                    body: formData
+                }).then((res) => {
+                    return res.json();
+                }).then((response) => {
+                    if (response.status) {
+                        window.location.reload();
+                    } else {
+                        document.querySelector('.generic_error').innerHTML = response.message;
+                        document.querySelector('.generic_error').classList.remove('d-none');
+                        setTimeout(function () {
+                            document.querySelector('.generic_error').classList.add('d-none');
+                        }, 2500);
+                    }
+                })
+            });
+        });
+
+        {% if showPrivateKeyFirstTime %}
+            let viewAPIKeyModal = new bootstrap.Modal(document.getElementById('view_api_keys_modal'), {});
+            let copyPublicKeyButton = document.getElementById('copy-public-key');
+            let copySecretKeyButton = document.getElementById('copy-secret-key');
+
+            viewAPIKeyModal.show();
+
+            copyPublicKeyButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                let publicKey = document.getElementById('public-api-key').value;
+                let message = '{{ 'dockontrol.settings.api.api_keys.messages.public_key_copied'|trans }}';
+                copyKeyToClipBoard(publicKey, message);
+            });
+
+            copySecretKeyButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                let secretKey = document.getElementById('private-api-key').value;
+                let message = '{{ 'dockontrol.settings.api.api_keys.messages.private_key_copied'|trans }}';
+                copyKeyToClipBoard(secretKey, message);
+            });
+
+            async function copyKeyToClipBoard(contentToCopy, message) {
+                try {
+                    await navigator.clipboard.writeText(contentToCopy);
+                    showToastMessage(message);
+                } catch (err) {
+                    console.log('error: ', err)
+                }
+            }
+
+            function showToastMessage(message) {
+                document.getElementById('message').innerHTML = message;
+                let toastEl = document.getElementById('copy_link_toast');
+                new bootstrap.Toast(toastEl).show();
+            }
+        {% endif %}
+
+        let deleteAPIKeyButtons = document.querySelectorAll('.delete-api-key-btn');
+        let deleteAPIKeyForm = document.getElementById('delete_api_key_form');
+        let deleteAPIKeyModal = new bootstrap.Modal(document.getElementById('delete_api_key_modal'), {});
+
+        deleteAPIKeyButtons.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let deleteSignupCodeHash = el.getAttribute('data-api-key-hash');
+                let csrfToken = document.getElementById('_csrf_token_api_key_delete').value;
+                document.getElementById('delete_api_key_hash').innerHTML = deleteSignupCodeHash;
+                deleteAPIKeyModal.show();
+                deleteAPIKeyForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let formData = new FormData();
+                    formData.append('_csrf', csrfToken);
+
+                    let deleteURL = "{{ path('cp_access_management_api_keys_delete', {'publicKey': '__HASH__'}) }}";
+                    deleteURL = deleteURL.replace('__HASH__', deleteSignupCodeHash);
+
+                    fetch(deleteURL, {
+                        method: 'POST',
+                        body: formData
+                    }).then((response) => {
+                        return response.json();
+                    }).then((res) => {
+                        if (res.status) {
+                            window.location.reload();
+                        } else {
+                            document.querySelector('.generic_error').innerHTML = res.message;
+                            document.querySelector('.generic_error').classList.remove('d-none');
+                            setTimeout(function () {
+                                document.querySelector('.generic_error').classList.add('d-none');
+                            }, 2500);
+                        }
+                    });
+                });
+            });
+        });
+    });
+</script>

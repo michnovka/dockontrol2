@@ -1,0 +1,129 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        custom_hasher:
+            id: App\Security\Tools\PasswordTool
+
+        App\Entity\User:
+            algorithm: auto
+            migrate_from:
+                - custom_hasher
+                - auto
+
+    role_hierarchy:
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+        ROLE_ADMIN: ROLE_LANDLORD
+        ROLE_LANDLORD: ROLE_TENANT
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        dockontrol_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+        dockontrol_user_api_keypair_provider:
+            id: App\Security\UserProvider\APIKeyPairUserProvider
+        dockontrol_guest_provider:
+            entity:
+                class: App\Entity\Guest
+                property: hash
+        dockontrol_node_api_keypair_provider:
+            id: App\Security\UserProvider\APIKeyPairDockontrolNodeProvider
+        camera_session_id_user_provider:
+            id: App\Security\UserProvider\CameraSessionIDUserProvider
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api1:
+            pattern: ^/(api/1|api.php)
+            lazy: true
+            stateless: true
+            provider: dockontrol_user_provider
+            user_checker: security.user_checker.chain.api1
+            custom_authenticator: App\Security\Authenticator\LegacyAPIAuthenticator
+            login_throttling:
+                limiter: app.login_rate_limiter
+
+        api2:
+            pattern: ^/api/2
+            lazy: true
+            stateless: true
+            provider: dockontrol_user_api_keypair_provider
+            user_checker: security.user_checker.chain.api2
+            custom_authenticator: App\Security\Authenticator\APIKeyPairAuthenticator
+
+        dockontrol_node_api:
+            pattern: ^/api/node
+            lazy: true
+            stateless: true
+            provider: dockontrol_node_api_keypair_provider
+            custom_authenticator: App\Security\Authenticator\APIKeyPairAuthenticator
+
+        guest:
+            pattern: ^/guest-access
+            lazy: true
+            stateless: true
+            provider: dockontrol_guest_provider
+            user_checker: security.user_checker.chain.guest
+            custom_authenticator: App\Security\Authenticator\GuestAuthenticator
+
+        camera:
+            pattern: ^/camera/
+            lazy: true
+            stateless: true
+            provider: camera_session_id_user_provider
+            custom_authenticator: App\Security\Authenticator\CameraSessionAuthenticator
+
+        main:
+            lazy: true
+            provider: dockontrol_user_provider
+            user_checker: security.user_checker.chain.main
+            form_login:
+                login_path: dockontrol_login
+                check_path: dockontrol_login
+                enable_csrf: true
+            login_throttling:
+                limiter: app.login_rate_limiter
+            logout:
+                path: dockontrol_logout
+            remember_me:
+                secret: '%env(APP_SECRET)%'
+                lifetime: 31536000
+                always_remember_me: true
+                samesite: 'none'
+                secure: true
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            switch_user: {role: CAN_SWITCH_USER}
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+#    access_control:
+#        all the access control of /admin is ruled by attributes
+#        - { path: ^/login, roles: PUBLIC_ACCESS }
+#        - { path: ^/api, roles: PUBLIC_ACCESS }
+#        - { path: ^/signup, roles: PUBLIC_ACCESS }
+#        - { path: ^/guest-access, roles: ROLE_GUEST }
+#        - { path: ^/admin/(dashboard|access-management/users|access-management/signup-codes|stats/usage), allow_if: 'is_granted("ROLE_ADMIN") and is_fully_authenticated()' }
+#        - { path: ^/admin, allow_if: 'is_granted("ROLE_SUPER_ADMIN") and is_fully_authenticated()' }
+#        - { path: ^/, roles: [ROLE_USER] }
+#        - { path: ^/profile, roles: ROLE_USER }
+
+when@test:
+    security:
+        password_hashers:
+            # By default, password hashers are resource intensive and take time. This is
+            # important to generate secure password hashes. In tests however, secure hashes
+            # are not important, waste resources and increase test times. The following
+            # reduces the work factor to the lowest possible values.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

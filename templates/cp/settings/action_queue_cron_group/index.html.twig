@@ -1,0 +1,221 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Action Queue Cron Groups | Settings{% endblock %}
+{% set active = 'action_queue_cron_groups' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Action Queue Cron Group'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_action_cron_group_new'),
+        'title': 'Create New Action Queue Cron Group',
+    }
+] %}
+
+{% block content %}
+    <div class="card mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions Assigned</th>
+                        <th>DB Action Queued</th>
+                        <th>Redis Action Queued</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for cronGroup in cronGroups %}
+                    {% include 'cp/settings/action_queue_cron_group/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="3">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': cronGroups}) }}
+    </div>
+
+    <div class="modal fade" id="delete_cron_group_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_cron_group_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Action Queue Cron Group
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following cron group is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_cron_group_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the cron group, which you want to delete.</h6>
+                        <input type="text" class="confirm-cron_group-name form-control" id="confirm-cron-group-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect cron group name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_cron_group" name="_csrf_token_cron_group" id="_csrf_token_cron_group" value="{{ csrf_token("crongroupcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-cron-group text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="clear_action_queue_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h6 class="card-title text-white">
+                        Clear Queue
+                    </h6>
+                    <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>The following cron group's pending actions about to be deleted:</p>
+                    <strong>
+                        <ul>
+                            <li id="clear_action_queue_cron_group"></li>
+                        </ul>
+                    </strong>
+                    <p>Are you sure you want to proceed?</p>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                    <input type="hidden" class="_csrf_token_cron_group" name="_csrf_token_cron_group" id="_csrf_token_cron_group" value="{{ csrf_token("crongroupcsrf") }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-info approve-the-deletion-for-cron-group text-white" id="clear_db_queue_btn">Clear DB Queue</button>
+                    <button type="submit" class="btn bg-warning approve-the-deletion-for-cron-group text-white" id="clear_redis_queue_btn">Clear Redis Queue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let deleteCronGroupButtons = document.querySelectorAll('.delete-cron-group-btn');
+        let deleteCronGroupModal = new bootstrap.Modal(document.getElementById('delete_cron_group_modal'), {});
+        let deleteCronGroupForm = document.getElementById('delete_cron_group_form');
+
+        deleteCronGroupButtons.forEach((el) => {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                let cronGroupName = el.getAttribute('data-cron-group-name');
+                document.getElementById('delete_cron_group_name').innerText = cronGroupName;
+                deleteCronGroupModal.show();
+
+                deleteCronGroupForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let confirmCronGroupName = document.getElementById('confirm-cron-group-name').value;
+                    if (confirmCronGroupName !== cronGroupName) {
+                        document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                        setTimeout(function() {
+                            document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                        }, 2500);
+                    } else {
+                        let deleteURL = "{{ path('cp_settings_action_cron_group_delete', {'name': '__NAME__'}) }}";
+                        deleteURL = deleteURL.replace('__NAME__', cronGroupName);
+                        let csrfToken = document.getElementById('_csrf_token_cron_group').value;
+                        let formData = new FormData();
+                        formData.append('_csrf', csrfToken);
+
+                        fetch(deleteURL, {
+                            body: formData,
+                            method: 'POST'
+                        }).then((response) => {
+                            return response.json();
+                        }).then((res) => {
+                            console.log(res)
+                            if (res.status) {
+                                deleteCronGroupModal.hide();
+                                window.location.reload();
+                            } else {
+                                document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                                document.querySelector('.generic_error').classList.remove('d-none');
+                                setTimeout(function() {
+                                    document.querySelector('.generic_error').classList.add('d-none');
+                                }, 2500)
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+        let clearActionQueueButtons = document.querySelectorAll('.clear-queue-btn');
+        let clearActionQueueModal = new bootstrap.Modal(document.getElementById('clear_action_queue_modal'), {});
+        let clearDBQueueBtn = document.getElementById('clear_db_queue_btn');
+        let clearRedisQueueBtn = document.getElementById('clear_redis_queue_btn');
+
+        clearActionQueueButtons.forEach((el) => {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                let cronGroupName = el.getAttribute('data-cron-group-name');
+                document.getElementById('clear_action_queue_cron_group').innerText = cronGroupName;
+                clearActionQueueModal.show();
+
+                clearDBQueueBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearQueue(cronGroupName, 'database');
+                });
+
+                clearRedisQueueBtn.addEventListener('click', (e) => {
+                   e.preventDefault();
+                   clearQueue(cronGroupName, 'redis');
+                });
+            });
+        });
+
+        function clearQueue (cronGroupName, queueType) {
+            let clearQueueURL = "{{ path('cp_settings_action_cron_group_clear_queue', {'name': '__NAME__'}) }}";
+            clearQueueURL = clearQueueURL.replace('__NAME__', cronGroupName);
+            let csrfToken = document.getElementById('_csrf_token_cron_group').value;
+            let formData = new FormData();
+            formData.append('_csrf', csrfToken);
+            formData.append('queue_type', queueType);
+
+            fetch(clearQueueURL, {
+                body: formData,
+                method: 'POST'
+            }).then((response) => {
+                return response.json();
+            }).then((res) => {
+                console.log(res)
+                if (res.status) {
+                    clearActionQueueModal.hide();
+                    window.location.reload();
+                } else {
+                    document.getElementById('clear_action_queue_modal').querySelector('.generic_error').innerHTML = res.errorMessage;
+                    document.getElementById('clear_action_queue_modal').querySelector('.generic_error').classList.remove('d-none');
+                    setTimeout(function () {
+                        document.getElementById('clear_action_queue_modal').querySelector('.generic_error').classList.add('d-none');
+                    }, 2500)
+                }
+            });
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Camera{% endblock %}
+{% set active = 'cameras' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_camera'),
+        'title': 'Cameras'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/camera/form.html.twig' %}
+{% endblock %}

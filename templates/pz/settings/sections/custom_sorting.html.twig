@@ -1,0 +1,1003 @@
+<div class="card shadow-none border-0 d-none d-xl-block" id="main-content">
+    {% set customSortingButtons = [] %}
+    {% set customModalColumnSize = [] %}
+    {% set modalButtons = {} %}
+    {% set formSubmitBtn = false %}
+    {% if app.user.customSorting %}
+        <div class="d-flex justify-content-end gap-1">
+            <a href="javascript:void(0)" class="btn btn-sm btn-primary" id="add-custom-sorting-group">{{ 'dockontrol.settings.custom_sorting.create_new_sorting_group_button'|trans }}</a>
+            <a href="{{ path('dockontrol_settings_custom_sorting_disable') }}" class="btn btn-sm btn-primary" id="disable-custom-sorting">{{ 'dockontrol.settings.custom_sorting.disable_button'|trans }}</a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 mt-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white py-1 px-2">
+                        <h6 class="mb-0">{{ 'dockontrol.settings.custom_sorting.info_page.title'|trans }}</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <p class="mb-1">
+                            <small>
+                                {{ 'dockontrol.settings.custom_sorting.info_page.description'|trans }}
+                            </small>
+                        </p>
+                        <ul>
+                            <small>
+                                <li>
+                                    <strong>{{ 'dockontrol.settings.custom_sorting.info_page.customizable_groups.title'|trans }}</strong>
+                                    {{ 'dockontrol.settings.custom_sorting.info_page.customizable_groups.description'|trans }}
+
+                                </li>
+                                <li>
+                                    <strong>{{ 'dockontrol.settings.custom_sorting.info_page.button_placement.title'|trans }}</strong>
+                                    {{ 'dockontrol.settings.custom_sorting.info_page.button_placement.description'|trans }}
+                                </li>
+                                <li>
+                                    <strong>{{ 'dockontrol.settings.custom_sorting.info_page.sorting.title'|trans }}</strong>
+                                    {{ 'dockontrol.settings.custom_sorting.info_page.sorting.description'|trans }}
+                                </li>
+                                <li>
+                                    <strong>{{ 'dockontrol.settings.custom_sorting.info_page.drag_and_drop.title'|trans }}</strong>
+                                    {{ 'dockontrol.settings.custom_sorting.info_page.drag_and_drop.description'|trans }}
+                                </li>
+                            </small>
+                        </ul>
+                        <p class="mb-0">
+                            <small>
+                                <em>{{ 'dockontrol.settings.custom_sorting.info_page.warning_message.title'|trans }}</em>
+                                {{ 'dockontrol.settings.custom_sorting.info_page.warning_message.description'|trans }}
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9" id="custom-sorting-groups">
+                {% for customSortingGroup in customSortingGroups %}
+                    {% if not customSortingGroup.isGroupForModal %}
+                    <div class="card mt-2 shadow-sm custom-sorting-groups" data-sort-index="{{ customSortingGroup.sortIndex }}" data-sort-group-id="{{ customSortingGroup.id }}">
+                        <div class="d-flex justify-content-between card-header text-body">
+                            <i class="bi bi-arrows-move handle hand-cursor"></i>
+                            <h5 class="mb-0">
+                                {{ customSortingGroup.name }}
+                            </h5>
+
+                            <div>
+                                <a href="javascript:void(0)"
+                                   class="text-decoration-none fs-6 text-body edit-custom-sorting-group-btn me-2"
+                                   data-custom-sort-group-id="{{ customSortingGroup.id }}"
+                                   data-custom-sort-group-name="{{ customSortingGroup.name }}"
+                                   data-custom-sort-group-column-size="{{ customSortingGroup.columnSize }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-original-title="{{ 'dockontrol.global.edit_button_tooltip'|trans }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+
+                                <a href="javascript:void(0)"
+                                   class="text-decoration-none fs-6 text-danger delete-custom-sorting-group-btn"
+                                   data-custom-sort-group-id="{{ customSortingGroup.id }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-original-title="{{ 'dockontrol.global.delete_button_tooltip'|trans }}">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="dropzone" data-group-id="{{ customSortingGroup.id }}">
+                                <div class="row p-0 m-0 dropzone-element" id="dropzone_{{ customSortingGroup.id }}" data-column-size="{{ customSortingGroup.columnSize }}">
+                                    {% if customSortingGroup.customSortingElements|length > 0 %}
+                                        {% for sortingGroup in customSortingGroup.customSortingElements %}
+                                            {% set customSortingButtons = customSortingButtons|merge([sortingGroup.button]) %}
+
+                                            <div class="mt-2 btn-element {% if customSortingGroup.columnSize == 1  %}
+                                            col-md-12 {% elseif customSortingGroup.columnSize == 2 %}
+                                            col-md-6 {% else %} col-md-4 {% endif %}">
+                                                {% set customName = sortingGroup.customName %}
+                                                {% set buttonName = sortingGroup.customName ?? sortingGroup.button.name|upper  %}
+                                                {% set buttonSpecification = nameConflicts[sortingGroup.button.name] > 1 and sortingGroup.customName is null ? (sortingGroup.button.nameSpecification|upper) : '' %}
+                                                {% set buttonText = buttonName ~ ' ' ~ buttonSpecification %}
+                                                {% set defaultButtonText = sortingGroup.button.name|upper ~ ' ' ~ nameConflicts[sortingGroup.button.name] > 1 ? sortingGroup.button.name|upper ~ ' ' ~  (sortingGroup.button.nameSpecification|upper) : sortingGroup.button.name|upper %}
+                                                <twig:Button name="{{ sortingGroup.button.action.name }}"
+                                                         buttonObj="{{ sortingGroup.button }}"
+                                                         customStyle="{{ sortingGroup.customButtonStyle }}"
+                                                         customName="{{ customName }}"
+                                                         id="{{ sortingGroup.button.id }}"
+                                                         value="{{ buttonName }} {{ buttonSpecification }}"
+                                                         text="{{ buttonText|translate_button_text|upper }}"
+                                                         defaultName="{{ defaultButtonText|translate_button_text|upper }}"
+                                                         isDraggable="true"
+                                                         isRelative="true"
+                                                         formSubmitButton="{{ formSubmitBtn }}"
+                                                         allowCamera="{{ is_granted('ROLE_TENANT') }}"
+                                                         showEditAndDeleteIcon="{{ true }}"
+                                                         allow1min="{{ sortingGroup.button.allow1MinOpen }}"
+                                                         customAllow1min="{{ sortingGroup.allow1MinOpen }}"
+                                            >
+                                            </twig:Button>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                        {% if customSortingGroup.customSortingElements|length > 0 %}
+                            {% for sortingElement in customSortingGroup.customSortingElements %}
+                                {% set parentButtonId = customSortingGroup.isGroupForModal.button.id %}  {# Get the parent button ID #}
+                                {% set customName = sortingElement.customName %}
+                                {% set customColor = sortingElement.customButtonStyle %}
+                                {% set isAllow1min = sortingElement.allow1MinOpen ? "1" : "0" %}
+                                {% set button = sortingElement.button.id %}
+                                {% set sortIndex = sortingElement.sortIndex %}
+                                {% set sortingData = {'button': button, 'name': customName, 'color': customColor, 'index': sortIndex, 'allow1min': isAllow1min} %}
+                                {% set modalButtonsColumnSize = customSortingGroup.columnSize %}
+                                {% if modalButtons[parentButtonId] is not defined %}
+                                    {% set modalButtons = modalButtons|merge({(parentButtonId): []}) %}
+                                {% endif %}
+                                {% if customModalColumnSize[parentButtonId] is not defined %}
+                                    {% set customModalColumnSize = customModalColumnSize|merge({(parentButtonId): modalButtonsColumnSize})  %}
+                                {% endif %}
+                                {% set modalButtons = modalButtons|merge({(parentButtonId): modalButtons[parentButtonId]|merge([sortingData])}) %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="col-md-3" id="user-buttons">
+                {% for button in buttons %}
+                    {% if button not in customSortingButtons %}
+                        {% set buttonName = button.name|upper %}
+                        {% set buttonText = buttonName ~ ' ' ~ (nameConflicts[button.name] > 1 ? button.nameSpecification|upper : '') %}
+                        <div class="mt-2">
+                            <twig:Button
+                                    buttonObj="{{ button }}"
+                                    id="{{ button.id }}"
+                                    name="{{ button.name }}"
+                                    text="{{ buttonText|translate_button_text|upper }}"
+                                    value="{{ button.name|upper }} {{ nameConflicts[button.name] > 1 ? (button.nameSpecification|upper) : '' }}"
+                                    defaultName="{{ buttonText|translate_button_text|upper }}"
+                                    formSubmitButton="{{ formSubmitBtn }}"
+                                    allowCamera="{{ is_granted('ROLE_TENANT') }}"
+                                    isDraggable="true"
+                                    showEditAndDeleteIcon="{{ true }}"
+                                    allow1min="{{ button.allow1MinOpen }}"
+                            ></twig:Button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="col-md-12 text-end mt-2">
+                <a href="javascript:void(0)" class="btn btn-primary btn-sm w-100 btn-large" id="save-custom-sorting-for-user">{{ 'dockontrol.settings.custom_sorting.save_custom_sorting_button'|trans }}</a>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="d-flex justify-content-end">
+            <a href="{{ path('dockontrol_settings_custom_sorting_enable') }}" class="btn btn-sm btn-primary" id="enable-custom-sorting">{{ 'dockontrol.settings.custom_sorting.enable_button'|trans }}</a>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <strong>{{ 'dockontrol.settings.custom_sorting.custom_sorting_disable_message'|trans }}</strong>
+        </div>
+    {% endif %}
+
+
+    <div class="modal fade" id="delete_sorting_group_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_sorting_group_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            {{ 'dockontrol.settings.custom_sorting.delete_custom_sorting_group_modal.title'|trans }}
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>{{ 'dockontrol.settings.custom_sorting.delete_custom_sorting_group_modal.description'|trans }}</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_sorting_group_name"></li>
+                            </ul>
+                        </strong>
+                        <p>{{ 'dockontrol.settings.custom_sorting.delete_custom_sorting_group_modal.warning_message'|trans }}</p>
+                        <span class="validation-invalid-label generic_error d-none">{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>
+                        <input type="hidden" class="_csrf_token_sorting_group_delete" name="_csrf_token_sorting_group_delete" id="_csrf_token_sorting_group_delete" value="{{ csrf_token('customsortinggroup') }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                        <button type="submit" class="btn bg-danger text-white">{{ 'dockontrol.global.modals.approve_the_deletion_button'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="create_sorting_group_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="create_sorting_group_form">
+                    <div class="modal-header bg-primary">
+                        <h6 class="card-title text-white m-0 p-0">
+                            {{ 'dockontrol.settings.custom_sorting.create_custom_sorting_group_modal.title'|trans }}
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <label for="custom_sorting_group_name">{{ 'dockontrol.settings.custom_sorting.create_custom_sorting_group_modal.name'|trans }}</label>
+                        <div class="position-relative w-100">
+                            <input type="text" id="custom_sorting_group_name" name="custom_sorting_group_name" class="form-control">
+                            <i class="bi bi-x position-absolute top-50 translate-middle-y cursor-pointer text-body end-0 me-2" id="clear-group-name"></i>
+                        </div>
+
+                        <div class="mt-2">
+                            <label for="custom_sorting_group_column_size">{{ 'dockontrol.settings.custom_sorting.create_custom_sorting_group_modal.column_size'|trans }}</label>
+                            <select id="custom_sorting_group_column_size" name="custom_sorting_group_column_size" class="form-select choices-select-size">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+
+
+                        <span class="validation-invalid-label generic_error d-none">{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>
+                        <input type="hidden" class="_csrf_token_sorting_group_create" name="_csrf_token_sorting_group_create" id="_csrf_token_sorting_group_create" value="{{ csrf_token('customsortinggroup') }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                        <button type="submit" class="btn bg-primary text-white">{{ 'dockontrol.settings.custom_sorting.create_custom_sorting_group_modal.save_button'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="customize_sorting_button_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="customize_sorting_button_form">
+                    <div class="modal-header bg-info">
+                        <h6 class="card-title text-white m-0 p-0" id="customize_sorting_button_name"></h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <label for="sorting_button_name">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.custom_button_name'|trans }}</label>
+                        <div class="position-relative w-100">
+                            <input type="text" id="sorting_button_name" name="sorting_button_name" class="form-control" placeholder="Enter button name">
+                            <i class="bi bi-x position-absolute top-50 translate-middle-y cursor-pointer text-body end-0 me-2" id="clear-custom-name"></i>
+                        </div>
+
+                        <div class="mt-2">
+                            <label for="custom_sorting_group_column_color">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.custom_color'|trans }}</label>
+                            <select id="custom_sorting_group_column_color" name="custom_sorting_group_column_color" class="form-select">
+                                <option value="">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.style.default'|trans }}</option>
+                                <option value="blue">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.style.blue'|trans }}</option>
+                                <option value="red">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.style.red'|trans }}</option>
+                            </select>
+                        </div>
+
+                        <div class="mt-2">
+                            <label for="custom_sorting_group_column_allow_1_min_open">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.allow_1_min_open'|trans }}</label>
+                            <select id="custom_sorting_group_column_allow_1_min_open" name="custom_sorting_group_column_allow_1_min_open" class="form-select">
+                                <option value="1">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.yes'|trans }}</option>
+                                <option value="0">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.no'|trans }}</option>
+                            </select>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token_sorting_group_create" id="_csrf_token_sorting_group_create" value="{{ csrf_token('customsortinggroup') }}">
+                    </div>
+
+                    <div class="modal-footer rounded-bottom-0">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                        <button type="submit" class="btn bg-primary text-white">{{ 'dockontrol.global.save_changes_button'|trans }}</button>
+                    </div>
+                </form>
+
+                <!-- Configure Modal Buttons Section -->
+                <div id="configure_modal_section" class="p-2 d-none">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <span class="mb-0 fw-bold">
+                                {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.title'|trans }}
+                            </span>
+                        </div>
+
+                        <div class="col-md-4 d-flex align-items-center">
+                            <label for="column-size" class="me-2 mb-0 w-100">
+                                {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.column_size'|trans }}
+                            </label>
+                            <select class="form-select" id="column-size" name="columnSize">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </div>
+
+                        <!-- Add New Button Link -->
+                        <div class="col-md-2 text-end">
+                            <a href="javascript:void(0);" id="add_new_button"
+                               class="text-success text-decoration-none show-underline-hover fs-6"
+                               data-bs-toggle="tooltip"
+                               title="{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.add_button'|trans }}">
+                                <i class="bi bi-plus-circle"></i>
+                                {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.add_button'|trans }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <table class="table table-striped text-nowrap">
+                        <thead>
+                        <tr>
+                            <th style="width: 5%;"></th>
+                            <th style="width: 30%;">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.listing.buttons'|trans }}</th>
+                            <th style="width: 30%;">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.listing.name'|trans }}</th>
+                            <th style="width: 20%;">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.listing.style'|trans }}</th>
+                            <th style="width: 20%;">{{ 'dockontrol.settings.custom_sorting.edit_button_modal.allow_1_min_open'|trans }}</th>
+                            <th style="width: 5%;"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="modal_buttons_table"></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-none border-0 d-xl-none" id="error-content">
+    <strong>{{ 'dockontrol.settings.custom_sorting.only_mobile_view_message'|trans }}</strong>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let addCustomSortingBtn = document.getElementById('add-custom-sorting-group');
+        let sortingGroupAddModal = new bootstrap.Modal(document.getElementById('create_sorting_group_modal'), {});
+        let customSortingGroupAddForm = document.getElementById('create_sorting_group_form');
+        let buttonConfigurations = {{ modalButtons|json_encode|raw }};
+        const buttonColumnSizeMap = {{ customModalColumnSize|json_encode|raw }};
+        let buttonForModalConfig;
+        let currentSortingData = JSON.stringify(generateSortingGroupsJSON());
+        let isSortingDataUpdated;
+        let needToShowPopupBeforeReloadPage = true;
+
+        function isSortingGroupUpdated()
+        {
+            let updatedSortingData = JSON.stringify(generateSortingGroupsJSON());
+            if (currentSortingData === updatedSortingData) {
+                isSortingDataUpdated = false;
+                if (!document.getElementById('save-custom-sorting-for-user').classList.contains('disabled')) {
+                    document.getElementById('save-custom-sorting-for-user').classList.add('disabled')
+                }
+            } else {
+                isSortingDataUpdated = true;
+                if (document.getElementById('save-custom-sorting-for-user').classList.contains('disabled')) {
+                    document.getElementById('save-custom-sorting-for-user').classList.remove('disabled')
+                }
+            }
+        }
+
+        addCustomSortingBtn.addEventListener('click', () => {
+            new Choices(document.getElementById('custom_sorting_group_column_size'), {
+                removeItemButton: true,
+                searchEnabled: false,
+                allowHTML: true,
+            });
+            customSortingGroupAddForm.reset();
+            sortingGroupAddModal.show();
+        });
+
+        customSortingGroupAddForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let customSortingGroupName = document.getElementById('custom_sorting_group_name').value;
+            let customSortingGroupColumnSize = document.getElementById('custom_sorting_group_column_size').value;
+            const editingGroupId = customSortingGroupAddForm.getAttribute('data-editing-group-id');
+
+            if (editingGroupId !== null) {
+                const card = document.querySelector(`.custom-sorting-groups[data-sort-group-id="${editingGroupId}"]`);
+                if (card) {
+                    card.querySelector('h5').textContent = customSortingGroupName;
+                    const dropzone = card.querySelector('.dropzone .row');
+                    dropzone.setAttribute('data-column-size', customSortingGroupColumnSize);
+                    const editButton = card.querySelector('.edit-custom-sorting-group-btn');
+                    editButton.setAttribute('data-custom-sort-group-name', customSortingGroupName);
+                    editButton.setAttribute('data-custom-sort-group-column-size', customSortingGroupColumnSize);
+                    if (card.querySelectorAll('.dropzone .row div.btn-element').length > 0) {
+                        card.querySelectorAll('.dropzone .row div.btn-element').forEach((el) => {
+                            const validSizes = { 1: 'col-md-12', 2: 'col-md-6', 3: 'col-md-4' };
+                            const columnClass = validSizes[customSortingGroupColumnSize];
+                            el.classList.remove('col-md-12', 'col-md-6', 'col-md-4');
+                            el.classList.add(columnClass);
+                        });
+                    }
+                    customSortingGroupAddForm.removeAttribute('data-editing-group-id');
+                }
+            } else {
+                let groupId = `group_${Date.now()}`;
+                let dropzoneId = `dropzone_${groupId}`;
+
+                let cardHTML = `
+                    <div class="card mt-2 shadow-sm custom-sorting-groups" data-sort-index="0" data-sort-group-id="${groupId}">
+                        <div class="d-flex justify-content-between card-header text-body">
+                            <i class="bi bi-arrows-move handle hand-cursor"></i>
+                            <h5 class="mb-0">${customSortingGroupName}</h5>
+                            <div>
+                                <a href="javascript:void(0)"
+                                   class="text-decoration-none fs-6 text-body edit-custom-sorting-group-btn me-2"
+                                   data-custom-sort-group-id="${groupId}"
+                                   data-custom-sort-group-name="${customSortingGroupName}"
+                                   data-custom-sort-group-column-size="${customSortingGroupColumnSize}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-original-title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="javascript:void(0)"
+                                   class="text-decoration-none fs-6 text-danger delete-custom-sorting-group-btn"
+                                   data-custom-sort-group-id="${groupId}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-original-title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="dropzone" data-group-id="${groupId}">
+                                <div class="row dropzone-element" id="${dropzoneId}" data-column-size="${customSortingGroupColumnSize}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                let sortingGroupsContainer = document.getElementById('custom-sorting-groups');
+                sortingGroupsContainer.insertAdjacentHTML('beforeend', cardHTML);
+            }
+            sortingGroupAddModal.hide();
+            initializeDropzones();
+            reinitializeTooltip();
+            isSortingGroupUpdated();
+        });
+
+        document.addEventListener('click', (event) => {
+            const editButton = event.target.closest('.edit-custom-sorting-group-btn');
+            if (editButton) {
+                const groupId = editButton.getAttribute('data-custom-sort-group-id');
+                const groupName = editButton.getAttribute('data-custom-sort-group-name');
+                const columnSize = editButton.getAttribute('data-custom-sort-group-column-size');
+                document.getElementById('custom_sorting_group_name').value = groupName;
+                document.getElementById('custom_sorting_group_column_size').value = columnSize;
+                customSortingGroupAddForm.setAttribute('data-editing-group-id', groupId);
+                new Choices(document.getElementById('custom_sorting_group_column_size'), {
+                    removeItemButton: false,
+                    searchEnabled: false,
+                    allowHTML: true,
+                    removeItems: false,
+                });
+                sortingGroupAddModal.show();
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (event.target.closest('.delete-custom-sorting-group-btn')) {
+                const deleteButton = event.target.closest('.delete-custom-sorting-group-btn');
+                const groupId = deleteButton.getAttribute('data-custom-sort-group-id');
+                const card = document.querySelector(`.custom-sorting-groups[data-sort-group-id="${groupId}"]`);
+                const tooltipId = deleteButton.getAttribute('aria-describedby');
+                const tooltipElement = document.getElementById(tooltipId);
+                if (card) {
+                    if (card.querySelectorAll('.dropzone .row div.btn-element').length > 0) {
+                        card.querySelectorAll('.dropzone .row div.btn-element').forEach((el) => {
+                            el.classList.remove('btn-element', 'col-md-4', 'col-md-6', 'col-md-12')
+                            const dragzone = document.getElementById('user-buttons');
+                            dragzone.appendChild(el);
+                        });
+                    }
+                    card.remove();
+                    if (tooltipElement) {
+                        tooltipElement.remove();
+                    }
+                    isSortingGroupUpdated();
+                }
+            }
+        });
+
+        initializeDropzones();
+
+        function initializeDropzones() {
+            document.querySelectorAll('.dropzone').forEach((el) => {
+                if (el.getAttribute('data-sortable-initialized')) {
+                    return;
+                }
+                let id = el.getAttribute('data-group-id');
+                let dropzoneElement = document.getElementById('dropzone_' + id);
+                new Sortable(dropzoneElement, {
+                    group: 'shared',
+                    animation: 150,
+                    onStart: function () {
+                        document.querySelectorAll('.dropzone').forEach((dropzone) => {
+                            dropzone.classList.add('drag-over');
+                        });
+                    },
+                    onMove: function (evt) {
+                        const droppedButton = evt.dragged;
+                        const dropzoneElement = evt.to;
+                        const columnSize = dropzoneElement.dataset.columnSize;
+                        if (dropzoneElement.classList.contains('row')) {
+                            const validSizes = { 1: 'col-md-12', 2: 'col-md-6', 3: 'col-md-4' };
+                            const columnClass = validSizes[columnSize];
+                            droppedButton.classList.remove('col-md-12', 'col-md-6', 'col-md-4');
+                            droppedButton.classList.add(columnClass);
+                        } else {
+                            droppedButton.classList.remove('btn-element', 'col-md-12', 'col-md-6', 'col-md-4');
+                        }
+                    },
+                    onEnd: function (evt) {
+                        document.querySelectorAll('.dropzone').forEach((dropzone) => {
+                            dropzone.classList.remove('drag-over');
+                        });
+                        const droppedButton = evt.item;
+                        const dropzoneElement = evt.to;
+                        const columnSize = dropzoneElement.dataset.columnSize;
+                        if (dropzoneElement.classList.contains('row')) {
+                            const validSizes = { 1: 'col-md-12', 2: 'col-md-6', 3: 'col-md-4' };
+                            const columnClass = validSizes[columnSize];
+                            droppedButton.classList.remove('col-md-12', 'col-md-6', 'col-md-4');
+                            droppedButton.classList.add(columnClass);
+                        } else {
+                            droppedButton.classList.remove('btn-element', 'col-md-12', 'col-md-6', 'col-md-4');
+                        }
+                        isSortingGroupUpdated();
+                    },
+                    onEnter: function (evt) {
+                        evt.to.classList.add('drag-over');
+                    },
+                    onLeave: function (evt) {
+                        evt.from.classList.remove('drag-over');
+                    },
+                });
+                el.setAttribute('data-sortable-initialized', 'true');
+            });
+        }
+
+        new Sortable(document.getElementById('user-buttons'), {
+            group: 'shared',
+            animation: 150,
+            onStart: function () {
+                document.querySelectorAll('.dropzone').forEach((dropzone) => {
+                    dropzone.classList.add('drag-over');
+                });
+            },
+            onMove: function (evt) {
+                const droppedButton = evt.dragged;
+                const dropzoneElement = evt.to;
+                const columnSize = dropzoneElement.dataset.columnSize;
+                if (dropzoneElement.classList.contains('row')) {
+                    const validSizes = { 1: 'col-md-12', 2: 'col-md-6', 3: 'col-md-4' };
+                    const columnClass = validSizes[columnSize];
+                    droppedButton.classList.remove('col-md-12', 'col-md-6', 'col-md-4');
+                    droppedButton.classList.add(columnClass);
+                } else {
+                    droppedButton.classList.remove('btn-element', 'col-md-12', 'col-md-6', 'col-md-4');
+                }
+            },
+            onEnd: function (evt) {
+                document.querySelectorAll('.dropzone').forEach((dropzone) => {
+                    dropzone.classList.remove('drag-over');
+                });
+                const droppedButton = evt.item;
+                const dropzoneElement = evt.to;
+                const columnSize = dropzoneElement.dataset.columnSize;
+                if (dropzoneElement.classList.contains('row')) {
+                    const validSizes = { 1: 'col-md-12', 2: 'col-md-6', 3: 'col-md-4' };
+                    const columnClass = validSizes[columnSize];
+                    droppedButton.classList.add('btn-element', columnClass);
+                } else {
+                    droppedButton.classList.remove('btn-element', 'col-md-12', 'col-md-6', 'col-md-4');
+                }
+                isSortingGroupUpdated();
+            },
+            onEnter: function (evt) {
+                console.log(evt)
+                evt.to.classList.add('drag-over');
+            },
+            onLeave: function (evt) {
+                evt.from.classList.remove('drag-over');
+            },
+        });
+
+        function deleteButton(button) {
+            button.classList.remove('btn-element', 'col-md-12', 'col-md-6', 'col-md-4');
+            const dragzone = document.getElementById('user-buttons');
+            dragzone.appendChild(button);
+            isSortingGroupUpdated();
+        }
+
+        document.querySelectorAll('.edit-icon').forEach((el) => {
+           el.addEventListener('click', (e) => {
+              handleEditClick(e);
+           });
+        });
+
+        document.querySelectorAll('.delete-icon').forEach((el) => {
+           el.addEventListener('click', (e) => {
+               let mainButtonElement = el.parentElement.parentElement.parentElement;
+               deleteButton(mainButtonElement)
+           });
+        });
+
+        function handleEditClick(e) {
+            e.stopPropagation();
+            const editIcon = e.currentTarget;
+            let buttonName = editIcon.getAttribute('data-button-name');
+            let buttonId = editIcon.getAttribute('data-button-id');
+            buttonForModalConfig = buttonId;
+            const button = document.getElementById(buttonId);
+            const parentElement = button.parentElement;
+            const defaultName = button.dataset.defaultName;
+            let hasCameraBtn = parentElement.querySelector('.camera-btn') !== null;
+            let customColor = button.getAttribute('data-custom-color');
+            let customColorElement = document.getElementById('custom_sorting_group_column_color');
+            let isAllow1MinOpen = Boolean(parseInt(button.dataset.allow1min));
+            let allow1minSelected = button.dataset.customAllow1min;
+            const columnSizeDropdown = document.getElementById("column-size");
+
+            if (!columnSizeDropdown.choiceInstance) {
+                columnSizeDropdown.choiceInstance = new Choices(columnSizeDropdown, {
+                    searchEnabled: false,
+                    allowHTML: true,
+                });
+            } else {
+                columnSizeDropdown.choiceInstance.removeActiveItems();
+            }
+
+            const selectedValue = buttonColumnSizeMap[buttonId] ? String(buttonColumnSizeMap[buttonId]) : "1";
+            buttonColumnSizeMap[buttonId] = selectedValue;
+            columnSizeDropdown.choiceInstance.setChoiceByValue(selectedValue);
+
+
+            const modal = new bootstrap.Modal(document.getElementById('customize_sorting_button_modal'));
+            document.getElementById('customize_sorting_button_name').textContent = buttonName;
+            const form = document.getElementById('customize_sorting_button_form');
+            form.reset();
+
+            document.getElementById('sorting_button_name').setAttribute('placeholder', buttonName.trim());
+
+            if (!customColorElement.choiceInstance) {
+                customColorElement.choiceInstance = new Choices(customColorElement, {
+                    searchEnabled: false,
+                    searchChoices: false,
+                    removeItems: true,
+                    removeItemButton: true,
+                    allowHTML: true
+                });
+            }
+
+            if (customColor !== null) {
+                customColorElement.choiceInstance.setChoiceByValue(customColor);
+            } else {
+                customColorElement.choiceInstance.setChoiceByValue("");
+            }
+            if (hasCameraBtn) {
+                if (!document.getElementById('customize_sorting_button_modal').classList.contains('modal-lg')) {
+                    document.getElementById('customize_sorting_button_modal').classList.add('modal-lg');
+                }
+            } else {
+                if (document.getElementById('customize_sorting_button_modal').classList.contains('modal-lg')) {
+                    document.getElementById('customize_sorting_button_modal').classList.remove('modal-lg');
+                }
+            }
+            let allow1minOpenElement = document.getElementById('custom_sorting_group_column_allow_1_min_open');
+
+            if (isAllow1MinOpen) {
+                allow1minOpenElement.removeAttribute('disabled');
+                if (!allow1minOpenElement.choiceInstance) {
+                    allow1minOpenElement.choiceInstance = new Choices(allow1minOpenElement, {
+                        searchEnabled: false,
+                        allowHTML: true,
+                    });
+                }
+                allow1minOpenElement.choiceInstance.setChoiceByValue(allow1minSelected);
+            } else {
+                if (allow1minOpenElement.choiceInstance) {
+                    allow1minOpenElement.choiceInstance.destroy();
+                    allow1minOpenElement.choiceInstance = null;
+                }
+                allow1minOpenElement.value = "0";
+                allow1minOpenElement.setAttribute('disabled', 'disabled');
+            }
+
+
+            const configureSection = document.getElementById('configure_modal_section');
+            configureSection.classList.toggle('d-none', !hasCameraBtn);
+            const tableBody = document.getElementById('modal_buttons_table');
+            tableBody.innerHTML = "";
+            loadStoredConfigurations(buttonId);
+            modal.show();
+
+            form.onsubmit = null;
+
+            document.getElementById('customize_sorting_button_modal').querySelector('#clear-custom-name').addEventListener('click', () => {
+                parentElement.querySelector('.btn-text').textContent = defaultName;
+                document.getElementById('sorting_button_name').setAttribute('placeholder', defaultName.trim());
+                button.removeAttribute('data-custom-name');
+            });
+
+            form.onsubmit =
+                function handleSubmit(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('sorting_button_name').value;
+                    const color = customColorElement.value;
+                    const allow1MinOpen = document.getElementById('custom_sorting_group_column_allow_1_min_open').value;
+
+                    if (name !== '') {
+                        parentElement.querySelector('.btn-text').textContent = name ? name : defaultName;
+                        button.value = name;
+                        button.setAttribute('data-custom-name', name);
+                    }
+                    button.setAttribute('data-custom-color', color);
+                    button.setAttribute('data-custom-allow1min', allow1MinOpen);
+
+                    const colorClasses = {
+                        blue: ' btn-primary border-primary hover-bg-primary',
+                        red: ' btn-danger border-danger hover-bg-red',
+                        basic: ' btn-basic',
+                    };
+
+                    for (let color in colorClasses) {
+                        let classes = colorClasses[color].split(' ');
+                        classes.forEach((buttonClass) => {
+                            if (button.classList.contains(buttonClass)) {
+                                button.classList.remove(buttonClass);
+                            }
+                        });
+                    }
+                    let buttonClasses = colorClasses[color];
+
+                    if (buttonClasses !== undefined) {
+                        button.className += buttonClasses;
+                    }
+
+                modal.hide();
+                editIcon.setAttribute('data-button-name', name);
+                isSortingGroupUpdated();
+            };
+        }
+
+        function loadStoredConfigurations(buttonId) {
+            const tableBody = document.getElementById('modal_buttons_table');
+            tableBody.innerHTML = ""; // Clear old rows before adding new ones
+
+            if (buttonConfigurations[buttonId]) {
+                buttonConfigurations[buttonId].forEach(config => {
+                    addTableRow(config.button, config.name, config.color, config.allow1min, buttonId);
+                });
+            }
+        }
+
+        function addTableRow(selectedButton = "", customName = "", selectedColor = "", allowOneMinuteOpen = 0, buttonId) {
+            const tableBody = document.getElementById('modal_buttons_table');
+            const newRow = document.createElement('tr');
+            customName = customName == null ? "" : customName;
+            let button = document.getElementById(buttonId);
+            let isAllow1Min = button.dataset.allow1min;
+
+            newRow.innerHTML = `
+        <td class="text-center align-middle">
+            <i class="bi bi-arrows-move handle hand-cursor"></i>
+        </td>
+        <td>
+            <select class="form-select button-select">
+                <option value=""> {{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.buttons_placeholder'|trans }} </option>
+                {% for button in buttons %}
+                    {% set buttonName = button.name %}
+                    {% set buttonText = buttonName ~ ' ' ~ (nameConflicts[buttonName] > 1 ? button.nameSpecification|upper : '') %}
+                    <option value="{{ button.id }}" ${selectedButton === "{{ button.id }}" ? "selected" : ""}>
+                        {{ buttonText|translate_button_text }}
+                    </option>
+                {% endfor %}
+            </select>
+        </td>
+        <td>
+            <input type="text" class="form-control name-input" value="${customName}">
+        </td>
+        <td>
+            <select class="form-select color-select">
+                <option value="" ${selectedColor === "" ? "selected" : ""}>{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.style.default'|trans }}</option>
+                <option value="blue" ${selectedColor === "blue" ? "selected" : ""}>{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.style.blue'|trans }}</option>
+                <option value="red" ${selectedColor === "red" ? "selected" : ""}>{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.style.red'|trans }}</option>
+            </select>
+        </td>
+        <td>
+            <select class="form-select allow-1-min-select" data-bs-toggle="tooltip"
+        data-bs-placement="top" data-bs-original-title="{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_tooltip'|trans }}">
+                <option value="0" ${allowOneMinuteOpen == 0 ? "selected" : ""}>{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.no'|trans }}</option>
+                <option value="1" ${allowOneMinuteOpen == 1 ? "selected" : ""}>{{ 'dockontrol.settings.custom_sorting.edit_button_modal.configure_modal_buttons.allow_1_min_open_option.yes'|trans }}</option>
+            </select>
+        </td>
+        <td class="text-center align-middle">
+            <i class="bi bi-trash remove-row cursor-pointer text-danger"></i>
+        </td>`;
+
+            tableBody.appendChild(newRow);
+
+            const buttonSelectElement = newRow.querySelector('.button-select');
+            const colorSelectElement = newRow.querySelector('.color-select');
+            const allow1MinSelectElement = newRow.querySelector('.allow-1-min-select');
+
+            if (!buttonSelectElement.choiceInstance) {
+                buttonSelectElement.choiceInstance = new Choices(buttonSelectElement, {
+                    searchEnabled: false,
+                    allowHTML: true
+                });
+            }
+
+            if (!colorSelectElement.choiceInstance) {
+                colorSelectElement.choiceInstance = new Choices(colorSelectElement, {
+                    searchEnabled: false,
+                    allowHTML: true
+                });
+            }
+
+            if (!Boolean(parseInt(isAllow1Min))) {
+                allow1MinSelectElement.setAttribute('disabled', 'disabled');
+            } else {
+                if (!allow1MinSelectElement.choiceInstance) {
+                    allow1MinSelectElement.choiceInstance = new Choices(allow1MinSelectElement, {
+                        searchEnabled: false,
+                        allowHTML: true
+                    });
+                }
+
+                allow1MinSelectElement.choiceInstance.setChoiceByValue(allowOneMinuteOpen.toString());
+            }
+
+            newRow.querySelector('.remove-row').addEventListener('click', function () {
+                newRow.remove();
+                saveTableConfig(buttonId);
+            });
+
+            buttonSelectElement.addEventListener('change', () => saveTableConfig(buttonId));
+            newRow.querySelector('.name-input').addEventListener('input', () => saveTableConfig(buttonId));
+            colorSelectElement.addEventListener('change', () => saveTableConfig(buttonId));
+            allow1MinSelectElement.addEventListener('change', () => saveTableConfig(buttonId));
+
+            reinitializeTooltip();
+        }
+
+        new Sortable(document.getElementById('modal_buttons_table'), {
+            handle: '.handle',
+            animation: 150,
+        });
+
+        function saveTableConfig(buttonId) {
+            const tableBody = document.getElementById('modal_buttons_table');
+            let configs = [];
+
+            tableBody.querySelectorAll('tr').forEach((row, index) => {
+                let button = row.querySelector('.button-select').value;
+                let name = row.querySelector('.name-input').value;
+                let color = row.querySelector('.color-select').value;
+                let allow1min = row.querySelector('.allow-1-min-select').value;
+
+                name = name === "" ? null : name;
+                color = color === "" ? null : color;
+                configs.push({ button, name, color, allow1min, index });
+            });
+
+            buttonConfigurations[buttonId] = configs;
+            isSortingGroupUpdated();
+        }
+
+        document.getElementById('add_new_button').addEventListener('click', function () {
+            addTableRow("", "", "", 0, buttonForModalConfig);
+        });
+
+        document.getElementById("column-size").addEventListener("change", function () {
+            if (buttonForModalConfig) {
+                buttonColumnSizeMap[buttonForModalConfig] = this.value;
+            }
+        });
+
+        new Sortable(document.getElementById('custom-sorting-groups'), {
+            handle: '.handle',
+            animation: 150,
+            onEnd: () => {
+                isSortingGroupUpdated();
+            }
+        });
+
+        document.getElementById('save-custom-sorting-for-user').addEventListener('click', (e) => {
+            e.preventDefault();
+            let sortingGroupData = generateSortingGroupsJSON();
+            let csrfToken = document.getElementById('_csrf_token_sorting_group_create').value;
+            let saveSortingGroupURL = "{{ path('dockontrol_custom_sorting_group_save') }}";
+            let formData = new FormData();
+            formData.append('_csrf', csrfToken);
+            formData.append('sortingGroupData', JSON.stringify(sortingGroupData));
+            fetch(saveSortingGroupURL, {
+                method: 'POST',
+                body: formData
+            }).then((res) => {
+                return res.json();
+            }).then(() => {
+                needToShowPopupBeforeReloadPage = false;
+                window.location.reload();
+            });
+        });
+
+        function generateSortingGroupsJSON() {
+            const sortingGroups = [];
+            const cleanButtons = (buttons) => {
+                return buttons.filter(button => button.id !== null && button.name !== null && button.value !== null);
+            };
+            document.querySelectorAll('.custom-sorting-groups').forEach((groupCard, index) => {
+                const groupData = {
+                    sort_index: index,
+                    name: groupCard.querySelector('h5').textContent.trim(),
+                    column_size: parseInt(groupCard.querySelector('a.edit-custom-sorting-group-btn').getAttribute('data-custom-sort-group-column-size')),
+                    buttons: []
+                };
+                const buttons = groupCard.querySelectorAll('.btn-draggable');
+                buttons.forEach((button) => {
+                    if (button !== null) {
+                        let btn = button.querySelector('.single-open');
+                        const buttonId = btn.dataset.buttonId;
+                        const buttonData = {
+                            id: buttonId,
+                            name: btn.dataset.name,
+                            value: btn.dataset.value,
+                            allow1min: btn.dataset.customAllow1min,
+                            custom_attributes: getButtonCustomAttributes(btn),
+                        };
+                        if (buttonConfigurations[buttonId] && buttonConfigurations[buttonId].length > 0) {
+                            buttonData.modal_buttons = buttonConfigurations[buttonId];
+                            buttonData.modal_buttons_column_size = buttonColumnSizeMap[buttonId];
+                        }
+                        groupData.buttons.push(buttonData);
+                    }
+                });
+                groupData.buttons = cleanButtons(groupData.buttons);
+                groupData.buttons.forEach((button, idx) => {
+                    button.sort_index = idx;
+                });
+                sortingGroups.push(groupData);
+            });
+            return sortingGroups;
+        }
+        isSortingGroupUpdated();
+
+        function getButtonCustomAttributes(button) {
+            const attributes = {};
+            Array.from(button.attributes).forEach(attr => {
+                if (attr.name.startsWith('data-')) {
+                    if (attr.value.trim() !== '') {
+                        attributes[attr.name] = attr.value;
+                    }
+                }
+            });
+            return attributes;
+        }
+
+        function reinitializeTooltip()
+        {
+            const tooltipElements = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+            for (const tooltip of tooltipElements) {
+                new bootstrap.Tooltip(tooltip); // eslint-disable-line no-new
+            }
+        }
+
+        window.addEventListener("beforeunload", function (event) {
+            if (isSortingDataUpdated && needToShowPopupBeforeReloadPage) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>

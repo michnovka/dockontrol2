@@ -1,0 +1,52 @@
+<button data-button-id="{{ this.buttonObj is not null ? this.buttonObj.id : id }}" data-value="{{ value }}" class="d-flex align-items-center w-100 btn-main p-0 m-0 border rounded {% if this.isRelative or nukiButton %} position-relative {% endif %} {% if this.isDraggable %} btn-draggable disabled {% endif %}">
+    <div id="{{ id }}"
+            class="{% if nukiButton %} nuki-btn {% else %} single-open {% endif%} {{ this.getButtonClasses() }} d-flex align-items-center justify-content-center"
+            data-name="{{ name }}"
+            data-value="{{ value }}"
+            data-default-name="{{ defaultName}}"
+            {% if this.customName %}
+                data-custom-name="{{ this.customName }}"
+            {% endif %}
+
+            {% if this.customStyle %}
+                data-custom-color="{{ this.customStyle.readable }}"
+            {% endif %}
+
+            {% if this.buttonObj is not null %}
+                data-button-id="{{ this.buttonObj.id }}"
+            {% endif %}
+
+            {% if not nukiButton %}
+                data-allow1min="{{ allow1min ? '1' : '0' }}"
+                data-custom-allow1min="{{ customAllow1min ? '1' : '0' }}"
+            {% endif %}
+            {% if nukiButton %}
+                data-nuki-id="{{ nukiId }}"
+                data-pin-enabled="{{ pinEnabled ? '1' : '0' }}"
+                data-is-lock="{{ nukiIsLock ? '1' : '0' }}"
+            {% endif %}
+    >
+        <span class="btn-text">{{ this.getText() }}</span>
+        <span id="{{ id }}_loader" class="spinner-border d-none"></span>
+        {% if nukiButton %}
+            {% if nukiIsLock %}
+                <i class="bi bi-lock-fill lock-nuki-btn nuki-btn-icon position-absolute top-50 end-0 translate-middle-y me-2 fs-3"></i>
+            {% else %}
+                <i class="bi bi-unlock-fill lock-nuki-btn nuki-btn-icon position-absolute top-50 end-0 translate-middle-y me-2 fs-3"></i>
+            {% endif %}
+        {% endif %}
+        {% if this.showEditAndDeleteIcon %}
+            <i class="bi bi-pencil-square edit-icon cursor-pointer text-body position-absolute top-50 start-0 translate-middle-y ms-2" data-button-id="{{ this.buttonObj.id }}" data-button-name="{{ this.customName ?? value|translate_button_text }}"></i>
+            <i class="bi bi-trash delete-icon cursor-pointer text-body position-absolute top-50 end-0 translate-middle-y me-2" data-button-id="{{ this.buttonObj.id }}" data-button-name="{{ this.customName ?? value|translate_button_text }}"></i>
+        {% endif %}
+    </div>
+
+    {% if this.getButtonHasCamera() and this.allowCamera %}
+        <div class="btn-right align-content-center camera-btn"  {{ this.getButtonAttributes() }}
+             data-allow1min="{{ allow1min ? '1' : '0' }}"
+             data-custom-allow1min="{{ customAllow1min ? '1' : '0' }}"
+             data-button-id="{{ this.buttonObj.id }}" data-text="{{ this.getText()|capitalize }}">
+            <img src="{{ asset('assets/images/security-camera.svg') }}" class="m-auto invert-svg" alt="Camera Icon"  height="32">
+        </div>
+    {% endif %}
+</button>

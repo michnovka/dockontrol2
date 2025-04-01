@@ -1,0 +1,137 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Buttons | Settings{% endblock %}
+{% set active = 'buttons' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Buttons'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_button_new'),
+        'title': 'Create New Buttton',
+    }
+] %}
+{% block content %}
+    <div class="card mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>{{ knp_pagination_sortable(buttons, 'ID', 'b.id') }}</th>
+                    <th>{{ knp_pagination_sortable(buttons, 'Name', 'b.name') }}</th>
+                    <th>{{ knp_pagination_sortable(buttons, 'Name Specification', 'b.nameSpecification') }}</th>
+                    <th>{{ knp_pagination_sortable(buttons, 'Type', 'b.type') }}</th>
+                    <th>{{ knp_pagination_sortable(buttons, 'Action Name', 'a.name') }}</th>
+                    <th>{{ knp_pagination_sortable(buttons, 'Permission', 'p.name') }}</th>
+                    <th>{{ knp_pagination_sortable(buttons, 'Allow 1 Min Open', 'b.allow1MinOpen') }}</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for button in buttons %}
+                    {% include 'cp/settings/button/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="8">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': buttons}) }}
+    </div>
+
+    <div class="modal fade" id="delete_button_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_button_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Button
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following button is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_button_id"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the ID of the button, which you want to delete.</h6>
+                        <input type="text" class="confirm-button-id form-control" id="confirm-button-id"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect button id.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_button" name="_csrf_token_button" id="_csrf_token_button" value="{{ csrf_token("buttoncsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-button text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let deleteButttonBtns = document.querySelectorAll('.delete-button-btn');
+        let deleteButtonModal = new bootstrap.Modal(document.getElementById('delete_button_modal'), {});
+        let deleteButtonForm = document.getElementById('delete_button_form');
+
+        deleteButttonBtns.forEach((el) => {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                let buttonId = el.getAttribute('data-button-id');
+                document.getElementById('delete_button_id').innerText = buttonId;
+                deleteButtonModal.show();
+
+                deleteButtonForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let confirmButtonId = document.getElementById('confirm-button-id').value;
+                    if (confirmButtonId !== buttonId) {
+                        document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                        setTimeout(function() {
+                            document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                        }, 2500);
+                    } else {
+                        let deleteURL = "{{ path('cp_settings_button_delete', {'id': '__ID__'}) }}";
+                        deleteURL = deleteURL.replace('__ID__', buttonId);
+                        let csrfToken = document.getElementById('_csrf_token_button').value;
+                        let formData = new FormData();
+                        formData.append('_csrf', csrfToken);
+
+                        fetch(deleteURL, {
+                            body: formData,
+                            method: 'POST'
+                        }).then((response) => {
+                            return response.json();
+                        }).then((res) => {
+                            if (res.status) {
+                                deleteButtonModal.hide();
+                                window.location.reload();
+                            } else {
+                                document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                                document.querySelector('.generic_error').classList.remove('d-none');
+                                setTimeout(function() {
+                                    document.querySelector('.generic_error').classList.add('d-none');
+                                }, 2500)
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

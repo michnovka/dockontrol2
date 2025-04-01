@@ -1,0 +1,22 @@
+<tr id="announcement_{{ announcement.id }}">
+    <td>
+        <input name="{{ announcement.subject }}" class="form-check-input announcement-checkbox  cursor-pointer" type="checkbox" data-id="{{ announcement.id }}">
+    </td>
+    <td>{{ announcement.subject }}</td>
+    <td>{{ announcement.building ? announcement.building.name : 'All buildings'  }}</td>
+    <td>{{ announcement|announcement_visibility_badge }}</td>
+    <td>{{ announcement.startTime ? announcement.startTime.format('Y-m-d H:i:s') : 'N/A' }}</td>
+    <td>{{ announcement.endTime ? announcement.endTime.format('Y-m-d H:i:s') : 'N/A' }}</td>
+    <td>{{ announcement.createdTime.format('Y-m-d H:i:s') }}</td>
+    <td>
+        {{ announcement.createdBy.name }}
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_settings_announcement_edit', {'id': announcement.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-announcement-btn" data-announcement-id="{{ announcement.id }}" data-announcement-subject="{{ announcement.subject }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

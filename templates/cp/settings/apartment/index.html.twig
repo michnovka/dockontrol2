@@ -1,0 +1,138 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Apartments | Settings{% endblock %}
+{% set active = 'apartments' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Apartments'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_apartment_new'),
+        'title': 'Create New Apartment',
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/settings/apartment/filter.html.twig' %}
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Building</th>
+                    <th>Default Group</th>
+                    <th>Users</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for apartment in apartments %}
+                    {% include 'cp/settings/apartment/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="6">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': apartments}) }}
+    </div>
+
+    <div class="modal fade" id="delete_apartment_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_apartment_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Apartment
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following apartment is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_apartment_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the Name of the apartment, which you want to delete.</h6>
+                        <input type="text" class="confirm-apartment-name form-control" id="confirm-apartment-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect apartment name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_apartment" name="_csrf_token_apartment" id="_csrf_token_apartment" value="{{ csrf_token("apartmentcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-apartment text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let deleteApartmentBtns = document.querySelectorAll('.delete-apartment-btn');
+        let deleteApartmentModal = new bootstrap.Modal(document.getElementById('delete_apartment_modal'), {});
+        let deleteApartmentForm = document.getElementById('delete_apartment_form');
+        deleteApartmentBtns.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let apartmentId = el.getAttribute('data-apartment-id');
+                let apartmentName = el.getAttribute('data-apartment-name');
+                document.getElementById('delete_apartment_name').innerText = apartmentName;
+                deleteApartmentModal.show();
+
+                deleteApartmentForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let confirmApartmentName = document.getElementById('confirm-apartment-name').value;
+
+                    if (confirmApartmentName !== apartmentName) {
+                        document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                        setTimeout(function() {
+                            document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                        }, 2500);
+                    } else {
+                        let deleteApartmentURL = "{{ path('cp_settings_apartment_delete', {'id': '__ID__'}) }}";
+                        deleteApartmentURL = deleteApartmentURL.replace('__ID__', apartmentId);
+                        let csrfToken = document.getElementById('_csrf_token_apartment').value;
+                        let formData = new FormData();
+                        formData.append('_csrf', csrfToken);
+
+                        fetch(deleteApartmentURL, {
+                            method: 'POST',
+                            body: formData
+                        }).then((res) => {
+                            return res.json();
+                        }).then((response) => {
+                            if (response.status) {
+                                deleteApartmentModal.hide();
+                                window.location.reload();
+                            } else {
+                                document.querySelector('.generic_error').innerHTML = response.errorMessage;
+                                document.querySelector('.generic_error').classList.remove('d-none');
+                                setTimeout(function() {
+                                    document.querySelector('.generic_error').classList.add('d-none');
+                                }, 2500)
+                            }
+                        })
+                    }
+                });
+            })
+        })
+    </script>
+{% endblock %}

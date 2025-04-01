@@ -1,0 +1,39 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Usage | Stats{% endblock %}
+{% set active = 'usage' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Stats', 'link': path('cp_stats')
+    },
+    {
+        'title': 'Stats For Last 3 Months'
+    }
+] %}
+{% block content %}
+<div class="card">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>Action</th>
+                {% for period in periods %}
+                    <th>{{ period }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+
+            <tbody class="table-group-divider">
+                {% for action, stat in stats %}
+                    <tr>
+                        <td>{{ action }}</td>
+                        {% for period in periods %}
+                            <td>{{ stat[period] is defined ? stat[period]|number_format : 0 }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,544 @@
+<div class="card mb-2">
+    <div class="card-body p-0">
+        <div class="card-header d-flex justify-content-between p-2 align-items-center">
+            <h6 class="mb-0">{{ 'dockontrol.settings.apartment.tenants_under_my_account'|trans }}</h6>
+            <div class="d-flex justify-content-end">
+                <a href="javascript:void(0)" class="btn btn-sm btn-primary add-tenant-btn" id="add-tenant-btn">{{ 'dockontrol.settings.apartment.add_tenant'|trans }}</a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive rounded">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>{{ 'dockontrol.settings.apartment.listing.name'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.email'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.phone'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.enabled'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.time_created'|trans }}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for tenant in app.user.tenants %}
+                        <tr>
+                            <td>{{ tenant.name }}</td>
+                            <td>
+                                {{ tenant.email|lower }}
+                                {% if tenant.emailVerified %}
+                                    <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail verified">
+                                {% else %}
+                                    <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail not verified">
+                                {% endif %}
+                            </td>
+                            <td>
+                                +{{ tenant.phoneCountryPrefix }}{{ tenant.phone }}
+                                {% if tenant.phoneVerified %}
+                                    <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone verified">
+                                {% else %}
+                                    <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone not verified">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill bg-{{ tenant.enabled ? 'success' : 'danger' }}">{{ tenant.enabled ? 'Yes' : 'No' }}</span>
+                            </td>
+                            <td>{{ tenant.createdTime|time_tooltip }}</td>
+                            <td class="text-end text-nowrap">
+                                <a href="#" class="text-decoration-none fs-6 text-body edit-tenant-btn" data-id="{{ tenant.id }}" data-name="{{ tenant.name }}" data-email="{{ tenant.email }}" data-phone="{{ tenant.phone }}" data-phone-country-prefix="{{ tenant.phoneCountryPrefix }}" data-enabled="{{ tenant.enabled }}" data-bs-toggle="tooltip" data-bs-original-title="{{ 'dockontrol.global.edit_button_tooltip'|trans }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="#" class="text-decoration-none fs-6 text-danger delete-tenant-btn" data-tenant-id="{{ tenant.id }}" data-tenant-email="{{ tenant.email }}" data-bs-toggle="tooltip" data-bs-original-title="{{ 'dockontrol.global.delete_button_tooltip'|trans }}">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">{{ 'dockontrol.settings.apartment.listing.no_data'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="card-header p-2">
+            <h6 class="mb-0">{{ 'dockontrol.settings.apartment.other_accounts_related_to_this_apartment'|trans }}</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive rounded">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>{{ 'dockontrol.settings.apartment.listing.name'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.type'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.email'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.phone'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.enabled'|trans }}</th>
+                        <th>{{ 'dockontrol.settings.apartment.listing.time_created'|trans }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for apartmentUser in app.user.apartment.users %}
+                        <tr>
+                            <td>{{ apartmentUser.name }}</td>
+                            <td>
+                                <span class="badge {{ apartmentUser.role.badgeClass }}">{{ apartmentUser.role.readable }}</span>
+                                {% if apartmentUser.landlord is not null %}
+                                    ({{ apartmentUser.landlord.name }})
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ apartmentUser.email|lower }}
+                                {% if apartmentUser.emailVerified %}
+                                    <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail verified">
+                                {% else %}
+                                    <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail not verified">
+                                {% endif %}
+                            </td>
+                            <td>
+                                +{{ apartmentUser.phoneCountryPrefix }}{{ apartmentUser.phone }}
+                                {% if apartmentUser.phoneVerified %}
+                                    <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone verified">
+                                {% else %}
+                                    <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone not verified">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill bg-{{ apartmentUser.enabled ? 'success' : 'danger' }}">{{ apartmentUser.enabled ? 'Yes' : 'No' }}</span>
+                            </td>
+                            <td>{{ apartmentUser.createdTime|time_tooltip }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">{{ 'dockontrol.settings.apartment.listing.no_data'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="create_tenant_modal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="create_tenant_form">
+                <div class="modal-header bg-primary">
+                    <h6 class="card-title text-white mb-0">
+                        {{ 'dockontrol.settings.apartment.create_and_edit_modal.create_title'|trans }}
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body" id="form-content">
+                    {# render tenant type form here #}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                    <button type="submit" id="submit-btn" class="btn bg-success approve-the-deletion-for-group text-white disabled">{{ 'dockontrol.settings.apartment.create_and_edit_modal.save_btn'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete_tenant_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="delete_tenant_form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-white mb-0">
+                        {{ 'dockontrol.settings.apartment.delete_tenant_modal.title'|trans }}
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>{{ 'dockontrol.settings.apartment.delete_tenant_modal.description'|trans }}</p>
+                    <strong>
+                        <ul>
+                            <li id="delete_tenant_email"></li>
+                        </ul>
+                    </strong>
+                    <p>{{ 'dockontrol.settings.apartment.delete_tenant_modal.confirmation_message'|trans }}</p>
+                    <hr>
+                    <h6 class="font-weight-semibold">{{ 'dockontrol.settings.apartment.delete_tenant_modal.enter_email_info_label'|trans }}</h6>
+                    <input type="email" class="confirm-email form-control" id="confirm-email"/>
+                    <span class="validation-invalid-label incorrect_code d-none">{{ 'dockontrol.settings.apartment.delete_tenant_modal.incorrect_email'|trans }}</span>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>
+                    <input type="hidden" class="_csrf_token_tenant" name="_csrf_token_tenant" id="_csrf_token_tenant" value="{{ csrf_token("tenantcsrf") }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.global.modals.close_button'|trans }}</button>
+                    <button type="submit" class="btn bg-danger approve-the-deletion-for-group text-white">{{ 'dockontrol.global.modals.approve_the_deletion_button'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/phone-with-prefix.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {# create tenant #}
+            let createTenantForm = document.getElementById("create_tenant_form");
+            let createTenantBtn = document.querySelectorAll(".add-tenant-btn");
+            let editTenantBtns = document.querySelectorAll(".edit-tenant-btn");
+            let createTenantModal = new bootstrap.Modal(document.getElementById("create_tenant_modal"), {});
+            let submitBtn = document.getElementById("submit-btn");
+            let formContent = document.getElementById('form-content');
+
+            createTenantBtn.forEach((el) => {
+                el.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    resetForm();
+                    createTenantModal._element.querySelector('h6').innerHTML = "{{ 'dockontrol.settings.apartment.create_and_edit_modal.create_title'|trans }}";  // Update title for creating tenant
+                    fetchForm();
+                });
+            });
+
+            createTenantForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                let tenantIdElement = createTenantForm.querySelector("#tenant-id");
+                let tenantId = tenantIdElement ? tenantIdElement.value : null;
+                let submitURL = tenantId ? "{{ path('dockontrol_settings_tenant_edit', {'id': '__ID__'}) }}".replace('__ID__', tenantId) : "{{ path('dockontrol_settings_tenant_create') }}";
+
+                let formData = new FormData(createTenantForm);
+                let _csrf = document.getElementById('_csrf_token_tenant').value;
+                formData.append('_csrf', _csrf);
+
+                fetch(submitURL, {
+                    method: "POST",
+                    body: formData,
+                })
+                    .then((res) => res.json())
+                    .then((response) => {
+                        if (response.status) {
+                            createTenantModal.hide();
+                            window.location.reload();
+                        } else {
+                            if (response.errorMessage) {
+                                showGenericError(response.errorMessage);
+                            }
+
+                            if (response.errors) {
+                                displayValidationErrors(response.errors);
+                            }
+                        }
+                    })
+                    .catch((error) => console.error("Error:", error));
+            });
+
+            function fetchForm(tenantId = null) {
+                let fetchURL = "{{ path('dockontrol_settings_tenant_create') }}";
+
+                if (tenantId !== null) {
+                    fetchURL = "{{ path('dockontrol_settings_tenant_edit', {'id': '__ID__'}) }}".replace('__ID__', tenantId);
+                }
+
+                fetch(fetchURL, {
+                    method: "GET",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then((response) => response.text())
+                    .then((html) => {
+                        formContent.innerHTML = html;
+                        createTenantModal.show();
+                        initPhoneInput(formContent);
+
+                        document.getElementById("tenant_password_first")?.addEventListener("input", (e) => {
+                            handlePasswordStrength(e.target.value);
+                            validatePasswordMatch();
+                            enableSubmitButtonIfValid();
+                        });
+
+                        document.getElementById("tenant_password_second")?.addEventListener("input", (e) => {
+                            validatePasswordMatch();
+                            enableSubmitButtonIfValid();
+                        });
+
+                        document.getElementById("tenant_name")?.addEventListener("input", enableSubmitButtonIfValid);
+                        document.getElementById("tenant_phone")?.addEventListener("input", enableSubmitButtonIfValid);
+                        document.getElementById("tenant_email_first")?.addEventListener("input", enableSubmitButtonIfValid);
+                        document.getElementById("tenant_email_second")?.addEventListener("input", enableSubmitButtonIfValid);
+
+                        if (tenantId === null) {
+                            document.getElementById("tenant_email_first")?.addEventListener("input", validateEmailMatch);
+                            document.getElementById("tenant_email_second")?.addEventListener("input", validateEmailMatch);
+                        }
+
+                        if (tenantId) {
+                            submitBtn.classList.remove("disabled");
+                        }
+                    })
+                    .catch((error) => console.error("Error:", error));
+            }
+
+            function displayValidationErrors(errors) {
+                clearErrors();
+                for (const field in errors) {
+                    let fieldElement = document.getElementById(`tenant_${field}`);
+                    if (fieldElement) {
+                        let errorContainer = document.createElement("div");
+                        errorContainer.classList.add("invalid-feedback", "d-block");
+                        errorContainer.textContent = errors[field].join(", ");
+                        fieldElement.classList.add("is-invalid");
+                        fieldElement.parentNode.parentElement.appendChild(errorContainer);
+                    }
+                }
+            }
+
+            function validateEmailMatch() {
+                let email = document.getElementById("tenant_email_first").value;
+                let confirmEmail = document.getElementById("tenant_email_second").value;
+                let errorElement = document.getElementById("email-match-error");
+
+                if (email !== confirmEmail) {
+                    if (!errorElement) {
+                        errorElement = document.createElement("div");
+                        errorElement.id = "email-match-error";
+                        errorElement.className = "invalid-feedback d-block";
+                        errorElement.textContent =  "{{ 'dockontrol.settings.apartment.create_and_edit_modal.email_not_match'|trans }}";
+                        document.getElementById("tenant_email_second").after(errorElement);
+                    }
+                    submitBtn.classList.add("disabled");
+                } else {
+                    errorElement?.remove();
+                }
+            }
+
+            editTenantBtns.forEach((el) => {
+                el.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    resetForm();
+                    createTenantModal._element.querySelector('h6').innerHTML = "{{ 'dockontrol.settings.apartment.create_and_edit_modal.edit_title'|trans }}";
+                    const tenantId = el.dataset.id;
+                    appendTenantIdField(tenantId);
+
+                    fetchForm(tenantId);
+                    createTenantModal.show();
+                });
+            });
+
+            function clearErrors() {
+                document.querySelectorAll(".invalid-feedback").forEach(el => el.remove());
+                document.querySelectorAll(".is-invalid").forEach(el => el.classList.remove("is-invalid"));
+            }
+
+            function showGenericError(message) {
+                let errorDiv = document.querySelector(".generic_error");
+                errorDiv.innerHTML = message;
+                errorDiv.classList.remove("d-none");
+                setTimeout(() => {
+                    errorDiv.classList.add("d-none");
+                }, 2500);
+            }
+
+            function handlePasswordStrength(password) {
+                const errorId = "weak-password-element";
+                const target = document.getElementById("tenant_password_first");
+                if (password !== "") {
+                    let strength = checkPasswordStrength(password);
+                    if (strength < 5) {
+                        showError(errorId, target, "{{ 'dockontrol.settings.apartment.create_and_edit_modal.weak_password'|trans }}");
+                        return false;
+                    } else {
+                        removeError(errorId);
+                        return true;
+                    }
+                } else {
+                    removeError(errorId);
+                    return true;
+                }
+            }
+
+            function validatePasswordMatch() {
+                const first = document.getElementById("tenant_password_first").value;
+                const second = document.getElementById("tenant_password_second").value;
+                const tenantId = document.getElementById("tenant-id") ? document.getElementById("tenant-id").value : "";
+                const isEdit = Boolean(tenantId);
+                const errorId = "second-password-error-element";
+                const target = document.getElementById("tenant_password_second");
+                const errorMsg = "{{ 'dockontrol.settings.apartment.create_and_edit_modal.password_not_match'|trans }}";
+
+                if (first === "" && second === "") {
+                    removeError(errorId);
+                    return true;
+                }
+
+                if (!isEdit) {
+                    if (!first || !second || first !== second) {
+                        showError(errorId, target, errorMsg);
+                        return false;
+                    } else {
+                        removeError(errorId);
+                        return true;
+                    }
+                }
+                else {
+                    if (first === "" && second === "") {
+                        removeError(errorId);
+                        return true;
+                    } else if (!first || !second || first !== second) {
+                        showError(errorId, target, errorMsg);
+                        return false;
+                    } else {
+                        removeError(errorId);
+                        return true;
+                    }
+                }
+            }
+
+            function enableSubmitButtonIfValid() {
+                const tenantId = document.getElementById("tenant-id")?.value.trim() || "";
+                const isEdit = tenantId !== "";
+
+                const name = document.getElementById("tenant_name")?.value.trim() || "";
+                const phone = document.getElementById("tenant_phone")?.value.trim() || "";
+                let email = "";
+                let confirmEmail = "";
+
+                if (isEdit) {
+                    email = document.getElementById("tenant_email")?.value.trim() || "";
+                } else {
+                    email = document.getElementById("tenant_email_first")?.value.trim() || "";
+                    confirmEmail = document.getElementById("tenant_email_second")?.value.trim() || "";
+                }
+
+                const firstPassword = document.getElementById("tenant_password_first")?.value || "";
+                const secondPassword = document.getElementById("tenant_password_second")?.value || "";
+
+                const pwdStrengthValid = handlePasswordStrength(firstPassword);
+                const pwdMatchValid = validatePasswordMatch();
+
+                let valid = false;
+
+                if (!isEdit) {
+                    valid = name && phone && email && confirmEmail && firstPassword && secondPassword &&
+                        pwdStrengthValid && pwdMatchValid && (email === confirmEmail);
+                } else {
+                    if (name && phone && email) {
+                        valid = (firstPassword === "" && secondPassword === "") ||
+                            (pwdStrengthValid && pwdMatchValid);
+                    }
+                }
+
+                submitBtn.disabled = !valid;
+                submitBtn.classList.toggle("disabled", !valid);
+            }
+
+            function showError(errorId, targetElement, message) {
+                let errorElement = document.getElementById(errorId);
+                if (!errorElement) {
+                    errorElement = document.createElement("div");
+                    errorElement.id = errorId;
+                    errorElement.className = "invalid-feedback d-block";
+                    errorElement.textContent = message;
+                    targetElement.after(errorElement);
+                }
+            }
+
+            function removeError(errorId) {
+                let errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.remove();
+                }
+            }
+
+            function checkPasswordStrength(password) {
+                if (password.length < 8) return 0;
+
+                const hasUpper = /[A-Z]/.test(password);
+                const hasDigit = /\d/.test(password);
+                const hasSpecial = /[\W_]/.test(password);
+
+                if (!hasUpper || !hasDigit || !hasSpecial) {
+                    return 0;
+                }
+
+                let score = 4;
+                score += Math.floor(password.length / 3);
+                return Math.min(score, 10);
+            }
+
+            function resetForm() {
+                createTenantForm.reset();
+                const tenantIdField = createTenantForm.querySelector('#tenant-id');
+                if (tenantIdField) tenantIdField.remove();
+                clearErrors();
+            }
+
+            function appendTenantIdField(tenantId) {
+                const hiddenTypeElement = document.createElement('input');
+                hiddenTypeElement.type = 'hidden';
+                hiddenTypeElement.name = 'tenant-id';
+                hiddenTypeElement.id = 'tenant-id';
+                hiddenTypeElement.value = tenantId;
+                createTenantForm.appendChild(hiddenTypeElement);
+            }
+
+            {# delete tenant #}
+            let deleteBtns = document.querySelectorAll('.delete-tenant-btn');
+            let deleteForm = document.getElementById('delete_tenant_form');
+            let deleteModal = new bootstrap.Modal(document.getElementById('delete_tenant_modal'), {});
+
+            deleteBtns.forEach((el) => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    let email = this.getAttribute('data-tenant-email');
+                    let tenantId = this.getAttribute('data-tenant-id');
+                    document.getElementById('delete_tenant_email').innerText = email;
+                    document.getElementById('confirm-email').value = null;
+                    deleteModal.show();
+
+                    deleteForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        let confirmEmail = document.getElementById('confirm-email').value;
+                        if (confirmEmail !== email) {
+                            document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                            }, 2500);
+                        } else {
+                            let deleteURL = '{{ path('dockontrol_settings_tenant_delete', {'id': '__ID__'}) }}';
+                            deleteURL = deleteURL.replace('__ID__', tenantId);
+                            let _csrf = document.getElementById('_csrf_token_tenant').value;
+                            let formData = new FormData();
+                            formData.append('_csrf', _csrf);
+                            fetch(deleteURL, {
+                                method: 'POST',
+                                body: formData
+                            }).then((res) => {
+                                return res.json();
+                            }).then((response) => {
+                                if (response.status) {
+                                    deleteModal.hide();
+                                    window.location.reload();
+                                } else {
+                                    document.querySelector('.generic_error').innerHTML = response.errorMessage;
+                                    document.querySelector('.generic_error').classList.remove('d-none');
+                                    setTimeout(function() {
+                                        document.querySelector('.generic_error').classList.add('d-none');
+                                    }, 2500)
+                                }
+                            })
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}

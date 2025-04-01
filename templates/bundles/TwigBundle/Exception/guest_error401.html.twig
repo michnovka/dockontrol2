@@ -1,0 +1,9 @@
+{% extends 'bundles/TwigBundle/Exception/base_error.html.twig' %}
+
+{% set title = 'dockontrol.error.401.title'|trans %}
+{% set status_code = 401 %}
+{% set description = 'dockontrol.error.401.description'|trans %}
+
+{% block error_icon %}
+    <i class="bi bi-lock"></i>
+{% endblock %}

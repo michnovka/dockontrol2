@@ -1,0 +1,41 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}User Action Logs | Logs{% endblock %}
+{% set active = 'user_action_logs' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Logs', 'link': path('cp_logs')
+    },
+    {
+        'title': 'User Action Logs'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/logs/user_action_log/filter.html.twig' %}
+
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                    <th>Admin</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for userActionLog in userActionLogs %}
+                    {% include 'cp/logs/user_action_log/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="4">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('cp/common/custom_pagination.html.twig') }}
+    </div>
+{% endblock %}

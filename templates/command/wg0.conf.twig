@@ -1,0 +1,12 @@
+[Interface]
+PrivateKey = {{ wireguardServerPrivateKey }}
+Address = {{ wireguardServerVPNIP }}/{{ wireguardServerSubnet }}
+ListenPort = {{ wireguardServerPort }}
+
+{% for node in dockontrolNodes %}
+# {{ node.name }}
+[Peer]
+PublicKey = {{ node.wireguardPublicKey }}
+AllowedIPs = {{ node.ip }}/32
+
+{% endfor %}

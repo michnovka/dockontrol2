@@ -1,0 +1,8 @@
+<tr>
+    <td>{{ loginLog.id }}</td>
+    <td>{{ loginLog.time.format('Y-m-d H:i:s') }}</td>
+    <td>{{ loginLog.email is not empty ? loginLog.email|lower : 'N/A' }}</td>
+    <td>{{ loginLog.ip }}</td>
+    <td>{{ loginLog.browser }}</td>
+    <td>{{ loginLog.platform }}</td>
+</tr>

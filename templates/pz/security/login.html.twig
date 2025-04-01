@@ -1,0 +1,58 @@
+{% extends 'pz/pz_base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block logincontent %}
+<div class="page-content">
+    <div class="content container-md pt-0">
+        <h1 class="text-center">DOCKontrol {{ 'dockontrol.security.login.login'|trans }}</h1>
+            <form method="post">
+                <div class="card mb-0 border-0 shadow-none">
+                    <div class="card-body">
+                        {% include 'pz/common/messages.html.twig' with {'show_closable_button': false} %}
+                        {% if error %}
+                            <div class="alert alert-danger border-0 fade show">
+                                <div class="alert-inner">
+                                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-control-feedback form-control-feedback-start">
+                                        <input type="email" name="_username" id="inputEmail" class="form-control form-control-lg" placeholder="{{ 'dockontrol.security.login.email'|trans }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-control-feedback form-control-feedback-start">
+                                        <input type="password" name="_password" id="inputPassword" class="form-control form-control-lg" autocomplete="new-password" required placeholder="{{ 'dockontrol.security.login.password'|trans }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <div class="mb-3">
+                            <button type="submit" class="btn btn-primary w-100 btn-lg login-btn">{{ 'dockontrol.security.login.login'|trans }}</button>
+                        </div>
+
+                        <div class="text-end">
+                            <a href="{{ path('dockontrol_forgot_password') }}" class="nav-link show-underline-hover text-primary">{{ 'dockontrol.security.login.forgot_password'|trans }}</a>
+                        </div>
+                        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                            <div class="text-end">
+                                <a href="{{ path('dockontrol_main') }}" class="nav-link show-underline-hover text-primary">{{ 'dockontrol.security.login.return_to_control_panel'|trans }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

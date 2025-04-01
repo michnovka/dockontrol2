@@ -1,0 +1,24 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(form) }}
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.expires) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.remainingActions) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.defaultLanguage) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.note) }}
+            </div>
+            <div class="col-md-12 text-start">
+                <button type="submit" class="btn btn-primary mt-4 w-100">{{ 'dockontrol.guest_pass.form.create_guest_pass_button'|trans }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+</div>

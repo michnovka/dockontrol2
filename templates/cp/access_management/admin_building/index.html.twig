@@ -1,0 +1,38 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Admin Buildings | Access Management{% endblock %}
+{% set active = 'admin_buildings' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'title': 'Admin Buildings'
+    }
+] %}
+
+{% block content %}
+<div class="card mb-2">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Buildings</th>
+                <th class="text-end">Action</th>
+            </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for admin in adminUsers %}
+                {% include 'cp/access_management/admin_building/row.html.twig' %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No records found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': adminUsers}) }}
+</div>
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}System Overview | Settings{% endblock %}
+{% set active = 'system_overview' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'System Overview'
+    }
+] %}
+{% block content %}
+    {% if usingDefaultAppSecret %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Warning!</strong> Default APP_SECRET env variable is used. change it ASAP
+        </div>
+    {% endif %}
+    <div class="row d-flex">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header p-2 text-white">
+                    PHP
+                </div>
+                <div class="table-responsive rounded">
+                    <table class="table table-striped table-sm">
+                        <tr>
+                            <td>Version</td>
+                            <td class="text-end">{{ phpInfo.version }}</td>
+                        </tr>
+                        <tr>
+                            <td>Memory limit</td>
+                            <td class="text-end">{{ phpInfo.memoryLimit }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-nowrap">Maximum execution time</td>
+                            <td class="text-end">{{ phpInfo.maxExecutionTime }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-nowrap">File upload maximum size</td>
+                            <td class="text-end">{{ phpInfo.uploadMaxFilesize }}</td>
+                        </tr>
+                        <tr>
+                            <td class="align-top">Extensions</td>
+                            <td>
+                                <p class="text-break">
+                                    {{ phpInfo.extensions|join(', ') }}
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header p-2 text-white">
+                    Database
+                </div>
+                <div class="table-responsive rounded">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <td>Type</td>
+                            <td class="text-end">{{ dbInfo.type }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Version</td>
+                            <td class="text-end">{{ dbInfo.version }}</td>
+                        </tr>
+                        <tr>
+                            <td>Size</td>
+                            <td class="text-end">{{ dbInfo.size }} MB</td>
+                        </tr>
+                        <tr>
+                            <td>Database using UTF8MB4</td>
+                            <td class="text-end">
+                                {% if dbInfo.isDBUsingUtf8mb4 %}
+                                    <i class="bi-check-circle text-success"></i>
+                                {% else%}
+                                    <i class="bi-x-circle text-danger"></i>
+                                {% endif%}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="align-top">Default password</td>
+                            <td class="text-end">
+                                {% if dbInfo.usingDefaultPassword %}
+                                    <span class="text-danger">Yes</span>
+                                {% else %}
+                                    <span class="text-success">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header p-2">
+                    OS Information
+                </div>
+                <div class="table-responsive rounded">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <td>Device</td>
+                            <td class="text-end">{{ osInfo.deviceName }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>CPU</td>
+                            <td class="text-end">{{ osInfo.cpuModel }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Memory</td>
+                            <td class="text-end">{{ osInfo.memory ~ ' MB' }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Memory usage</td>
+                            <td class="text-end">{{ osInfo.memPeak ~ ' MB' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header p-2">
+                    Disk Usage
+                </div>
+                <div class="table-responsive rounded">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <td>Used disk space</td>
+                            <td class="text-end">{{ diskUsage.used }}</td>
+                        </tr>
+                        <tr>
+                            <td>Free disk space</td>
+                            <td class="text-end">{{ diskUsage.available }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total disk space</td>
+                            <td class="text-end">{{ diskUsage.total }}</td>
+                        </tr>
+                        <tr>
+                            <td>Percentage</td>
+                            <td class="text-end">{{ diskUsage.percent }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2 mb-2">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header p-2">
+                    Redis Server and Memory Information
+                </div>
+                <div class="table-responsive rounded">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <td>Redis version</td>
+                            <td class="text-end">{{ redisInfo.Server.redisVersion }}</td>
+                        </tr>
+                        <tr>
+                            <td>OS</td>
+                            <td class="text-end">{{ redisInfo.Server.os }}</td>
+                        </tr>
+                        <tr>
+                            <td>Uptime (days)</td>
+                            <td class="text-end">{{ redisInfo.Server.uptime }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Used memory</td>
+                            <td class="text-end">{{ redisInfo.Memory.usedMemory }}</td>
+                        </tr>
+                        <tr>
+                            <td>Memory peak</td>
+                            <td class="text-end">{{ redisInfo.Memory.memoryPeak }}</td>
+                        </tr>
+                        <tr>
+                            <td>Memory fragmentation ratio</td>
+                            <td class="text-end">{{ redisInfo.Memory.memoryFragmentationRatio }}</td>
+                        </tr>
+                        <tr>
+                            <td class="align-top">Default password</td>
+                            <td class="text-end">
+                                {% if redisInfo.usingDefaultPassword %}
+                                    <span class="text-danger">Yes</span>
+                                {% else %}
+                                    <span class="text-success">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header p-2">
+                    Redis Clients and Statistics Information
+                </div>
+                <div class="table-responsive rounded">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <td>Connected clients</td>
+                            <td class="text-end">{{ redisInfo.Clients.connectedClients }}</td>
+                        </tr>
+                        <tr>
+                            <td>Blocked clients</td>
+                            <td class="text-end">{{ redisInfo.Clients.blockedClients }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Total connections received</td>
+                            <td class="text-end">{{ redisInfo.Statistics.totalConnectionsReceived }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total commands processed</td>
+                            <td class="text-end">{{ redisInfo.Statistics.totalCommandsProcessed }}</td>
+                        </tr>
+                        <tr>
+                            <td>Keyspace hits</td>
+                            <td class="text-end">{{ redisInfo.Statistics.keyspaceHits }}</td>
+                        </tr>
+                        <tr>
+                            <td>Keyspace misses</td>
+                            <td class="text-end">{{ redisInfo.Statistics.keyspaceMisses }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2 mb-2">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header p-2">
+                    Meilisearch Info
+                </div>
+                <div class="table-responsive rounded">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <td>Status</td>
+                            <td class="text-end">{{ meilisearchInfo.status }}</td>
+                        </tr>
+                        <tr>
+                            <td>Version</td>
+                            <td class="text-end">{{ meilisearchInfo.version }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Commit date</td>
+                            <td class="text-end">{{ meilisearchInfo.commitDate }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total indexes</td>
+                            <td class="text-end">{{ meilisearchInfo.totalIndexes }}</td>
+                        </tr>
+                        <tr>
+                            <td>Database size (MB)</td>
+                            <td class="text-end">{{ meilisearchInfo.databaseSizeMB }}</td>
+                        </tr>
+                        <tr>
+                            <td>Last update time</td>
+                            <td class="text-end">{{ meilisearchInfo.lastUpdateTime }}</td>
+                        </tr>
+                        <tr>
+                            <td class="align-top">Default password</td>
+                            <td class="text-end">
+                                {% if meilisearchInfo.usingDefaultPassword %}
+                                    <span class="text-danger">Yes</span>
+                                {% else %}
+                                    <span class="text-success">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

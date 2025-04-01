@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+    <arg name="basepath" value="."/>
+    <arg name="cache" value=".phpcs-cache"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="encoding" value="utf-8"/>
+    <arg name="parallel" value="64"/>
+
+    <config name="php_version" value="80400"/>
+
+    <config name="installed_paths" value="../../slevomat/coding-standard,../../wp-coding-standards/wpcs"/>
+
+    <file>src/</file>
+    <file>tests/</file>
+
+    <exclude-pattern>/phpcs/*</exclude-pattern>
+
+    <!-- PSR12 is the default standard-->
+    <rule ref="PSR12">
+        <exclude name="Generic.Files.LineLength"/>
+        <exclude name="PSR12.Classes.AnonClassDeclaration.SpaceAfterKeyword"/>
+    </rule>
+
+    <rule ref="PEAR.Commenting.InlineComment"/>
+
+    <rule ref="Generic.NamingConventions.ConstructorName"/>
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+    <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <rule ref="Generic.PHP.NoSilencedErrors"/>
+
+    <rule ref="Generic.NamingConventions.AbstractClassNamePrefix">
+        <exclude-pattern>tests/Controller/BaseControllerTestCase.php</exclude-pattern>
+    </rule>
+    <rule ref="Generic.NamingConventions.TraitNameSuffix"/>
+    <rule ref="Generic.NamingConventions.InterfaceNameSuffix"/>
+
+    <!-- Ban some functions -->
+    <rule ref="Generic.PHP.ForbiddenFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="sizeof" value="count"/>
+                <element key="delete" value="unset"/>
+                <element key="print" value="echo"/>
+                <element key="create_function" value="null"/>
+                <element key="array_push" value="null"/>
+                <element key="date" value="null"/>
+                <element key="date_create" value="null"/>
+                <element key="date_create_from_format" value="null"/>
+                <element key="date_create_immutable" value="null"/>
+                <element key="date_create_immutable_from_format" value="null"/>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Files.LineEndings">
+        <properties>
+            <property name="eolChar" value="\n"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax.Found"/>
+
+    <rule ref="Generic.Files.OneClassPerFile"/>
+    <rule ref="Generic.Files.OneInterfacePerFile"/>
+    <rule ref="Generic.Files.OneTraitPerFile"/>
+
+
+    <rule ref="Squiz.Classes.LowercaseClassKeywords"/>
+
+    <rule ref="Squiz.Commenting.EmptyCatchComment"/>
+
+    <rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/>
+
+    <!-- Check var names, but we don't want leading underscores for private vars -->
+    <rule ref="Squiz.NamingConventions.ValidVariableName.PrivateNoUnderscore">
+        <severity>0</severity>
+    </rule>
+
+    <rule ref="Squiz.Operators.ValidLogicalOperators"/>
+
+    <!-- Private properties MUST not be prefixed with an underscore -->
+    <rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
+        <type>error</type>
+    </rule>
+
+    <!-- Private methods MUST not be prefixed with an underscore -->
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+        <type>error</type>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Arrays.MultiLineArrayEndBracketPlacement"/>
+    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/>
+
+    <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility"/>
+    <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing"/>
+    <rule ref="SlevomatCodingStandard.Classes.ClassStructure">
+        <properties>
+            <property name="groups" type="array">
+                <element value="uses"/>
+
+                <element value="enum cases"/>
+
+                <!-- Public constants are first but you don't care about the order of protected or private constants -->
+                <element value="public constants"/>
+                <element value="constants"/>
+
+                <!-- You don't care about the order among the properties. The same can be done with "properties" shortcut -->
+                <element value="public static properties, protected static properties, private static properties"/>
+
+                <element value="public properties, protected properties, private properties"/>
+
+                <!-- Constructor is first, then all public methods, then protected/private methods and magic methods are last -->
+                <element value="constructor"/>
+                <element value="all public methods"/>
+                <element value="methods"/>
+                <element value="magic methods"/>
+            </property>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference"/>
+    <rule ref="SlevomatCodingStandard.Classes.PropertyDeclaration"/>
+    <rule ref="SlevomatCodingStandard.Classes.PropertySpacing"/>
+    <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature">
+        <properties>
+            <property name="minLineLength" value="120"/>
+        </properties>
+    </rule>
+
+
+    <rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly"/>
+
+    <rule ref="SlevomatCodingStandard.Functions.ArrowFunctionDeclaration"/>
+    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration" />
+
+    <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.RequireOneNamespaceInFile"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+        <properties>
+            <property name="searchAnnotations" value="true"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Namespaces.UseSpacing">
+        <properties>
+            <property name="linesCountBetweenUseTypes" value="1"/>
+        </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.PHP.ForbiddenClasses">
+        <properties>
+            <property name="forbiddenClasses" type="array">
+                <element key="\DateTime" value="null"/>
+                <element key="\Carbon\Carbon" value="null"/>
+                <element key="\DateTimeImmutable" value="Carbon\CarbonImmutable"/>
+            </property>
+            <property name="forbiddenInterfaces" type="array">
+                <element key="\DateTimeInterface" value="null"/>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+        <properties>
+            <property name="spacesCountAroundEqualsSign" value="0"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.DNFTypeHintFormat"/>
+
+    <rule ref="SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable"/>
+
+    <rule ref="WordPress.Arrays.ArrayIndentation"/>
+
+    <rule ref="PSR12.Classes.ClassInstantiation"/>
+
+
+</ruleset>

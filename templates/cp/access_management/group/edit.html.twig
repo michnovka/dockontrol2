@@ -1,0 +1,27 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}
+    Edit | Group
+{% endblock %}
+{% set active = 'groups' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_groups') ,'title': 'Groups'
+    },
+    {
+        'title': group.name,
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/access_management/group/form.html.twig' with {'submit_button_label': 'Save Changes'} %}
+{% endblock %}
+
+
+

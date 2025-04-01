@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{% block title %}{% endblock %} | DOCKontrol</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/favicon/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/favicon/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/favicon/favicon-16x16.png') }}">
+        <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-icons.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/css/choices/choices.css') }}">
+        <link rel="manifest" href="{{ asset('assets/manifest/site.webmanifest') }}">
+        <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
+        <script>
+            var publicZone = true;
+            var changeLocaleURL = "{{ path('pz_change_locale', {'locale': '__locale__'}) }}";
+        </script>
+        <script src="{{ asset('assets/js/custom.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/js/choices/choices.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/js/choices.js') }}" type="text/javascript"></script>
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('{{ asset("assets/sw.js") }}',{ scope: '/assets/' }).then(function(registration) {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    }).catch(function(error) {
+                        console.error('Service Worker registration failed:', error);
+                    });
+                });
+            }
+
+            if ('Notification' in window) {
+                Notification.requestPermission()
+                    .then((permission) => {
+                        if (permission === 'granted') {
+                            console.log('Push notification permission granted.');
+                        } else {
+                            console.warn('Push notification permission denied.');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error requesting push notification permission:', error);
+                    });
+            }
+        </script>
+        {% block stylesheets %}
+        {% endblock %}
+        {% block linkpreloads %}
+        {% endblock %}
+    </head>
+    <body>
+        {% if app.user and app.request.get('_route') not in ['dockontrol_login', 'dockontrol_forgot_password', 'dockontrol_reset_password'] %}
+            <div class="container-fluid p-0">
+                <div class="mt-2">
+                    {% if pageTitle is defined %}
+                        <div class="divider">
+                            <h2 class="title text-body">{{ pageTitle }}</h2>
+                        </div>
+                    {% endif %}
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+
+            <div class="container-fluid p-0">
+                {% include 'pz/common/footer.html.twig' %}
+                <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
+                <script src="{{ asset('assets/js/sortable.min.js') }}"></script>
+            </div>
+        {% else %}
+            {% block logincontent %}
+            {% endblock %}
+        {% endif %}
+        {% block javascripts %}
+        {% endblock %}
+    </body>
+</html>

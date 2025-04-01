@@ -1,0 +1,38 @@
+<tr>
+    <td>{{ signupCode.hash }}</td>
+    <td>
+        {% if signupCode.usedTime is not null and signupCode.newUser is not null %}
+            <span class="badge rounded-pill bg-success">Used</span>
+        {% elseif signupCode.isExpired %}
+            <span class="badge rounded-pill bg-danger">Expired</span>
+        {% else %}
+            <span class="badge rounded-pill bg-primary">Unused</span>
+        {% endif %}
+    </td>
+    <td>{{ signupCode.adminUser.name }}</td>
+    <td>{{ signupCode.apartment.building.name }}</td>
+    <td>{{ signupCode.apartment.name }}</td>
+    <td>{{ signupCode.createdTime | time_tooltip }}</td>
+    <td>{{ signupCode.expires | time_tooltip }}</td>
+    <td>
+        {% if signupCode.newUser is not null %}
+            <a href="{{ path('cp_access_management_user_edit', {'id': signupCode.newUser.id}) }}" class="nav-link show-underline-hover text-primary"> {{ signupCode.newUser.name }} </a>
+        {% else %}
+            <p>N/A</p>
+        {% endif %}
+    </td>
+    <td>{{ signupCode.usedTime is not null ? signupCode.usedTime | time_tooltip : 'N/A' }}</td>
+    <td class="text-end">
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-signup-code-btn" data-signup-code-hash="{{ signupCode.hash }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-body copy-signup-code-btn" data-id="copy-btn-{{ signupCode.hash }}" data-link="{{ app.request.schemeAndHttpHost ~ path('dockontrol_signup_with_hash', {'hash': signupCode.hash}) }}" data-bs-toggle="tooltip" data-bs-original-title="Copy to clipboard">
+            <i class="bi bi-clipboard2"></i>
+        </a>
+
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-body d-none" id="copy-btn-{{ signupCode.hash }}" data-bs-toggle="tooltip" data-bs-original-title="Copied to clipboard">
+            <i class="bi bi-clipboard2-check-fill"></i>
+        </a>
+
+    </td>
+</tr>

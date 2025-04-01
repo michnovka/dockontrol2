@@ -1,0 +1,21 @@
+<tr>
+    <td>{{ guestPass.created|time_tooltip }}</td>
+    <td>{{ guestPass.expires|time_tooltip }}</td>
+    <td {% if guestPass.note is not empty and guestPass.note|length > 30 %} data-bs-toggle="tooltip" data-bs-original-title="{{ guestPass.note }}" {% endif %}>
+        {{ guestPass.note is not empty ? guestPass.note|length > 30 ? guestPass.note|slice(0,30) ~ '....' : guestPass.note : 'N/A' }}
+    </td>
+    <td>{{ guestPass.timeLastAction is not empty ? guestPass.timeLastAction|time_tooltip : 'N/A' }}</td>
+    <td>{{ guestPass.remainingActions < 0 ? 'Unlimited' : guestPass.remainingActions }}</td>
+    <td>{{ guestPass.defaultLanguage }}</td>
+    <td class="text-end">
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-body copy-to-clipboard"
+           data-link="{{ app.request.schemeAndHttpHost ~ path('dockontrol_guest_access', {'hash': guestPass.hash}) }}"
+           data-bs-toggle="tooltip" data-bs-original-title="Copy">
+            <i class="bi bi-clipboard"></i>
+        </a>
+
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-guest-pass" data-id="{{ guestPass.hash }}" data-hash="{{ guestPass.hash }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

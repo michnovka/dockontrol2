@@ -1,0 +1,20 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Action Queue Cron Group{% endblock %}
+{% set active = 'action_queue_cron_groups' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_action_cron_group'),
+        'title': 'Action Queue Cron Group'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/settings/action_queue_cron_group/form.html.twig' %}
+{% endblock %}

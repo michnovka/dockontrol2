@@ -1,0 +1,27 @@
+<div class="card border-0 shadow-none container">
+    {{ form_start(nukiTypeForm) }}
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                {{ form_row(nukiTypeForm.name) }}
+            </div>
+            <div class="col-md-12">
+                {{ form_row(nukiTypeForm.dockontrolNukiApiServer) }}
+            </div>
+            <div class="col-md-12">
+                {{ form_row(nukiTypeForm.username) }}
+            </div>
+            <div class="col-md-12">
+                {{ form_row(nukiTypeForm.password1) }}
+            </div>
+            <div class="col-md-12">
+                {{ form_row(nukiTypeForm.canLock) }}
+            </div>
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary w-100 btn-lg">{{ 'dockontrol.settings.nuki.form.save_changes_button'|trans }}</button>
+            </div>
+            {{ form_end(nukiTypeForm) }}
+        </div>
+    </div>
+</div>
+

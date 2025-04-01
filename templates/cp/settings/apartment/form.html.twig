@@ -1,0 +1,57 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(form) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-4">
+                {{ form_row(form.building) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(form.name) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(form.defaultGroup) }}
+            </div>
+            <div class="col-md-2 text-start">
+                <button class="btn btn-primary w-100">{{ show_submit_label|default('Create Apartment') }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buildingElement = document.getElementById('apartment_building');
+            const defaultGroupElement = document.getElementById('apartment_defaultGroup');
+
+            setDefaultGroup(buildingElement.value);
+
+            buildingElement.addEventListener('change', (e) => {
+                const selectedBuildingId = buildingElement.value;
+                setDefaultGroup(selectedBuildingId);
+            });
+
+            function setDefaultGroup(selectedBuildingId)
+            {
+                let fetchDefaultGroupUrl = "{{ path('cp_settings_building_default_group', {'id': '__ID__'}) }}";
+                fetchDefaultGroupUrl = fetchDefaultGroupUrl.replace('__ID__', selectedBuildingId);
+
+                fetch(fetchDefaultGroupUrl, {
+                    method: 'POST',
+                }).then((res) => {
+                    return res.json();
+                }).then((response) => {
+                    let defaultGroupId = response.default_group_id;
+
+                    if (defaultGroupId !== null) {
+                        defaultGroupElement.choicesInstance.setChoiceByValue(defaultGroupId.toString());
+                    } else {
+                        defaultGroupElement.choicesInstance.setChoiceByValue('');
+                    }
+                });
+            }
+        });
+    </script>
+
+{% endblock %}

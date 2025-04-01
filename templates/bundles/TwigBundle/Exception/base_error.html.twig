@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- Bootstrap CSS -->
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="{{ asset('assets/css/bootstrap-icons.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .error-container {
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .error-icon {
+            font-size: 80px;
+            color: #dc3545; /* Bootstrap's red color */
+            margin-bottom: 20px;
+        }
+        .error-code {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .error-message {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #6c757d; /* Bootstrap's secondary color */
+        }
+        .error-description {
+            font-size: 16px;
+            color: #6c757d;
+            margin-bottom: 25px;
+        }
+        .home-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0d6efd; /* Bootstrap primary color */
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .home-button:hover {
+            background-color: #0b5ed7;
+            text-decoration: none;
+            color: #ffffff;
+        }
+        @media (max-width: 576px) {
+            .error-container {
+                padding: 20px;
+            }
+            .error-icon {
+                font-size: 60px;
+            }
+            .error-code {
+                font-size: 36px;
+            }
+            .error-message {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <div class="error-icon">
+        {% block error_icon %}
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        {% endblock %}
+    </div>
+    <div class="error-code">
+        {{ status_code }}
+    </div>
+    <div class="error-message">
+        {{ message }}
+    </div>
+    <div class="error-description">
+        {{ description }}
+    </div>
+    {% if isGuest is not defined %}
+        <a href="{{ path('dockontrol_main') }}" class="home-button">
+            <i class="bi bi-house-door-fill me-2"></i> Return to the Home Page
+        </a>
+    {% endif %}
+</div>
+
+<!-- Bootstrap JS (Optional for interactive elements) -->
+<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

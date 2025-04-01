@@ -1,0 +1,20 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Announcement{% endblock %}
+{% set active = 'announcements' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_announcement'),
+        'title': 'Announcement'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/settings/announcement/form.html.twig' %}
+{% endblock %}

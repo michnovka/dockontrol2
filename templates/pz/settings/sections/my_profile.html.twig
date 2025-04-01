@@ -1,0 +1,129 @@
+<div class="card">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2 px-2">
+        <h6 class="mb-0">{{ 'dockontrol.settings.my_profile.sections.my_info'|trans }}</h6>
+    </div>
+    <div class="card-body px-2 py-2">
+        <div class="row mt-2 justify-content-between">
+            <div class="col-md-3 text-center">
+                <strong>{{ 'dockontrol.settings.my_profile.email'|trans }}</strong> {{ app.user.email }}
+            </div>
+            <div class="col-md-3 text-center">
+                <strong>{{ 'dockontrol.settings.my_profile.account_since'|trans }}:</strong> {{ app.user.createdTime|time_tooltip('Y-m-d') }}
+            </div>
+            <div class="col-md-3 text-center">
+                <strong>{{ 'dockontrol.settings.my_profile.building'|trans }}:</strong> {{ app.user.apartment ? app.user.apartment.building.name : 'None' }}
+            </div>
+            <div class="col-md-3 text-center">
+                <strong>{{ 'dockontrol.settings.my_profile.apartment'|trans }}:</strong> {{ app.user.apartment ? app.user.apartment.name : 'None' }}
+            </div>
+        </div>
+
+        <div class="row mt-1">
+            <div class="col-md-6 mt-2">
+                <li class="theme-option text-decoration-none list-unstyled" data-theme-value="dark">
+                    <button type="button" class="btn btn-primary w-100" data-bs-theme-value="dark" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{{ 'dockontrol.footer.menu.switch_to_dark_mode'|trans }}">
+                        <i class="bi bi-moon-stars-fill fs-7"></i>
+                        {{ 'dockontrol.settings.my_profile.theme.switch_to_dark'|trans }}
+                    </button>
+                </li>
+                <li class="theme-option ext-decoration-none list-unstyled" data-theme-value="light">
+                    <button type="button" class="btn btn-primary w-100 text-white" data-bs-theme-value="light" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{{ 'dockontrol.footer.menu.switch_to_light_mode'|trans }}">
+                        <i class="bi bi-sun-fill fs-7"></i>
+                        {{ 'dockontrol.settings.my_profile.theme.switch_to_light'|trans }}
+                    </button>
+                </li>
+            </div>
+            <div class="col-md-6 mt-2">
+                <form action="{{ path('pz_change_locale') }}" method="POST">
+                    <select class="form-select choices-select w-100" name="locale" onchange="this.form.submit();">
+                        <option value="cs" {% if app.request.locale == 'cs' %} selected {% endif %}>🇨🇿 Čeština</option>
+                        <option value="en" {% if app.request.locale == 'en' %} selected {% endif %}>🇬🇧 English</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        {{ form_start(userPublicSettingsTypeForm) }}
+        <div class="row mt-3">
+            <div class="{% if userPublicSettingsTypeForm.carEnterExitShow is defined %} col-md-3 {% else %} col-md-4 {% endif %}">
+                {{ form_label(userPublicSettingsTypeForm.phone) }}
+                <div class="input-group phone-with-prefix">
+                    {{ form_widget(userPublicSettingsTypeForm.phoneCountryPrefix) }}
+                    {{ form_widget(userPublicSettingsTypeForm.phone) }}
+                </div>
+                {{ form_errors(userPublicSettingsTypeForm.phoneCountryPrefix) }}
+                {{ form_errors(userPublicSettingsTypeForm.phone) }}
+            </div>
+            <div class="{% if userPublicSettingsTypeForm.carEnterExitShow is defined %} col-md-3 {% else %} col-md-4 {% endif %}">
+                {{ form_row(userPublicSettingsTypeForm.name) }}
+            </div>
+            <div class="{% if userPublicSettingsTypeForm.carEnterExitShow is defined %} col-md-3 {% else %} col-md-4 {% endif %}">
+                {{ form_row(userPublicSettingsTypeForm.buttonPressType) }}
+            </div>
+            {% if userPublicSettingsTypeForm.carEnterExitShow is defined %}
+                <div class="col-md-3">
+                    {{ form_row(userPublicSettingsTypeForm.carEnterExitShow) }}
+                </div>
+            {% endif %}
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary w-100 btn-lg" name="changePassword">{{ 'dockontrol.global.save_changes_button'|trans }}</button>
+            </div>
+        </div>
+        {{ form_end(userPublicSettingsTypeForm) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 d-flex mt-2 pe-md-0">
+        <div class="card">
+            <div class="card-header bg-transparent justify-content-between align-items-center py-2 px-2">
+                <h6 class="mb-0">{{ 'dockontrol.settings.my_profile.sections.change_password'|trans }}</h6>
+            </div>
+            <div class="card-body px-2 py-2">
+                {{ form_start(changePasswordForm) }}
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form_row(changePasswordForm.currentPassword, {'attr': {'autocomplete': 'current-password'}}) }}
+                    </div>
+                    <div class="col-md-12">
+                        {{ form_row(changePasswordForm.newPassword.first, {'attr': {'autocomplete': 'new-password'}}) }}
+                    </div>
+                    <div class="col-md-12">
+                        {{ form_row(changePasswordForm.newPassword.second, {'attr': {'autocomplete': 'new-password'}}) }}
+                    </div>
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary w-100 btn-lg" name="changePassword">{{ 'dockontrol.global.save_changes_button'|trans }}</button>
+                    </div>
+                </div>
+                {{ form_end(changePasswordForm) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 d-flex mt-2">
+        <div class="card w-100">
+            <div class="card-header bg-transparent justify-content-between align-items-center py-2 px-2">
+                <h6 class="mb-0">{{ 'dockontrol.settings.my_profile.sections.change_email'|trans }}</h6>
+            </div>
+            <div class="card-body p-2">
+                {{ form_start(changeEmailForm) }}
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form_row(changeEmailForm.email.first) }}
+                    </div>
+                    <div class="col-md-12">
+                        {{ form_row(changeEmailForm.email.second) }}
+                    </div>
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary w-100 btn-lg" id="changePassword" name="changePassword">{{ 'dockontrol.global.save_changes_button'|trans }}</button>
+                    </div>
+                </div>
+                {{ form_end(changeEmailForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ asset('assets/js/phone-with-prefix.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        initPhoneInput();
+    });
+</script>

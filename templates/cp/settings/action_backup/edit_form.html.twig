@@ -1,0 +1,15 @@
+{{ form_start(form, {'attr': {'id': 'edit-action-backup-form'}}) }}
+<div class="mb-3">
+    {{ form_label(form.dockontrolNode) }}
+    {{ form_widget(form.dockontrolNode, {'attr': {'class': 'edit-backup-action-dockontrol-node'}}) }}
+</div>
+<div class="mb-3">
+    {{ form_row(form.actionPayload) }}
+</div>
+<span class="validation-invalid-label generic_error d-none">Something went wrong</span>
+{{ form_widget(form) }}
+<div class="col-md-12 text-end">
+    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary" id="edit-action-backup">Save Changes</button>
+</div>
+{{ form_end(form) }}

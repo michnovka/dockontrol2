@@ -1,0 +1,27 @@
+{% extends 'cp/admin_base.html.twig' %}
+{% set active = 'permissions' %}
+{% block title %}
+Edit | Permission
+{% endblock %}
+
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_permission'), 'title': 'Permissions'
+    },
+    {
+      'title': permission.name
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/access_management/permission/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+{% endblock %}
+
+
+

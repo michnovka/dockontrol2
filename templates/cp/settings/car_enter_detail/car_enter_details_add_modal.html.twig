@@ -1,0 +1,44 @@
+<div class="modal fade" id="add_car_enter_details_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="add_car_enter_details_form">
+                <div class="modal-header bg-info">
+                    <h6 class="card-title text-white">
+                        Create New Car Enter Details
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body p-2">
+                    <div class="form-group">
+                        <label for="car_enter_details_action" class="form-label">{{ carEnterDetailsActionLabel }}</label>
+                        <select id="car_enter_details_action" class="choices-select form-select" name="car_enter_details_action" required>
+                            {% for action in allActions %}
+                                <option value="{{ action.name }}">{{ action.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="car_enter_details_wait_seconds_after_enter" class="form-label">Wait seconds after enter</label>
+                        <input type="number" id="car_enter_details_wait_seconds_after_enter" min="0" max="60" class="form-control"/>
+                    </div>
+
+                    <div class="from-group">
+                        <label for="car_enter_details_wait_seconds_before_exit" class="form-label">Wait seconds after exit</label>
+                        <input type="number" id="car_enter_details_wait_seconds_before_exit" min="0" max="60" class="form-control"/>
+                    </div>
+
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                    <input type="hidden" class="_csrf_token_car_enter_details_add" name="_csrf_token_car_enter_details_add" id="_csrf_token_car_enter_details_add" value="{{ csrfToken }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-primary save-car-details-for-building text-white" disabled>Create Car Enter Detail</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

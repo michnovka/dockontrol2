@@ -1,0 +1,33 @@
+{% set nodeStatus = enum("\\App\\Entity\\Enum\\DockontrolNodeStatus") %}
+<tr>
+    <td>{{ node.node.id }}</td>
+    <td>{{ node.node.name }}</td>
+    <td>{{ node.node.building.name }}</td>
+    <td>{{ node.node.ip }}</td>
+    <td>{{ node.node|dockontrol_node_status_badge }}</td>
+    <td>{{ node.node.lastCommandExecutedTime|time_tooltip }}</td>
+    <td>{{ node.node.ping|dockontrol_node_last_ping_time(node.node.lastPingTime) }}</td>
+    <td>{{ node.node.dockontrolNodeVersion is not null ? node.node.dockontrolNodeVersion : 'N/A' }}</td>
+
+    <td> <span data-bs-toggle="tooltip" data-bs-original-title="Kernel Version: {{ node.node.kernelVersion }}">
+            OS Version: {{ node.node.osVersion }}
+        </span>
+    </td>
+    <td>{{ node.node.device }}</td>
+    <td>{{ node.node.uptime|uptime_since }}</td>
+    <td>{{ node.node.dockerVersion ?? 'N/A' }}</td>
+    <td>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="notify_on_status_change_{{ node.node.id }}" {% if node.node.notifyWhenStatusChange %} checked {% endif %} onclick="return false;">
+            <label class="form-check-label" for="notify_on_status_change_{{ node.node.id }}">{% if node.node.notifyWhenStatusChange %}({{ node.totalNotifyUserWhenStatusChange }}){% endif %}</label>
+        </div>
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_settings_node_edit', {'id': node.node.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-node-btn" data-node-id="{{ node.node.id }}" data-node-name="{{ node.node.name }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

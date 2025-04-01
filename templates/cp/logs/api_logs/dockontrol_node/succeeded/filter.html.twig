@@ -1,0 +1,32 @@
+<div class="card">
+    {% set query_params = app.request.query.all['dockontrol_node_api_log_success_filter'] is defined %}
+
+    <div class="card-header bg-primary cursor-pointer {{ not query_params ? "collapsed" : "" }}" id="filter_header"  data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+        <h6 class="card-title text-white mb-0">Filter</h6>
+    </div>
+
+    <div id="collapseFilter" class="collapse {% if query_params is defined and query_params %} show {% endif %} ">
+        <div class="card-body p-2">
+            {{ form_start(apiLogFilterForm) }}
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(apiLogFilterForm.time) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(apiLogFilterForm.ip) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(apiLogFilterForm.dockontrolNode) }}
+                </div>
+                <div class="offset-lg-8 col-md-2">
+                    <button class="btn btn-primary w-100" type="submit">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ path('cp_logs_dockontrol_node_api_succeeded_logs') }}" class="btn btn-light w-100">Clear</a>
+                </div>
+            </div>
+            {{ form_end(apiLogFilterForm) }}
+        </div>
+    </div>
+</div>
+

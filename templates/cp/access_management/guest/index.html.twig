@@ -1,0 +1,232 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Guests | Access Management{% endblock %}
+{% set active = 'guest' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'title': 'Guests'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_access_management_guest_new'),
+        'title': 'Create New Guest Pass',
+    }
+] %}
+{% block content %}
+    {% include 'cp/access_management/guest/filter.html.twig' %}
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Apartment</th>
+                    <th>Status</th>
+                    <th>{{ knp_pagination_sortable(guests, 'Time Created', 'g.created') }}</th>
+                    <th>{{ knp_pagination_sortable(guests, 'Time Expires', 'g.expires') }}</th>
+                    <th>{{ knp_pagination_sortable(guests, 'Enabled', 'g.enabled') }}</th>
+                    <th>Remaining Actions</th>
+                    <th>Last Command Time</th>
+                    <th>Actions</th>
+{#                    <th>{{ knp_pagination_sortable(guests, 'Last Command Time', 'aq.timeCreated') }}</th>#}
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for guest in guests %}
+                    {% include 'cp/access_management/guest/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="10">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': guests}) }}
+    </div>
+
+    <div class="modal fade" id="delete_guest_pass_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_guest_pass_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Guest Pass
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following guest pass is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_guest_id"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the ID of the guest pass, which you want to delete.</h6>
+                        <input type="text" class="confirm-id form-control" id="confirm-id"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect ID.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_guest_pass" name="_csrf_token_guest_pass" id="_csrf_token_guest_pass" value="{{ csrf_token("guestcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-group text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="restore_guest_pass_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="restore_guest_pass_form">
+                    <div class="modal-header bg-info">
+                        <h6 class="card-title text-white">
+                            Restore Guest Pass
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following guest pass is about to be restored:</p>
+                        <strong>
+                            <ul>
+                                <li id="restore_guest_id"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the ID of the guest pass, which you want to restore.</h6>
+                        <input type="text" class="confirm-id form-control" id="confirm-id"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect ID.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_guest_pass" name="_csrf_token_guest_pass" id="_csrf_token_guest_pass" value="{{ csrf_token("guestcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-info approve-the-deletion-for-group text-white">Restore</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let guestPassDeleteButtons = document.querySelectorAll('.delete-guest-pass-btn');
+            let guestPassDeleteModal = new bootstrap.Modal(document.getElementById('delete_guest_pass_modal'), {});
+            let guestPassDeleteForm = document.getElementById('delete_guest_pass_form');
+
+            guestPassDeleteButtons.forEach((el) => {
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    let guestPassId = el.getAttribute('data-guest-pass-id');
+                    document.getElementById('delete_guest_id').innerText = guestPassId;
+                    document.getElementById('confirm-id').value = null;
+                    guestPassDeleteModal.show();
+
+                    guestPassDeleteForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        let confirmGuestPassId = document.getElementById('confirm-id').value;
+                        if (confirmGuestPassId != guestPassId) {
+                             document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                            }, 2500);
+                        } else {
+                            let deleteGuestPassURL = "{{ path('cp_access_management_guest_delete', {'id': '__ID__'}) }}";
+                            deleteGuestPassURL = deleteGuestPassURL.replace('__ID__', guestPassId);
+                            let csrfToken = document.getElementById('_csrf_token_guest_pass').value;
+
+                            let formData = new FormData();
+                            formData.append('_csrf', csrfToken);
+
+                            fetch(deleteGuestPassURL, {
+                                method: 'POST',
+                                body: formData,
+                            }).then((res) => {
+                                return res.json();
+                            }).then((response) => {
+                                if (response.status) {
+                                    guestPassDeleteModal.hide();
+                                    window.location.reload();
+                                } else {
+                                    document.querySelector('.generic_error').innerHTML = response.errorMessage;
+                                    document.querySelector('.generic_error').classList.remove('d-none');
+                                    setTimeout(function() {
+                                        document.querySelector('.generic_error').classList.add('d-none');
+                                    }, 2500)
+                                }
+                            })
+                        }
+                    });
+                });
+            });
+
+            let restoreGuestPassBtn = document.querySelectorAll('.restore-guest-pass-btn');
+            let restoreGuestPassModal = new bootstrap.Modal(document.querySelector('#restore_guest_pass_modal'), {});
+            let restoreGuestPassForm = document.querySelector('#restore_guest_pass_form');
+
+            restoreGuestPassBtn.forEach((el) => {
+               el.addEventListener('click', (e) => {
+                  e.preventDefault();
+                   let guestPassId = el.getAttribute('data-guest-pass-id');
+                   document.getElementById('restore_guest_id').innerText = guestPassId;
+                   restoreGuestPassForm.querySelector('#confirm-id').value = null;
+                   restoreGuestPassModal.show();
+
+                   restoreGuestPassForm.addEventListener('submit', (e) => {
+                      e.preventDefault();
+                       let confirmGuestPassId = restoreGuestPassForm.querySelector('#confirm-id').value;
+                       if (confirmGuestPassId != guestPassId) {
+                           document.querySelector('#restore_guest_pass_modal').querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                           setTimeout(function() {
+                               document.querySelector('#restore_guest_pass_modal').querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                           }, 2500);
+                       } else {
+                           let restoreGuestPassURL = "{{ path('cp_access_management_guest_restore', {'id': '__ID__'}) }}";
+                           restoreGuestPassURL = restoreGuestPassURL.replace('__ID__', guestPassId);
+                           let csrfToken = document.querySelector('#restore_guest_pass_modal').querySelector('#_csrf_token_guest_pass').value;
+
+                           let formData = new FormData();
+                           formData.append('_csrf', csrfToken);
+
+                           fetch(restoreGuestPassURL, {
+                               method: 'POST',
+                               body: formData,
+                           }).then((res) => {
+                               return res.json();
+                           }).then((response) => {
+                               if (response.status) {
+                                   restoreGuestPassModal.hide();
+                                   window.location.reload();
+                               } else {
+                                   document.querySelector('#restore_guest_pass_modal').querySelector('.generic_error').innerHTML = response.errorMessage;
+                                   document.querySelector('#restore_guest_pass_modal').querySelector('.generic_error').classList.remove('d-none');
+                                   setTimeout(function() {
+                                       document.querySelector('#restore_guest_pass_modal').querySelector('.generic_error').classList.add('d-none');
+                                   }, 2500)
+                               }
+                           })
+                       }
+                   });
+               });
+            });
+        });
+    </script>
+{% endblock %}

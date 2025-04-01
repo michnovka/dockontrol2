@@ -1,0 +1,56 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}API Logs | Logs{% endblock %}
+{% set active = 'legacy_api_failed_logs' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Logs', 'link': path('cp_logs')
+    },
+    {
+        'title': 'API Logs'
+    },
+    {
+        'title': 'Legacy API Logs'
+    },
+    {
+        'title': 'Failed Logs'
+    }
+] %}
+
+{% set actions = [
+    {
+        'link': path('cp_logs_legacy_api_succeeded_logs'),
+        'title': 'View Succeeded Logs',
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/logs/api_logs/legacy/failed/filter.html.twig' %}
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>{{ knp_pagination_sortable(apiLogs, 'ID', 'lafl.id') }}</th>
+                    <th>User</th>
+                    <th>{{ knp_pagination_sortable(apiLogs, 'Time', 'lafl.time') }}</th>
+                    <th>IP Address</th>
+                    <th>API Endpoint</th>
+                    <th>Reason</th>
+                    <th>API Action</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for apiLog in apiLogs %}
+                    {% include 'cp/logs/api_logs/legacy/failed/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="7">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': apiLogs}) }}
+    </div>
+{% endblock %}

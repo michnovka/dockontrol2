@@ -1,0 +1,32 @@
+<div class="modal fade" id="delete_car_enter_details_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="delete_car_enter_details_form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-white">
+                        Delete Car Enter Detail
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>The following car enter detail is about to be deleted:</p>
+                    <strong>
+                        <ul>
+                            <li id="delete_car_enter_details_action_name"></li>
+                        </ul>
+                    </strong>
+                    <p>Are you sure you want to proceed?</p>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                    <input type="hidden" class="_csrf_token_car_enter_details_action" name="_csrf_token_car_enter_details_action" id="_csrf_token_car_enter_details_action" value="{{ csrfToken }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-danger approve-the-deletion-for-car-enter_details text-white">Approve the Deletion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

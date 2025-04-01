@@ -1,0 +1,20 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Dockontrol Node{% endblock %}
+{% set active = 'dockontrol_nodes' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_node'),
+        'title': 'Nodes'
+    },
+    {
+        'title': 'New'
+    },
+] %}
+
+{% block content %}
+    {% include 'cp/settings/dockontrol_node/form.html.twig' %}
+{% endblock %}

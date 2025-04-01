@@ -1,0 +1,22 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Edit | Apartment{% endblock %}
+{% set active = 'apartments' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_apartment'),
+        'title': 'Apartments'
+    },
+    {
+        'title': apartment.name
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/apartment/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+{% endblock %}

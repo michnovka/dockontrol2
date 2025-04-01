@@ -1,0 +1,9 @@
+<tr>
+    <td>{{ apiLog.id }}</td>
+    <td>{{ apiLog.email is not empty ? apiLog.email|lower : 'N/A' }}</td>
+    <td>{{ apiLog.time.format('Y-m-d H:i:s') }}</td>
+    <td>{{ apiLog.ip }}</td>
+    <td>{{ apiLog.apiEndpoint is not empty ? apiLog.apiEndpoint : 'N/A' }}</td>
+    <td>{{ apiLog.reason is not empty ? apiLog.reason : 'N/A' }}</td>
+    <td>{{ apiLog.apiAction }}</td>
+</tr>

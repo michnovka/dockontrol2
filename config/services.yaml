@@ -1,0 +1,81 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    dockontrol_version: '%env(DOCKONTROL_VERSION)%'
+    public_key_for_test: '%env(PUBLIC_KEY_FOR_TEST)%'
+    private_key_for_test: '%env(PRIVATE_KEY_FOR_TEST)%'
+    dockontrol_node_public_key_for_test: '%env(DOCKONTROL_NODE_PUBLIC_KEY_FOR_TEST)%'
+    dockontrol_node_private_key_for_test: '%env(DOCKONTROL_NODE_PRIVATE_KEY_FOR_TEST)%'
+    wg_server_public_ip: '%env(WIREGUARD_SERVER_PUBLIC_IP)%'
+    wg_server_port: '%env(WIREGUARD_SERVER_PORT)%'
+    wg_server_public_key: '%env(WIREGUARD_SERVER_PUBLIC_KEY)%'
+    wg_server_vpn_ip: '%env(WIREGUARD_SERVER_VPN_IP)%'
+    wg_server_vpn_subnet: '%env(WIREGUARD_SERVER_VPN_SUBNET)%'
+    wg_server_private_key: '%env(WIREGUARD_SERVER_PRIVATE_KEY)%'
+    email_for_legacy_api_test: '%env(EMAIL_FOR_LEGACY_API_TEST)%'
+    password_for_legacy_api_test: '%env(PASSWORD_FOR_LEGACY_API_TEST)%'
+    redis_ip: '%env(REDIS_LISTEN_IP)%'
+    redis_port: '%env(REDIS_LISTEN_PORT)%'
+    redis_password: '%env(REDIS_PASSWORD)%'
+    app_secret: '%env(APP_SECRET)%'
+    meili_search_api_key: '%env(MEILISEARCH_API_KEY)%'
+    email_verification_grace_period: 3600
+    default_phone_prefix: '%env(DEFAULT_PHONE_PREFIX)%'
+    webauthn_domain_override: '%env(default::WEBAUTHN_DOMAIN_OVERRIDE)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+
+    App\Doctrine\ORM\TypedFieldMapper\EnumTypedFieldMapper:
+
+    Doctrine\ORM\Mapping\DefaultTypedFieldMapper:
+        arguments:
+            $typedFieldMappings:
+                Carbon\CarbonImmutable: 'datetime_immutable'
+
+    Doctrine\ORM\Mapping\ChainTypedFieldMapper:
+        arguments:
+            $typedFieldMappers:
+                - '@App\Doctrine\ORM\TypedFieldMapper\EnumTypedFieldMapper'
+                - '@Doctrine\ORM\Mapping\DefaultTypedFieldMapper'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    App\Security\Tools\PasswordTool:
+        tags:
+            - { name: 'security.password_hasher' }
+
+    App\Security\UserChecker\AccountEnabledUserChecker:
+        tags:
+            - { name: security.user_checker.main, priority: 10 }
+            - { name: security.user_checker.admin, priority: 10 }
+            - { name: security.user_checker.api1, priority: 10 }
+            - { name: security.user_checker.api2, priority: 10 }
+
+    App\Security\UserChecker\GuestHashUserChecker:
+        tags:
+            - { name: security.user_checker.guest, priority: 10 }
+
+    app.login_rate_limiter:
+        class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
+        arguments:
+            $globalFactory: '@limiter.ip_login'
+            $localFactory: '@limiter.username_ip_login'
+            $secret: '%kernel.secret%'

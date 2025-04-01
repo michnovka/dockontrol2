@@ -1,0 +1,168 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}User Deletion Requests | Access Management{% endblock %}
+{% set active = 'user_deletion_requests' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'title': 'User Deletion Requests'
+    }
+] %}
+
+{% block content %}
+
+<div class="card mt-3 mb-2">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                    <th>User</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for userDeletionRequest in userDeletionRequests %}
+                    {% include 'cp/access_management/users_deletion_request/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="4">No User Deletion Requests found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="account-delete-process-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="account-delete-process-form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-white mb-0">
+                        Process permanent account deletion
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>The following account is about to be deleted</p>
+                    <strong>
+                        <ul>
+                            <li id="delete-account-email"></li>
+                        </ul>
+                    </strong>
+                    <p>Are you sure you want to proceed?</p>
+                    <hr>
+                    <h6 class="font-weight-semibold">Enter the e-mail address to confirm.</h6>
+                    <input type="email" class="confirm-email form-control" id="confirm-email"/>
+                    <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect e-mail address</span>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                    <input type="hidden" class="_csrf_token_account_deletion_process" name="_csrf_token_account_deletion_process" id="_csrf_token_account_deletion_process" value="{{ csrf_token("deleteaccountprocess") }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn bg-danger approve-the-request text-white" id="reject-btn">
+                        <span class="spinner-border spinner-border-sm d-none" id="btn-spinner" role="status" aria-hidden="true"></span>
+                        Reject Deletion Request
+                    </button>
+                    <button type="button" class="btn bg-success approve-the-request text-white" id="approve-btn">
+                        <span class="spinner-border spinner-border-sm d-none" id="btn-spinner" role="status" aria-hidden="true"></span>
+                        Approve Deletion
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+           let processDeleteAccountRequestBtns = document.querySelectorAll('.process-delete-account-request');
+           let processDeleteAccountRequestModal = new bootstrap.Modal(document.getElementById('account-delete-process-modal'));
+           let processDeleteAccountRequestForm = document.getElementById('account-delete-process-form');
+           let approveBtn = document.getElementById('approve-btn');
+           let rejectBtn = document.getElementById('reject-btn');
+           let processRequestId;
+           let processRequestUserEmail;
+           let isApprovedRequest;
+
+            processDeleteAccountRequestBtns.forEach((el) => {
+               el.addEventListener('click', (e) => {
+                   e.preventDefault();
+
+                   processRequestUserEmail = el.dataset.userEmail;
+                   processRequestId = el.dataset.userAccountDeletionId;
+
+                   processDeleteAccountRequestForm.reset();
+                   document.getElementById('delete-account-email').innerText = processRequestUserEmail;
+                   processDeleteAccountRequestModal.show();
+               });
+
+               approveBtn.addEventListener('click', (e) => {
+                   e.preventDefault();
+                   isApprovedRequest = true;
+                   processDeleteAccountRequestForm.dispatchEvent(new Event('submit'));
+               });
+
+                rejectBtn.addEventListener('click', (e) => {
+                   e.preventDefault();
+                   isApprovedRequest = false;
+                   processDeleteAccountRequestForm.dispatchEvent(new Event('submit'));
+               });
+
+               processDeleteAccountRequestForm.addEventListener('submit', (e) => {
+                  e.preventDefault();
+                  let confirmEmail = document.getElementById('confirm-email').value;
+                  if (confirmEmail !== processRequestUserEmail) {
+                      processDeleteAccountRequestForm.querySelector('.incorrect_code').classList.remove('d-none');
+                      setTimeout(() => {
+                          processDeleteAccountRequestForm.querySelector('.incorrect_code').classList.add('d-none');
+                      }, 2500);
+                  } else {
+                      if (isApprovedRequest) {
+                          approveBtn.querySelector('#btn-spinner').classList.remove('d-none');
+                          approveBtn.setAttribute('disabled', 'disabled');
+                          rejectBtn.setAttribute('disabled', 'disabled');
+                      } else {
+                          rejectBtn.querySelector('#btn-spinner').classList.remove('d-none');
+                          rejectBtn.setAttribute('disabled', 'disabled');
+                          approveBtn.setAttribute('disabled', 'disabled');
+                      }
+                      let csrfToken = document.getElementById('_csrf_token_account_deletion_process').value;
+                      let formData = new FormData();
+                      formData.append('_csrf', csrfToken);
+                      formData.append('is_approved', isApprovedRequest);
+
+                      let processDeletionRequestURL = "{{ path('cp_access_management_user_deletion_request_process', {'id': '__ID__'}) }}";
+                      processDeletionRequestURL = processDeletionRequestURL.replace('__ID__', processRequestId);
+
+                      fetch(processDeletionRequestURL, {
+                          method: 'POST',
+                          body: formData,
+                      }).then((res) => {
+                          return res.json();
+                      }).then((response) => {
+                          if (response.status) {
+                              location.reload();
+                          } else {
+                              processDeleteAccountRequestForm.querySelector('.generic_error').textContent = response.errorMessage;
+                              processDeleteAccountRequestForm.querySelector('.generic_error').classList.remove('d-none');
+                              setTimeout(() => {
+                                  processDeleteAccountRequestForm.querySelector('.generic_error').classList.add('d-none');
+                              }, 2500);
+                          }
+                      })
+                  }
+               });
+            });
+        });
+    </script>
+{% endblock %}

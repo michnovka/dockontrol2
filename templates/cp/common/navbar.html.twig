@@ -1,0 +1,154 @@
+<div class="header navbar navbar-expand-lg fixed-top navbar-dark">
+    <div class="container-fluid navbar-container">
+        <a href="{{ path('cp_dashboard') }}" class="navbar-brand">
+            <img class="d-inline-block mx-2" src="{{ asset('assets/images/favicon/favicon-192x192.png') }}" alt="" width="30" height="28">
+            Admin Dashboard
+        </a>
+        <button class="navbar-toggler border-0" id="toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {% import 'cp/macro/_menu_macro.html.twig' as menu_helper %}
+
+        {% set menu = [
+            {
+                label: 'Home',
+                path: path('cp_dashboard'),
+                icon: 'bi bi-house-door',
+                is_active: active in ['dashboard'],
+                role: 'ROLE_ADMIN',
+            },
+            {
+                label: 'Stats',
+                path: '#',
+                icon: 'bi bi-pc-display-horizontal',
+                is_active: active in ['usage', 'queue'],
+                role: 'ROLE_ADMIN',
+                children: [
+                    { label: 'Queue', path: path('cp_stats_queue'), is_active: active in ['queue'], role: 'ROLE_SUPER_ADMIN',},
+                    { label: 'Usage Stats', path: path('cp_stats_usage'), is_active: active in ['usage']}
+            ]
+            },
+            {
+                label: 'Access Management',
+                path: '#',
+                icon: 'bi bi-kanban',
+                role: 'ROLE_ADMIN',
+                is_active: active in ['users', 'groups', 'permissions', 'admin_buildings', 'guest', 'signup_codes', 'api_keys', 'nukis', 'user_deletion_requests'],
+                children: [
+                    { label: 'Admin Buildings', path: path('cp_access_management_admin_building'), is_active: active in ['admin_buildings'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'API Keys', path: path('cp_access_management_api_keys'), is_active: active in ['api_keys'] },
+                    { label: 'Groups', path: path('cp_access_management_groups'), is_active: active in ['groups'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Guests', path: path('cp_access_management_guests'), is_active: active in ['guest'] },
+                    { label: 'Nukis', path: path('cp_access_management_nukis'), is_active: active in ['nukis'] },
+                    { label: 'Permissions', path: path('cp_access_management_permission'), is_active: active in ['permissions'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Signup Codes', path: path('cp_access_management_signup_code'), is_active: active in ['signup_codes'] },
+                    { label: 'Users', path: path('cp_access_management_users'), is_active: active in ['users'] },
+                    { label: 'User Deletion Requests', path: path('cp_access_management_user_deletion_requests'), is_active: active in ['user_deletion_requests'], role: 'ROLE_SUPER_ADMIN' }
+                ]
+            },
+            {
+                label: 'Settings',
+                path: '#',
+                icon: 'bi bi-gear-fill',
+                role: 'ROLE_ADMIN',
+                is_active: active in  ['action_queue_cron_groups', 'actions', 'announcements', 'apartments', 'buildings', 'buttons', 'cameras', 'system_setting', 'crons', 'email_config', 'dockontrol_nodes', 'system_overview'],
+                children: [
+                    { label: 'Action Queue Cron Groups', path: path('cp_settings_action_cron_group'), is_active: active in ['action_queue_cron_groups'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Actions', path: path('cp_settings_action'), is_active: active in ['actions'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Announcements', path: path('cp_settings_announcement'), is_active: active in ['announcements'] },
+                    { label: 'Apartments', path: path('cp_settings_apartment'), is_active: active in ['apartments'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Buildings', path: path('cp_settings_building'), is_active: active in ['buildings'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Buttons', path: path('cp_settings_button'), is_active: active in  ['buttons'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Cameras', path: path('cp_settings_camera'), is_active: active in ['cameras'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Config Options', path: path('cp_settings_config_option'), is_active: active in ['system_setting'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Crons', path: path('cp_settings_cron'), is_active: active in ['crons'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'E-mail Settings', path: path('cp_settings_email_setting'), is_active: active in ['email_config'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'Nodes', path: path('cp_settings_node'), is_active: active in ['dockontrol_nodes'], role: 'ROLE_SUPER_ADMIN' },
+                    { label: 'System Overview', path: path('cp_settings_system_overview'), is_active: active in ['system_overview'], role: 'ROLE_SUPER_ADMIN' }
+            ]
+            },
+            {
+                label: 'Logs',
+                path: '#',
+                icon: 'bi bi-door-open-fill',
+                role: 'ROLE_SUPER_ADMIN',
+                is_active: active in ['user_action_logs', 'api2_succeeded_logs', 'api2_failed_logs', 'dockontrol_node_succeeded_logs', 'dockontrol_node_failed_logs', 'legacy_api_succeeded_logs', 'legacy_api_failed_logs', 'camera_logs', 'cron_logs', 'email_change_logs', 'email_logs', 'login_succeeded_logs', 'login_failed_logs', 'nuki_logs'],
+                children: [
+                    { label: 'API Logs', path: '#', id: 'api-logs-menu', sub_menu_toggle_id: 'api-logs-toggle',special_icon_class: 'bi bi-caret-down-fill rotate-icon', is_active: active in ['api2_succeeded_logs', 'api2_failed_logs', 'dockontrol_node_succeeded_logs', 'dockontrol_node_failed_logs', 'legacy_api_succeeded_logs', 'legacy_api_failed_logs'], children: [
+                        { label: 'API2 Call Logs', path: path('cp_logs_api2_succeeded_logs'), is_active: active in ['api2_succeeded_logs', 'api2_failed_logs'] },
+                        { label: 'Dockontrol Node API Call Logs', path: path('cp_logs_dockontrol_node_api_succeeded_logs'), is_active: active in ['dockontrol_node_succeeded_logs', 'dockontrol_node_failed_logs'] },
+                        { label: 'Legacy API Call Logs', path: path('cp_logs_legacy_api_succeeded_logs'), is_active: active in ['legacy_api_succeeded_logs', 'legacy_api_failed_logs'] }
+                    ] },
+                    { label: 'Camera Logs', path: path('cp_logs_camera_logs'), is_active: active in ['camera_logs'] },
+                    { label: 'Cron Logs', path: path('cp_logs_cron_logs'), is_active: active in['cron_logs'] },
+                    { label: 'E-mail Change Logs', path: path('cp_logs_email_change_logs'), is_active: active in['email_change_logs'] },
+                    { label: 'E-mail Logs', path: path('cp_logs_email_logs'), is_active: active in['email_logs'] },
+                    { label: 'Login Logs', path: path('cp_logs_succeeded_login_logs'), is_active: active in['login_succeeded_logs'] },
+                    { label: 'Nuki Logs', path: path('cp_logs_nuki_logs'), is_active: active in['nuki_logs'] },
+                    { label: 'User Action Logs', path: path('cp_logs_user_action_log'), is_active: active in['user_action_logs'] }
+            ]
+            },
+            {
+                path: '#',
+                label: 'Switch to dark mode',
+                tooltip_text: 'dockontrol.footer.menu.switch_to_dark_mode'|trans,
+                switch_theme_option: 'dark',
+                is_active: false,
+                icon: 'bi bi-moon-stars-fill',
+                icon_show_always: true,
+                hide_text_on_desktop: true,
+            },
+            {
+                path: '#',
+                label: 'Switch to light mode',
+                tooltip_text: 'dockontrol.footer.menu.switch_to_light_mode'|trans,
+                switch_theme_option: 'light',
+                is_active: false,
+                icon: 'bi bi-sun-fill',
+                icon_show_always: true,
+                hide_text_on_desktop: true,
+            },
+            {
+                label: 'Public Zone',
+                path: path('dockontrol_main'),
+                icon: 'bi bi-globe',
+                is_active: false,
+                icon_show_always: true,
+                hide_text_on_desktop: true,
+            },
+            {
+                label: app.user.name,
+                path: '#',
+                icon: 'bi bi-person-circle',
+                icon_show_always: true,
+                class: 'nav-item dropdown',
+                is_active: false,
+                children: [
+                    {
+                        label: 'My Profile',
+                        path: path('dockontrol_settings_my_profile'),
+                        icon: 'bi bi-person-circle',
+                        is_active: false,
+                    },
+                    {
+                        label: 'Logout',
+                        path: path('dockontrol_logout'),
+                        icon: 'bi bi-power',
+                        is_active: false,
+                    },
+                    {
+                        label: 'Exit Impersonation',
+                        path: impersonation_exit_path(path('cp_access_management_users')),
+                        icon: 'bi bi-power',
+                        role: ['IS_IMPERSONATOR'],
+                        is_active: false,
+                    }
+                ]
+            }
+        ] %}
+
+        <nav class="navbar-collapse-menu collapse navbar-collapse" id="navbarResponsive">
+            {{ menu_helper.render_menu(menu) }}
+        </nav>
+    </div>
+</div>

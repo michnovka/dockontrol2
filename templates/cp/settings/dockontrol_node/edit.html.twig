@@ -1,0 +1,291 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Edit | Dockontrol Node{% endblock %}
+{% set active = 'dockontrol_nodes' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_node'),
+        'title': 'Nodes'
+    },
+    {
+        'title': node.name
+    },
+] %}
+
+{% block content %}
+    {% include 'cp/settings/dockontrol_node/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+
+    <div class="position-absolute top-0 end-0 p-3" style="z-index: 11">
+        <div id="copy_link_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="bg-success toast-header text-white" id="dock-toast">
+                <strong class="me-auto">DOCKontrol</strong>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <span id="message"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="regenerate_api_keys_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="regenerate_api_keys_form">
+                    <div class="modal-header bg-info">
+                        <h6 class="card-title text-white">
+                            Regenerate API Key
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>You have requested API key generation for following node:</p>
+                        <strong>
+                            <ul>
+                                <li id="node_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the node, which API keys you want to regenerate.</h6>
+                        <input type="text" class="confirm-name form-control" id="confirm-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none" id="incorrect_name">You entered the incorrect node name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_node" name="_csrf_token_node" id="_csrf_token_node" value="{{ csrf_token("nodecsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-info approve-the-regeneration-for-node text-white">Approve</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="regenerate_wg_keys_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="regenerate_wg_keys_form">
+                    <div class="modal-header bg-info">
+                        <h6 class="card-title text-white">
+                            Regenerate Wireguard Key
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>You have requested wireguard key generation for following node:</p>
+                        <strong>
+                            <ul>
+                                <li id="node_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the node, which wireguard keys you want to regenerate.</h6>
+                        <input type="text" class="confirm-name form-control" id="confirm-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none" id="incorrect_name">You entered the incorrect node name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_node" name="_csrf_token_node" id="_csrf_token_node" value="{{ csrf_token("nodecsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-info approve-the-regeneration-for-node text-white">Approve</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="view_api_keys_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post">
+                    <div class="modal-header bg-info">
+                        <h6 class="card-title text-white">
+                            Generated API Keys
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <label for="public-api-key">Public Key</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="public API key" id="public-api-key" aria-label="public API key" aria-describedby="basic-addon2" readonly>
+                            <div class="input-group-append cursor-pointer" id="copy-public-key" data-bs-toggle="tooltip" data-bs-original-title="Copy to clipboard">
+                                <span class="input-group-text rounded-start-0" id="copy-public-key-icon">
+                                    <i class="bi bi-clipboard2"></i>
+                                    <i class="bi bi-clipboard2-check-fill d-none"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <label for="public-api-key">Secret Key</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="secret API key" id="secret-api-key" aria-label="secret API key" aria-describedby="basic-addon2" readonly>
+                            <div class="input-group-append cursor-pointer" id="copy-secret-key" data-bs-toggle="tooltip" data-bs-original-title="Copy to clipboard">
+                                <span class="input-group-text rounded-start-0" id="copy-secret-key-icon">
+                                    <i class="bi bi-clipboard2"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let regenerateAPIKeysNodeButton = document.querySelector('.regenerate-api-keys-btn');
+        let regenerateAPIKeyModal = new bootstrap.Modal(document.getElementById('regenerate_api_keys_modal'), {});
+        let regenerateAPIKeyForm = document.getElementById('regenerate_api_keys_form');
+
+        let regenerateWgKeysNodeButton = document.querySelector('.regenerate-wg-keys-btn');
+        let regenerateWgKeyModal = new bootstrap.Modal(document.getElementById('regenerate_wg_keys_modal'), {});
+        let regenerateWgKeyForm = document.getElementById('regenerate_wg_keys_form');
+
+        let showAPIKeyModal = new bootstrap.Modal(document.getElementById('view_api_keys_modal'), {});
+        let copyPublicKeyButton = document.getElementById('copy-public-key');
+        let copySecretKeyButton = document.getElementById('copy-secret-key');
+
+        regenerateAPIKeysNodeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let nodeId = regenerateAPIKeysNodeButton.getAttribute('data-node-id');
+            let nodeName = regenerateAPIKeysNodeButton.getAttribute('data-node-name');
+            regenerateAPIKeyForm.querySelector('#node_name').innerText = nodeName;
+            regenerateAPIKeyForm.querySelector('#confirm-name').value = null;
+            regenerateAPIKeyModal.show();
+            regenerateAPIKeyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let confirmNodeName = document.getElementById('confirm-name').value;
+                if (confirmNodeName != nodeName) {
+                    document.getElementById('incorrect_name').classList.remove('d-none');
+                    setTimeout(function() {
+                        document.getElementById('incorrect_name').classList.add('d-none')
+                    }, 2500);
+                } else {
+                    let csrfToken = document.getElementById('_csrf_token_node').value;
+                    let regenerateAPIKeyURL = "{{ path('cp_settings_regenerate_api_keys', {'id': '__ID__'}) }}";
+                    regenerateAPIKeyURL = regenerateAPIKeyURL.replace('__ID__', nodeId);
+                    let formData = new FormData();
+                    formData.append('_csrf', csrfToken);
+
+                    fetch(regenerateAPIKeyURL, {
+                        method: 'POST',
+                        body: formData
+                    }).then((response) => {
+                        return response.json();
+                    }).then((result) => {
+                        if (result.success) {
+                            regenerateAPIKeyModal.hide();
+                            document.getElementById('public-api-key').value = result.publicKey;
+                            document.getElementById('secret-api-key').value = result.secretKey;
+                            document.getElementById('public-key').innerText = result.publicKey;
+                            showAPIKeyModal.show();
+                        } else {
+                            document.querySelector('.generic_error').innerHTML = response.message;
+                            document.querySelector('.generic_error').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.generic_error').classList.add('d-none');
+                            }, 2500)
+                        }
+                    });
+                }
+            });
+        });
+
+        regenerateWgKeysNodeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let nodeId = regenerateWgKeysNodeButton.getAttribute('data-node-id');
+            let nodeName = regenerateWgKeysNodeButton.getAttribute('data-node-name');
+            regenerateWgKeyForm.querySelector('#node_name').innerText = nodeName;
+            regenerateWgKeyForm.querySelector('#confirm-name').value = null;
+            regenerateWgKeyModal.show();
+            regenerateWgKeyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let confirmNodeName = regenerateWgKeyForm.querySelector('#confirm-name').value;
+                if (confirmNodeName != nodeName) {
+                    document.getElementById('incorrect_name').classList.remove('d-none');
+                    setTimeout(function() {
+                        document.getElementById('incorrect_name').classList.add('d-none')
+                    }, 2500);
+                } else {
+                    let csrfToken = document.getElementById('_csrf_token_node').value;
+                    let regenerateAPIKeyURL = "{{ path('cp_settings_regenerate_wg_keys', {'id': '__ID__'}) }}";
+                    regenerateAPIKeyURL = regenerateAPIKeyURL.replace('__ID__', nodeId);
+                    let formData = new FormData();
+                    formData.append('_csrf', csrfToken);
+
+                    fetch(regenerateAPIKeyURL, {
+                        method: 'POST',
+                        body: formData
+                    }).then((response) => {
+                        return response.json();
+                    }).then((result) => {
+                        if (result.success) {
+                            regenerateWgKeyModal.hide();
+                            document.getElementById('public-api-key').value = result.publicKey;
+                            document.getElementById('secret-api-key').value = result.secretKey;
+                            document.getElementById('wg-public-key').innerText = result.publicKey;
+                            showAPIKeyModal.show();
+                        } else {
+                            document.querySelector('.generic_error').innerHTML = response.message;
+                            document.querySelector('.generic_error').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.generic_error').classList.add('d-none');
+                            }, 2500)
+                        }
+                    });
+                }
+            });
+        });
+
+        copyPublicKeyButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let publicKey = document.getElementById('public-api-key').value;
+            copyKeyToClipBoard(publicKey, 'Public key copied to clipboard.');
+        });
+
+        copySecretKeyButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let secretKey = document.getElementById('secret-api-key').value;
+            copyKeyToClipBoard(secretKey, 'Secret key copied to clipboard.');
+        });
+
+        async function copyKeyToClipBoard(contentToCopy, message) {
+            try {
+                await navigator.clipboard.writeText(contentToCopy);
+                document.getElementById('message').innerHTML = message;
+                let toastEl = document.getElementById('copy_link_toast');
+                new bootstrap.Toast(toastEl).show();
+            } catch (err) {
+                console.log('error: ', err)
+            }
+        }
+
+        {% if showKeyPairFirstTime is defined and showKeyPairFirstTime %}
+            let secretKey = "{{ node.apiSecretKey }}";
+            let publicKey = "{{ node.apiPublicKey }}";
+            let wgPublicKey = "{{ node.wireguardPublicKey }}";
+            document.getElementById('public-api-key').value = publicKey;
+            document.getElementById('secret-api-key').value = secretKey;
+            showAPIKeyModal.show();
+        {% endif %}
+    </script>
+{% endblock %}

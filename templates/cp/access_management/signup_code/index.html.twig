@@ -1,0 +1,157 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Signup Codes | Access Management{% endblock %}
+{% set active = 'signup_codes' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'title': 'Signup Codes'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_access_management_signup_code_new'),
+        'title': 'Create New Signup Code',
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/access_management/signup_code/filter.html.twig' %}
+
+<div class="card mt-3 mb-2">
+    <div class="table-responsive rounded">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>{{ knp_pagination_sortable(signupCodes, 'Hash', 'sc.hash') }}</th>
+                    <th>Status</th>
+                    <th>Admin</th>
+                    <th>{{ knp_pagination_sortable(signupCodes, 'Building', 'b.name') }}</th>
+                    <th>{{ knp_pagination_sortable(signupCodes, 'Apartment', 'a.name') }}</th>
+                    <th>{{ knp_pagination_sortable(signupCodes, 'Created Time', 'sc.createdTime') }}</th>
+                    <th>{{ knp_pagination_sortable(signupCodes, 'Expires', 'sc.expires') }}</th>
+                    <th>New User</th>
+                    <th>{{ knp_pagination_sortable(signupCodes, 'Used Time', 'sc.usedTime') }}</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for signupCode in signupCodes %}
+                    {% include 'cp/access_management/signup_code/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="10">No records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': signupCodes}) }}
+</div>
+
+<div class="modal fade" id="delete_signup_code_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="delete_signup_code_form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-white">
+                        Delete Signup Code
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>The following signup code is about to be deleted:</p>
+                    <strong>
+                        <ul>
+                            <li id="delete_signup_code_hash"></li>
+                        </ul>
+                    </strong>
+                    <p>Are you sure you want to proceed?</p>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                    <input type="hidden" class="_csrf_token_signup_code_delete" name="_csrf_token_signup_code_delete" id="_csrf_token_signup_code_delete" value="{{ csrf_token('signupcodecsrf') }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-danger approve-the-deletion-for-signup-code text-white">Approve the Deletion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+           let copyURLButtons = document.querySelectorAll('.copy-signup-code-btn');
+           let deleteSignupCodeButtons = document.querySelectorAll('.delete-signup-code-btn');
+           let deleteSignupCodeForm = document.getElementById('delete_signup_code_form');
+           let deleteSignupCodeModal = new bootstrap.Modal(document.getElementById('delete_signup_code_modal'), {});
+
+           deleteSignupCodeButtons.forEach((el) => {
+              el.addEventListener('click', (e) => {
+                 e.preventDefault();
+                 let deleteSignupCodeHash = el.getAttribute('data-signup-code-hash');
+                 let csrfToken = document.getElementById('_csrf_token_signup_code_delete').value;
+                 document.getElementById('delete_signup_code_hash').innerHTML = deleteSignupCodeHash;
+                 deleteSignupCodeModal.show();
+                 deleteSignupCodeForm.addEventListener('submit', (e) => {
+                     e.preventDefault();
+                     let formData = new FormData();
+                     formData.append('_csrf', csrfToken);
+
+                     let deleteURL = "{{ path('cp_access_management_signup_code_delete', {'hash': '__HASH__'}) }}";
+                     deleteURL = deleteURL.replace('__HASH__', deleteSignupCodeHash);
+
+                     fetch(deleteURL, {
+                         method: 'POST',
+                         body: formData
+                     }).then((response) => {
+                         return response.json();
+                     }).then((res) => {
+                         if (res.status) {
+                             document.location.reload();
+                         } else {
+                             document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                             document.querySelector('.generic_error').classList.remove('d-none');
+                             setTimeout(function() {
+                                 document.querySelector('.generic_error').classList.add('d-none');
+                             }, 2500);
+                         }
+                     });
+                 });
+              });
+           });
+
+           copyURLButtons.forEach((el) => {
+              el.addEventListener('click', (e) => {
+                 e.preventDefault();
+                 let linkToCopy = el.getAttribute('data-link');
+                 let copiedElementId = el.getAttribute('data-id');
+
+                 let copiedElement = document.getElementById(copiedElementId);
+                  copyURLToClipBoard(linkToCopy);
+                 el.classList.add('d-none');
+                  copiedElement.classList.remove('d-none');
+                 setTimeout(()=> {
+                     copiedElement.classList.add('d-none');
+                     el.classList.remove('d-none');
+                 }, 500);
+              });
+
+               async function copyURLToClipBoard(contentToCopy) {
+                   try {
+                       await navigator.clipboard.writeText(contentToCopy);
+                   } catch (err) {
+                       console.log('error: ', err)
+                   }
+               }
+           });
+        });
+    </script>
+{% endblock %}

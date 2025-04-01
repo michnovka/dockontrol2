@@ -1,0 +1,136 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Buildings | Settings{% endblock %}
+{% set active = 'buildings' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Buildings'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_building_new'),
+        'title': 'Create New Building',
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/settings/building/filter.html.twig' %}
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>{{ knp_pagination_sortable(buildings, 'Name', 'b.name') }}</th>
+                    <th>{{ knp_pagination_sortable(buildings, 'Default Group', 'g.name') }}</th>
+                    <th>{{ knp_pagination_sortable(buildings, 'Apartments', 'apartments') }}</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for building in buildings %}
+                    {% include 'cp/settings/building/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': buildings}) }}
+    </div>
+
+    <div class="modal fade" id="delete_building_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_building_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Building
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following building is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_building_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the building, which you want to delete.</h6>
+                        <input type="text" class="confirm-building-name form-control" id="confirm-building-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect building name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_building" name="_csrf_token_building" id="_csrf_token_building" value="{{ csrf_token("buildingcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-building text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let deleteBuildingBtns = document.querySelectorAll('.delete-building-btn');
+        let deleteBuildingModal = new bootstrap.Modal(document.getElementById('delete_building_modal'), {});
+        let deleteBuildingForm = document.getElementById('delete_building_form');
+        deleteBuildingBtns.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let buildingId = el.getAttribute('data-building-id');
+                let buildingName = el.getAttribute('data-building-name');
+                document.getElementById('delete_building_name').innerText = buildingName;
+                deleteBuildingModal.show();
+
+                deleteBuildingForm.addEventListener('submit', (e) => {
+                   e.preventDefault();
+                   let confirmBuildingName = document.getElementById('confirm-building-name').value;
+
+                   if (confirmBuildingName !== buildingName) {
+                       document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                       setTimeout(function() {
+                           document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                       }, 2500);
+                   } else {
+                       let deleteBuildingURL = "{{ path('cp_settings_building_delete', {'id': '__ID__'}) }}";
+                       deleteBuildingURL = deleteBuildingURL.replace('__ID__', buildingId);
+                       let csrfToken = document.getElementById('_csrf_token_building').value;
+                       let formData = new FormData();
+                       formData.append('_csrf', csrfToken);
+
+                       fetch(deleteBuildingURL, {
+                           method: 'POST',
+                           body: formData
+                       }).then((res) => {
+                           return res.json();
+                       }).then((response) => {
+                           if (response.status) {
+                               deleteBuildingModal.hide();
+                               window.location.reload();
+                           } else {
+                               document.querySelector('.generic_error').innerHTML = response.errorMessage;
+                               document.querySelector('.generic_error').classList.remove('d-none');
+                               setTimeout(function() {
+                                   document.querySelector('.generic_error').classList.add('d-none');
+                               }, 2500)
+                           }
+                       })
+                   }
+                });
+            })
+        })
+    </script>
+{% endblock %}

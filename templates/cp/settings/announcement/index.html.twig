@@ -1,0 +1,258 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Announcement | Settings{% endblock %}
+{% set active = 'announcements' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Announcement'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_announcement_new'),
+        'title': 'Create New Announcement',
+    }
+] %}
+
+{% block content %}
+    <div class="card mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th style="width: 15px !important;">
+                        <input class="form-check-input cursor-pointer" type="checkbox" id="select-all" data-bs-toggle="tooltip" data-bs-original-title="Select all">
+                    </th>
+                    <th>Subject</th>
+                    <th>Building</th>
+                    <th>Visibility</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Created Time</th>
+                    <th>Created By</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for announcement in announcements %}
+                    {% include 'cp/settings/announcement/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="9">No records found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-danger disabled" id="multi-select-delete-btn">Delete Selected</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete_announcement_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_announcement_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Announcement
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following announcement is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_announcement_subject"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_announcement" name="_csrf_token_announcement" id="_csrf_token_announcement" value="{{ csrf_token("announcementcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-announcement text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bulk_delete_announcement_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="bulk_delete_announcement_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Selected Announcements
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Are you sure, you want to delete selected announcements?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please type <b>CONFIRM</b> to proceed.</h6>
+                        <input type="text" class="confirm-bulk-delete form-control" id="confirm-bulk-delete"/>
+                        <span class="validation-invalid-label incorrect_code d-none">please check entered value</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_announcement" name="_csrf_token_announcement" id="_csrf_token_announcement" value="{{ csrf_token("announcementcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-announcement text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const selectAllCheckbox = document.getElementById('select-all');
+        const itemCheckboxes = document.querySelectorAll('.announcement-checkbox');
+        const multiSelectDeleteBtn = document.getElementById('multi-select-delete-btn');
+        let announcementIds = [];
+        let bulkDeleteModal = new bootstrap.Modal(document.getElementById('bulk_delete_announcement_modal'));
+        let bulkDeleteForm = document.getElementById('bulk_delete_announcement_form');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                if (selectAllCheckbox.checked) {
+                    addAnnouncementId(checkbox.dataset.id);
+                    checkbox.closest('tr').classList.add('table-active');
+                } else {
+                    removeAnnouncementId(checkbox.dataset.id);
+                    checkbox.closest('tr').classList.remove('table-active');
+                }
+                toggleMultiDeleteButton();
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allChecked = Array.from(itemCheckboxes).every(checkbox => checkbox.checked);
+                if (checkbox.checked) {
+                    addAnnouncementId(checkbox.dataset.id);
+                    checkbox.closest('tr').classList.add('table-active');
+                } else {
+                    removeAnnouncementId(checkbox.dataset.id);
+                    checkbox.closest('tr').classList.remove('table-active');
+                }
+                toggleMultiDeleteButton();
+                selectAllCheckbox.checked = allChecked;
+            });
+        });
+
+        multiSelectDeleteBtn.addEventListener('click', (e) => {
+           e.preventDefault();
+            bulkDeleteModal.show();
+        });
+
+        bulkDeleteForm.addEventListener('submit', (e) => {
+           e.preventDefault();
+            console.log(document.getElementById('confirm-bulk-delete').value)
+            if (document.getElementById('confirm-bulk-delete').value !== 'CONFIRM') {
+                bulkDeleteForm.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                setTimeout(function() {
+                    bulkDeleteForm.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                }, 2500);
+            } else {
+                let formData = new FormData();
+                let csrfToken = document.getElementById('_csrf_token_announcement').value;
+                formData.append('_csrf', csrfToken);
+                formData.append('announcementIds', JSON.stringify(announcementIds));
+                let bulkDeleteURL = '{{ path('cp_settings_announcement_bulk_delete') }}';
+                fetch(bulkDeleteURL, {
+                    method: 'POST',
+                    body: formData
+                }).then((res) => {
+                    return res.json();
+                }).then((response) => {
+                    if (response.status) {
+                        bulkDeleteModal.hide();
+                        window.location.reload();
+                    } else {
+                        bulkDeleteForm.querySelector('.generic_error').innerHTML = response.errorMessage;
+                        bulkDeleteForm.querySelector('.generic_error').classList.remove('d-none');
+                        setTimeout(function() {
+                            bulkDeleteForm.querySelector('.generic_error').classList.add('d-none');
+                        }, 2500)
+                    }
+                })
+            }
+        });
+
+        function addAnnouncementId(announcementId) {
+            if (!announcementIds.includes(announcementId)) {
+                announcementIds.push(announcementId);
+            }
+        }
+        function toggleMultiDeleteButton()
+        {
+            if (announcementIds.length > 0) {
+                multiSelectDeleteBtn.classList.remove('disabled');
+            } else {
+                multiSelectDeleteBtn.classList.add('disabled');
+            }
+        }
+
+        function removeAnnouncementId(announcementId) {
+            const index = announcementIds.indexOf(announcementId);
+            if (index > -1) {
+                announcementIds.splice(index, 1);
+            }
+        }
+
+        let deleteAnnouncementBtns = document.querySelectorAll('.delete-announcement-btn');
+        let deleteAnnouncementModal = new bootstrap.Modal(document.getElementById('delete_announcement_modal'), {});
+        let deleteAnnouncementForm = document.getElementById('delete_announcement_form');
+        deleteAnnouncementBtns.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let announcementId = el.getAttribute('data-announcement-id');
+                document.getElementById('delete_announcement_subject').innerText = el.getAttribute('data-announcement-subject');
+                deleteAnnouncementModal.show();
+
+                deleteAnnouncementForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let deleteAnnouncementURL = "{{ path('cp_settings_announcement_delete', {'id': '__ID__'}) }}";
+                    deleteAnnouncementURL = deleteAnnouncementURL.replace('__ID__', announcementId);
+                    let csrfToken = document.getElementById('_csrf_token_announcement').value;
+                    let formData = new FormData();
+                    formData.append('_csrf', csrfToken);
+
+                    fetch(deleteAnnouncementURL, {
+                        method: 'POST',
+                        body: formData
+                    }).then((res) => {
+                        return res.json();
+                    }).then((response) => {
+                        if (response.status) {
+                            deleteAnnouncementModal.hide();
+                            window.location.reload();
+                        } else {
+                            deleteAnnouncementForm.querySelector('.generic_error').innerHTML = response.errorMessage;
+                            deleteAnnouncementForm.querySelector('.generic_error').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.generic_error').classList.add('d-none');
+                            }, 2500)
+                        }
+                    });
+
+                });
+            })
+        })
+    </script>
+{% endblock %}

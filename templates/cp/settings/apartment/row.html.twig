@@ -1,0 +1,25 @@
+<tr>
+    <td>{{ apartment.apartment.id }}</td>
+    <td>{{ apartment.apartment.name }}</td>
+    <td>{{ apartment.apartment.building.name }}</td>
+    <td>{{ apartment.apartment.defaultGroup ? apartment.apartment.defaultGroup.name : 'N/A'  }}</td>
+    <td>
+        {% if apartment.users > 0 %}
+            <a href="{{ path('cp_access_management_users', {
+                    user_filter: {
+                        'apartment': apartment.apartment.id
+                    }
+            }) }}" class="nav-link show-underline-hover px-2 text-primary">{{ apartment.users }}</a>
+        {% else %}
+            N/A
+        {% endif %}
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_settings_apartment_edit', {'id': apartment.apartment.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-apartment-btn" data-apartment-id="{{ apartment.apartment.id }}" data-apartment-name="{{ apartment.apartment.name }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

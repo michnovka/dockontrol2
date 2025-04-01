@@ -1,0 +1,19 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Edit | E-mail Setting{% endblock %}
+{% set active = 'email_config' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_email_setting'),
+        'title': 'E-mail'
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/email_setting/form.html.twig' %}
+{% endblock %}

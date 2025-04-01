@@ -1,0 +1,10 @@
+<tr>
+    <td>{{ emailChangeLog.id }}</td>
+    <td>{{ emailChangeLog.timeCreated|format('Y-m-d H:i:s') }}</td>
+    <td>{{ emailChangeLog.user.email }}</td>
+    <td>{{ emailChangeLog.oldEmail }}</td>
+    <td>{{ emailChangeLog.newEmail }}</td>
+    <td>{{ emailChangeLog.oldEmailConfirmedTime ? emailChangeLog.oldEmailConfirmedTime | format('Y-m-d H:i:s') : 'N/A'  }}</td>
+    <td>{{ emailChangeLog.newEmailConfirmedTime ? emailChangeLog.newEmailConfirmedTime | format('Y-m-d H:i:s') : 'N/A'  }}</td>
+    <td>{{ emailChangeLog|email_change_log_status }}</td>
+</tr>

@@ -1,0 +1,24 @@
+{% extends 'cp/admin_base.html.twig' %}
+{% block title %}Edit | Admin Building{% endblock %}
+{% set active = 'admin_buildings' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_admin_building'), 'title': 'Admin Buildings'
+    },
+    {
+        'title': user.name
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/access_management/admin_building/form.html.twig' %}
+{% endblock %}
+
+
+

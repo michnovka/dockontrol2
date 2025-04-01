@@ -1,0 +1,28 @@
+<tr>
+    <td>{{ camera.camera.nameId }}</td>
+    <td>{{ camera.camera.friendlyName }}</td>
+    <td>
+        {{ camera.camera.permissionRequired ? camera.camera.permissionRequired.name : 'N/A' }}
+    </td>
+    <td>{{ camera.camera.dockontrolNode.name }}</td>
+    <td>{{ camera.camera.dockontrolNode|dockontrol_node_status_indicator }}</td>
+    <td>
+        <code>
+            {{ camera.camera.dockontrolNodePayload | json_encode }}
+        </code>
+    </td>
+    <td>
+        {{ camera.cameraBackups }}
+    </td>
+    <td class="text-end text-nowrap">
+        <a href="{{ path('cp_settings_camera_edit', {id: camera.camera.nameId}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-camera-btn" data-camera-name="{{ camera.camera.nameId }}"  data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-primary preview-camera-btn" data-camera-name="{{ camera.camera.nameId }}"  data-bs-toggle="tooltip" data-bs-original-title="View">
+            <i class="bi bi-eye"></i>
+        </a>
+    </td>
+</tr>

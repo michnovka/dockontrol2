@@ -1,0 +1,38 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Edit | Building{% endblock %}
+{% set active = 'buildings' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_building'),
+        'title': 'Buildings'
+    },
+    {
+        'title': building.name
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/building/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+
+    {% if building is defined and building is not null %}
+        {% include 'cp/settings/car_enter_detail/car_enter_details_add_modal.html.twig' with {
+            'allActions': allActions,
+            'carEnterDetailsActionLabel': 'Select action for your building: ' ~ building.name,
+            'carEnterDetailsCount': carEnterDetails | length,
+            'csrfToken': csrf_token("carenterdetailscsrf")
+        }
+        %}
+
+        {% include 'cp/settings/car_enter_detail/car_enter_details_remove.html.twig' with {
+            'csrfToken': csrf_token("carenterdetailscsrf")
+        } %}
+    {% endif %}
+
+{% endblock %}
+

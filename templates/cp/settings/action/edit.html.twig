@@ -1,0 +1,22 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Edit | Action{% endblock %}
+{% set active = 'actions' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_action'),
+        'title': 'Actions'
+    },
+    {
+        'title': action.friendlyName
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/action/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+{% endblock %}

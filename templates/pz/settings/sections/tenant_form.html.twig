@@ -1,0 +1,41 @@
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-md-6">
+        {{ form_row(form.name) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_label(form.phoneCountryPrefix) }}
+        {{ form_label(form.phone) }}
+        <div class="input-group phone-with-prefix">
+            {{ form_widget(form.phoneCountryPrefix) }}
+            {{ form_widget(form.phone) }}
+        </div>
+        {{ form_errors(form.phoneCountryPrefix) }}
+        {{ form_errors(form.phone) }}
+    </div>
+    {% if show_edit_form_fields is defined and not show_edit_form_fields %}
+        <div class="col-md-6">
+            {{ form_row(form.email) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.enabled) }}
+        </div>
+    {% else %}
+        <div class="col-md-6">
+            {{ form_row(form.email.first) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.email.second) }}
+        </div>
+    {% endif %}
+    <div class="col-md-6">
+        {{ form_row(form.password.first) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.password.second) }}
+    </div>
+</div>
+<input type="hidden" class="_csrf_token_tenant" name="_csrf_token_tenant" id="_csrf_token_tenant" value="{{ csrf_token("tenantcsrf") }}">
+{{ form_end(form) }}
+<span class="validation-invalid-label incorrect_code d-none ">{{ 'dockontrol.settings.apartment.delete_tenant_modal.incorrect_email'|trans }}</span>
+<span class="validation-invalid-label generic_error d-none">Something went wrong.{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>

@@ -1,0 +1,139 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Actions | Settings{% endblock %}
+{% set active = 'actions' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Actions'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_action_new'),
+        'title': 'Create New Action',
+    }
+] %}
+{% block content %}
+    <div class="card mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Friendly Name</th>
+                    <th>Type</th>
+                    <th>Node</th>
+                    <th>Status</th>
+                    <th>Action Payload</th>
+                    <th>CRON Group</th>
+                    <th>Backup Actions</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% set dockontrolNodeStatus = enum("\\App\\Entity\\Enum\\DockontrolNodeStatus") %}
+                {% for action in dockontrolActions %}
+                    {% include 'cp/settings/action/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="6">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': dockontrolActions}) }}
+    </div>
+
+    <div class="modal fade" id="delete_action_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_action_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Action
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following action is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_action_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the action, which you want to delete.</h6>
+                        <input type="text" class="confirm-action-name form-control" id="confirm-action-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect action name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_action" name="_csrf_token_action" id="_csrf_token_action" value="{{ csrf_token("actioncsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-action text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let deleteActionBtns = document.querySelectorAll('.delete-action-btn');
+        let deleteActionModal = new bootstrap.Modal(document.getElementById('delete_action_modal'), {});
+        let deleteActionForm = document.getElementById('delete_action_form');
+
+        deleteActionBtns.forEach((el) => {
+           el.addEventListener('click', function (e) {
+               e.preventDefault();
+               let actionName = el.getAttribute('data-action-name');
+               document.getElementById('delete_action_name').innerText = actionName;
+               deleteActionModal.show();
+
+               deleteActionForm.addEventListener('submit', (e) => {
+                  e.preventDefault();
+                  let confirmActionName = document.getElementById('confirm-action-name').value;
+                  if (confirmActionName !== actionName) {
+                      document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                      setTimeout(function() {
+                          document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                      }, 2500);
+                  } else {
+                      let deleteURL = "{{ path('cp_settings_action_delete', {'name': '__NAME__'}) }}";
+                      deleteURL = deleteURL.replace('__NAME__', actionName);
+                      let csrfToken = document.getElementById('_csrf_token_action').value;
+                      let formData = new FormData();
+                      formData.append('_csrf', csrfToken);
+
+                      fetch(deleteURL, {
+                          body: formData,
+                          method: 'POST'
+                      }).then((response) => {
+                          return response.json();
+                      }).then((res) => {
+                          if (res.status) {
+                              deleteActionModal.hide();
+                              window.location.reload();
+                          } else {
+                              document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                              document.querySelector('.generic_error').classList.remove('d-none');
+                              setTimeout(function() {
+                                  document.querySelector('.generic_error').classList.add('d-none');
+                              }, 2500)
+                          }
+                      });
+                  }
+              });
+           });
+        });
+    </script>
+{% endblock %}

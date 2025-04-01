@@ -1,0 +1,11 @@
+{% extends 'pz/pz_base.html.twig' %}
+
+{% block title %} {{ 'dockontrol.guest_pass.form.new_page_title'|trans }}{% endblock %}
+{% set pageTitle = 'dockontrol.guest_pass.form.page_title'|trans %}
+
+{% block content %}
+    <div class="card border-0 shadow-none container-md">
+        <p>{{ 'dockontrol.guest_pass.form.description'|trans }}</p>
+        {% include 'pz/guest_pass/form.html.twig' %}
+    </div>
+{% endblock %}

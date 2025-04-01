@@ -1,0 +1,78 @@
+<tr>
+    <td>{{ user.id }}</td>
+    <td>{{ user.name }}</td>
+    <td>
+        {{ user.email|lower }}
+        {% if user.emailVerified %}
+            <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail verified">
+        {% else %}
+            <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="E-mail not verified">
+        {% endif %}
+
+    </td>
+    <td>
+        +{{ user.phoneCountryPrefix }}{{ user.phone }}
+        {% if user.phoneVerified %}
+            <img src="{{ asset('assets/images/verified.svg') }}" alt="Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone verified">
+        {% else %}
+            <img src="{{ asset('assets/images/not_verified.svg') }}" alt="Not Verified" height="12" width="12" data-bs-toggle="tooltip" title="Phone not verified">
+        {% endif %}
+    </td>
+    <td>
+        <span class="badge rounded-pill bg-{{ user.enabled ? 'success' : 'danger' }}">{{ user.enabled ? 'Yes' : 'No' }}</span>
+    </td>
+    <td>{{ user.apartment ? user.apartment.name ~ ' (' ~ user.apartment.building.name ~ ')' : 'N/A' }}</td>
+    <td>
+        {% if user.role == userRole.ADMIN %}
+            {% set buildingNames = user.adminBuildings|map(building => building.name)|join(', ') %}
+            <span class="badge {{ user.role.badgeClass }}" data-bs-toggle="tooltip" data-bs-original-title="{{ buildingNames }}">{{ user.role.readable }}</span>
+        {% else %}
+            <span class="badge {{ user.role.badgeClass }}">{{ user.role.readable }}</span>
+        {% endif %}
+    </td>
+    <td class="px-0">
+        {% if user.landlord is not null %}
+            <a href="{{ path('cp_access_management_user_edit', {'id': user.landlord.id}) }}" class="nav-link show-underline-hover text-primary"> {{ user.landlord.name }} </a>
+        {% else %}
+            <p>N/A</p>
+        {% endif %}
+    </td>
+    <td>
+        <div class="group-container">
+            {% for group in user.groups %}
+                <span class="badge bg-secondary">{{ group.name }}</span>
+            {% endfor %}
+        </div>
+    </td>
+    <td>{{ user.createdTime|time_tooltip }}</td>
+    <td>
+        {% if user.timeLastAction is not null %}
+            <a href="{{ path('cp_stats_queue', {userId: user.id}) }}" class="text-body text-decoration-none">
+                {{ user.timeLastAction|time_tooltip }}
+            </a>
+        {% else %}
+            N/A
+        {% endif %}
+    </td>
+    <td class="text-end text-nowrap">
+        <a href="{{ path('cp_access_management_user_edit', {'id': user.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+            <a href="{{ user.enabled ? path('dockontrol_main', {'_switch_user': user.email}) : '#' }}"
+               class="text-decoration-none fs-6 text-body {% if not user.enabled %} opacity-50 {% endif %}"
+               data-user-id="{{ user.id }}"
+               data-email="{{ user.email }}"
+               data-bs-toggle="tooltip"
+               data-bs-original-title="{% if user.enabled %} Impersonate {% else %} Can not impersonate disabled user {% endif %}"
+                    {% if not user.enabled %} tabindex="-1" aria-disabled="true" {% endif %}>
+                <i class="bi bi-person"></i>
+            </a>
+
+
+            <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-user-btn" data-user-id="{{ user.id }}" data-email="{{ user.email }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                <i class="bi bi-trash"></i>
+            </a>
+        {% endif %}
+    </td>
+</tr>

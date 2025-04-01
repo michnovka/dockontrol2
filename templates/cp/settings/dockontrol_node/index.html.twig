@@ -1,0 +1,146 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Dockontrol Nodes | Settings{% endblock %}
+{% set active = 'dockontrol_nodes' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Nodes'
+    }
+] %}
+{% set actions = [
+    {
+        'link': path('cp_settings_node_new'),
+        'title': 'Create New Node',
+    }
+] %}
+
+{% block content %}
+    <div class="card mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>{{ knp_pagination_sortable(nodes, 'ID', 'n.id') }}</th>
+                    <th>{{ knp_pagination_sortable(nodes, 'Name', 'n.name') }}</th>
+                    <th>{{ knp_pagination_sortable(nodes, 'Building', 'b.name') }}</th>
+                    <th>{{ knp_pagination_sortable(nodes, 'IP Address', 'n.ip') }}</th>
+                    <th>{{ knp_pagination_sortable(nodes, 'Status', 'n.status') }}</th>
+                    <th>{{ knp_pagination_sortable(nodes, 'Last Command', 'n.lastCommandExecutedTime') }}</th>
+                    <th>{{ knp_pagination_sortable(nodes, 'Ping', 'n.ping') }}</th>
+                    <th>Version</th>
+                    <th>OS</th>
+                    <th>Device</th>
+                    <th>{{ knp_pagination_sortable(nodes, 'Up Time', 'n.uptime') }}</th>
+                    <th>Docker Version</th>
+                    <th>Notify On Status Change</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for node in nodes %}
+                    {% include 'cp/settings/dockontrol_node/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="10">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': nodes}) }}
+    </div>
+
+    <div class="modal fade" id="delete_node_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_node_form">
+                    <div class="modal-header bg-danger">
+                        <h6 class="card-title text-white">
+                            Delete Node
+                        </h6>
+                        <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following node is about to be deleted:</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_node_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <hr>
+                        <h6 class="font-weight-semibold">Please enter the name of the node, which you want to delete.</h6>
+                        <input type="text" class="confirm-node-name form-control" id="confirm-node-name"/>
+                        <span class="validation-invalid-label incorrect_code d-none">You entered the incorrect node name.</span>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_node" name="_csrf_token_node" id="_csrf_token_node" value="{{ csrf_token("nodecsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-danger approve-the-deletion-for-node text-white">Approve the Deletion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let deleteNodeBtns = document.querySelectorAll('.delete-node-btn');
+        let deleteNodeModal = new bootstrap.Modal(document.getElementById('delete_node_modal'), {});
+        let deleteNodeForm = document.getElementById('delete_node_form');
+
+        deleteNodeBtns.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let nodeId = el.getAttribute('data-node-id');
+                let nodeName = el.getAttribute('data-node-name');
+                document.getElementById('delete_node_name').innerText = nodeName;
+                deleteNodeModal.show();
+
+                deleteNodeForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let confirmNodeName = document.getElementById('confirm-node-name').value;
+
+                    if (confirmNodeName !== nodeName) {
+                        document.querySelector('.validation-invalid-label.incorrect_code').classList.remove('d-none');
+                        setTimeout(function() {
+                            document.querySelector('.validation-invalid-label.incorrect_code').classList.add('d-none')
+                        }, 2500);
+                    } else {
+                        let deleteNodeURL = "{{ path('cp_settings_node_delete', {'id': '__ID__'}) }}";
+                        deleteNodeURL = deleteNodeURL.replace('__ID__', nodeId);
+                        let csrfToken = document.getElementById('_csrf_token_node').value;
+                        let formData = new FormData();
+                        formData.append('_csrf', csrfToken);
+
+                        fetch(deleteNodeURL, {
+                            method: 'POST',
+                            body: formData
+                        }).then((res) => {
+                            return res.json();
+                        }).then((response) => {
+                            if (response.status) {
+                                deleteNodeModal.hide();
+                                window.location.reload();
+                            } else {
+                                document.querySelector('.generic_error').innerHTML = response.errorMessage;
+                                document.querySelector('.generic_error').classList.remove('d-none');
+                                setTimeout(function() {
+                                    document.querySelector('.generic_error').classList.add('d-none');
+                                }, 2500)
+                            }
+                        })
+                    }
+                });
+            })
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,29 @@
+<tr>
+    <td>{{ cronGroup.name }}</td>
+    <td>
+        {% if cronGroup.actions > 0 %}
+            <a href="{{ path('cp_settings_action', {'cron_group': cronGroup.name}) }}" class="nav-link show-underline-hover px-2 text-primary">{{ cronGroup.actions }}</a>
+        {% else %}
+            <a href="#" class="nav-link show-underline-hover px-2 text-primary">{{ cronGroup.actions }}</a>
+        {% endif %}
+    </td>
+    <td>
+        <span data-bs-toggle="tooltip" data-bs-original-title="Scheduled">{% if cronGroup.scheduledActions > 0 %}{{ cronGroup.scheduledActions }}{% else %}0{% endif %}</span>
+        <span data-bs-toggle="tooltip" data-bs-original-title="Immediate">({% if cronGroup.immediateActions > 0 %}{{ cronGroup.immediateActions }}{% else %}0{% endif %})</span>
+    </td>
+    <td>
+        <span data-bs-toggle="tooltip" data-bs-original-title="Scheduled">{% if plannedRedisActionQueued[cronGroup.name] is defined %}{{ plannedRedisActionQueued[cronGroup.name] }}{% endif %}</span>
+        <span data-bs-toggle="tooltip" data-bs-original-title="Immediate">({% if immediateRedisActionQueued[cronGroup.name] is defined %}{{ immediateRedisActionQueued[cronGroup.name] }}){% endif %}</span>
+    </td>
+    <td class="text-end text-nowrap">
+        <a href="{{ path('cp_settings_action_cron_group_edit', {'name': cronGroup.name}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-cron-group-btn" data-cron-group-name="{{ cronGroup.name }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-warning clear-queue-btn" data-cron-group-name="{{ cronGroup.name }}" data-bs-toggle="tooltip" data-bs-original-title="Clear queue">
+            <i class="bi bi-eraser-fill"></i>
+        </a>
+    </td>
+</tr>

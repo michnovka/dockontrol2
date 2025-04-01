@@ -1,0 +1,7 @@
+{% extends 'pz/pz_base.html.twig' %}
+{% block title %} {{ 'dockontrol.settings.custom_sorting.new_page_title'|trans }}{% endblock %}
+{% set pageTitle = 'Create Custom Sorting Group' %}
+
+{% block content %}
+    {% include 'pz/custom_sorting_group/form.html.twig' %}
+{% endblock %}

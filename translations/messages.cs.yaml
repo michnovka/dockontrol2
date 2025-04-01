@@ -1,0 +1,553 @@
+dockontrol:
+  logo: 'DOCKontrol'
+  global:
+    invalid_csrf_token: 'Neplatný CSRF token.'
+    invalid_request: 'Neplatný požadavek'
+    save_changes_button: 'Uložit změny'
+    edit_button_tooltip: 'Upravit'
+    delete_button_tooltip: 'Smazat'
+    modals:
+      some_went_wrong: 'Něco se pokazilo.'
+      close_button: 'Zavřít'
+      approve_the_deletion_button: 'Potvrdit smazání'
+
+  home:
+    home: 'Domů'
+    gates: 'Brány'
+    entrances: 'Vchody'
+    nuki: 'NUKI'
+    custom: 'Zvyk'
+    multi: 'Multi'
+    announcement: 'Oznámení!'
+    has_admin_been_notified:
+      title: 'Upozornění!'
+      message: 'Některá tlačítka nemusí fungovat. Pracujeme na tom.'
+    not_admin_been_notified:
+      title: 'Upozornění!'
+      message: 'Některé komponenty mají nehlášené problémy. Informujte prosím administrátora, aby mohly být opraveny.'
+    email_not_verified:
+      title: 'Upozornění!'
+      message: 'Vaše e-mailová adresa nebyla ověřena.'
+    has_missing_button: 'Některá tlačítka nejsou zobrazena, protože vlastní třídění není plně nakonfigurováno.'
+    legenda:
+      heading: 'Legenda'
+      description: 'Byl vám udělen časově omezený přístup pro hosty do rezidenční zóny DOCK v Praze. Všechny akce jsou zaznamenávány a všechny vchody jsou pod kamerovým dohledem.'
+      car_enter_exit:
+        car_enter_exit: 'Příjezd / Výjezd autem'
+        message: 'Podržte tlačítko na chvíli, abyste otevřeli jak velkou bránu, tak garážová vrata ve správném načasování, což umožní vjezd / výjezd vozidla jedním kliknutím.'
+      guest_and_entrances:
+        guest_and_entrances: 'Brány a vchody'
+        message: 'Podržte tlačítko na chvíli, abyste otevřeli pěší vchody.'
+    messages:
+      process_car_enter_exit: 'Pro tuto akci nemáte povolení.'
+      unsupported_action: 'Nepodporovaná akce: '
+      timout_message: 'Časový limit požadavku vypršel. Zkuste to znovu.'
+      failed_to_execute_button_action: 'Nepodařilo se provést akci tlačítka, '
+      cannot_request_full_admin_view_when_logged_in_as_guest: 'Nemůžete požádat o plný administrátorský pohled, když jste přihlášen jako host.'
+      cannot_request_full_admin_view_when_you_are_not_admin: 'Nemůžete požádat o plný administrátorský pohled, když nejste administrátor.'
+      pin_modal_title: 'Zadejte PIN'
+      delete_nuki_modal_title: 'Smazat Nuki'
+      delete_nuki_info_text: 'Následující nuki se chystá smazat'
+      delete_nuki_confirm_msg: 'Opravdu chcete pokračovat?'
+      delete_nuki_error_msg1: 'Zadali jste nesprávné uživatelské jméno'
+      delete_nuki_error_msg2: 'Něco se pokazilo'
+      operation_cancelled: 'Operace byla zrušena'
+
+    buttons:
+      car_enter: 'Auto příjezd'
+      car_exit: 'Auto odjezd'
+      gate: 'Brána'
+      garage: 'Garáž'
+      entrance: 'Vchod'
+      elevator: 'Výtah'
+      building: 'Budova'
+      single_open: 'Otevřít'
+      open_for_1_min: 'Otevřít na 1 min'
+      lock: 'Zamknout'
+      unlock: 'Odemknout'
+      del: 'Del'
+      ok: 'Ok'
+      close: 'Zavřít'
+      approve_deletion: 'Schválit smazání'
+
+    tos_modal:
+      card_title: 'Podmínky služby a zásady ochrany osobních údajů'
+      info_text: 'Abyste mohli DOCKontrol používat, musíte si je přečíst a přijmout'
+      accept: 'přijímám'
+      do_not_accept: 'nepřijímám'
+
+    btn_hold_info_modal:
+      title: 'Podržte pro pokračování'
+      info_text: 'Musíte stisknout a podržet tlačítko, ne jen kliknout.'
+
+  settings:
+    setting: 'Nastavení'
+    options:
+      my_profile: 'Můj profil'
+      apartment: 'Apartmán'
+      nuki: 'NUKI'
+      api: 'API'
+      custom_sorting: 'Vlastní třídění'
+      gdpr: 'GDPR'
+
+    my_profile:
+      page_title: 'Nastavení | Můj profil'
+      email: 'E-mail'
+      account_since: 'Účet od'
+      building: 'Budova'
+      apartment: 'Byt'
+      theme:
+        switch_to_dark: 'Přepnout na tmavý motiv'
+        switch_to_light: 'Přepnout na světlý motiv'
+      save_button: 'Uložit změny'
+      forms:
+        phone: 'Telefon'
+        name: 'Jméno'
+        button_press_type: 'Typ stisku tlačítka'
+      sections:
+        my_info: 'Moje informace'
+        change_password: 'Změnit heslo'
+        change_email: 'Změnit e-mail'
+      messages:
+        contact_info_saved: 'Kontaktní informace byly úspěšně uloženy.'
+        not_allowed_to_edit_profile: 'Nemáte oprávnění upravovat profil.'
+
+    apartment:
+      page_title: 'Nastavení | Byt'
+      add_tenant: 'Přidat nájemce'
+      tenants_under_my_account: 'Nájemníci pod mým účtem'
+      other_accounts_related_to_this_apartment: 'Další účty související s tímto bytem'
+      listing:
+        name: 'Jméno'
+        email: 'E-mail'
+        phone: 'Telefon'
+        enabled: 'Povolen'
+        time_created: 'Čas vytvoření'
+        no_data: 'K vašemu účtu nejsou přidruženi žádní nájemci.'
+        type: 'Typ'
+      delete_tenant_modal:
+        title: 'Smazat nájemce'
+        description: 'Následující nájemce bude smazán:'
+        confirmation_message: 'Opravdu chcete pokračovat?'
+        incorrect_email: 'Zadali jste nesprávnou e-mailovou adresu.'
+        enter_email_info_label: 'Prosím, zadejte e-mail nájemce, kterého chcete smazat.'
+      create_and_edit_modal:
+        create_title: 'Vytvořit nájemce'
+        edit_title: 'Upravit nájemce'
+        name: 'Jméno'
+        email: 'E-mail'
+        repeat_email: 'Opakujte e-mail'
+        phone: 'Telefon'
+        enabled: 'Povoleno'
+        password: 'Heslo'
+        repeat_password: 'Opakujte heslo'
+        country_code: 'Předpona'
+        password_not_match: 'Pole hesla se musí shodovat.'
+        email_not_match: 'Pole e-mailu se musí shodovat.'
+        weak_password: 'Heslo je příliš slabé. Použijte prosím silnější heslo.'
+        save_btn: 'Uložit'
+      tenant:
+        messages:
+          successfully_deleted: 'Nájemník byl úspěšně smazán.'
+          successfully_created: 'Nájemce byl úspěšně vytvořen.'
+          successfully_updated: 'Nájemce byl úspěšně aktualizován.'
+          failed_to_create: 'Nepodařilo se vytvořit nájemce: '
+          failed_to_update: 'Nepodařilo se aktualizovat nájemce: '
+          tenant_deleted_failed: 'Smazání nájemce se nezdařilo: '
+          do_not_have_permission_to_create: 'Nemáte oprávnění k vytvoření nájemce.'
+          do_not_have_permission_to_edit: 'Nemáte oprávnění upravovat tohoto nájemce.'
+          email_already_exist: 'E-mail již v systému existuje.'
+
+    change_email:
+      page_title: 'Nastavení | Změna e-mailu'
+      form:
+        email: 'E-mail'
+        repeated_email: 'Zopakovat nový e-mail'
+        invalid_email_message: 'E-mailová pole musí být stejná.'
+      messages:
+        ip_address_and_browser_can_not_be_null: 'IP adresa ani prohlížeč nesmí být prázdné.'
+        email_change_request_created: 'Byla vytvořena nová žádost o změnu e-mailu.'
+        verify_old_and_new_email_to_complete_change: 'Prosím, ověřte svůj starý i nový e-mail, aby byla změna dokončena.'
+        verify_new_email_to_complete_change: 'Prosím, ověřte nový e-mail, aby byla změna dokončena.'
+
+    change_password:
+      page_title: 'Nastavení | Změna hesla'
+      form:
+        current_password: 'Aktuální heslo *'
+        current_password_place_holder: 'Aktuální heslo'
+        current_password_invalid_message: 'Zadejte prosím platné aktuální heslo.'
+        new_password: 'Nové heslo *'
+        new_password_place_holder: 'Nové heslo'
+        repeated_new_password: 'Zopakovat nové heslo *'
+        repeated_new_password_place_holder: 'Zopakovat nové heslo'
+        repeated_new_password_invalid_message: 'Heslová pole se musí shodovat.'
+      messages:
+        now_allowed_to_change_password: 'Nemáte oprávnění změnit heslo.'
+        password_reset_successfully: 'Heslo bylo úspěšně resetováno.'
+
+    nuki:
+      title_description: 'Můžete přidat NUKI zařízení pomocí bridge do ovládacího panelu %bridge%.'
+      page_title: 'Nastavení | Nuki'
+      title_link: 'dockontrol-nuki-api'
+      nuki_description_first: 'Bezpečnost je zajištěna pomocí dvou hesel - jedno heslo je uloženo na serveru a druhé heslo je uloženo v místní mezipaměti prohlížeče. Hesla se používají k generování TOTP kódů, proto ani poskytovatel serveru nemůže vydávat příkazy pro zamknutí/odemknutí vašich NUKI. Zachycení komunikace (která by měla probíhat přes HTTPS) by útočníkovi umožnilo odemknout/zamknout dveře pouze během stejného 1minutového intervalu.'
+      nuki_description_second: 'Pro ochranu proti krádeži mobilních zařízení mohou být příkazy NUKI dále chráněny PIN kódem. Tento kód bude vyžadován s každým příkazem zamknutí/odemknutí a má omezenou rychlost.'
+      add_nuki_button: 'Přidat Nuki'
+      listing:
+        id: 'ID'
+        nuki_name: 'Název Nuki'
+        api_url: 'API URL'
+        username: 'Uživatelské jméno'
+        password1: 'Heslo1'
+        password2: 'Heslo2'
+        pin: 'PIN'
+        security: 'Bezpečnost'
+        can_lock: 'Lze zamknout?'
+        remove_pin: 'Odstranit PIN'
+      form:
+        create_page_title: 'Nový | Nuki'
+        edit_page_title: 'Upravit | Nuki'
+        title: 'Vytvořit Nuki'
+        edit_form_title: 'Upravit Nuki'
+        nuki_name: 'Název Nuki'
+        nuki_api_server: 'DOCKontrol Nuki API server'
+        nuki_api_server_invalid_message: 'URL serveru Nuki API není platná.'
+        username: 'Uživatelské jméno'
+        password: 'Heslo'
+        can_lock: 'Lze zamknout?'
+        pin: 'PIN'
+        save_changes_button: 'Uložit změny'
+      setup_password2_modal:
+        title: 'Nastavit Heslo2'
+        description: 'Zadejte prosím heslo2 pro toto zařízení NUKI:'
+        password2: 'Heslo2'
+        repeat_password2: 'Zopakovat heslo2'
+        close_button: 'Zavřít'
+        save_button: 'Uložit'
+      configure_pin_modal:
+        title: 'Konfigurace PIN'
+        pin_placeholder: 'Chcete-li použít bez kódu PIN, ponechte prázdné'
+        incorrect_password1_or_password2: 'Nesprávné Heslo1 nebo Heslo2.'
+        pin_length_error_message: 'Délka PIN musí být větší nebo rovna 4.'
+        close_button: 'Zavřít'
+        save_button: 'Uložit PIN'
+      remove_nuki_pin_modal:
+        title: 'Odstranit Nuki PIN'
+        description: 'Chcete-li pokračovat v odstraňování Nuki PIN, zadejte prosím heslo1.'
+        approve_button: 'Schválit'
+      biometric:
+        title: 'Biometrie'
+        description_enabled: 'Pro toto nuki zařízení je povoleno biometrické ověřování.'
+        description_disabled: 'Biometrické ověřování je pro toto nuki zařízení zakázáno.'
+        enable_button: 'Povolit biometrické údaje'
+        disable_button: 'Zakázat biometrické údaje'
+      messages:
+        nuki_created_message: 'Nuki bylo úspěšně vytvořeno.'
+        nuki_updated_message: 'Nuki bylo úspěšně aktualizováno.'
+        nuki_removed_message: 'Nuki bylo úspěšně odstraněno.'
+        setup_password2_saved_message: 'Heslo2 bylo úspěšně nastaveno.'
+        passwords_do_not_match: 'Hesla se neshodují.'
+        can_not_use_this_password_because_it_is_current_password: 'Toto heslo nemůžete použít, z bezpečnostních důvodů se hesla nemohou shodovat s aktuálním heslem.'
+        configure_pin_saved_message: 'PIN byl úspěšně aktualizován.'
+        nuki_created_not_allowed_message: 'Nemáte oprávnění vytvořit Nuki.'
+        nuki_updated_not_allowed_message: 'Nemáte oprávnění upravit Nuki.'
+        can_not_set_pin: 'Nemůžete nastavit PIN, nejprve prosím nastavte heslo2.'
+        password1_is_invalid: 'Heslo1 je neplatné.'
+        failed_to_set_password2: 'Nepodařilo se nastavit heslo2.'
+        failed_to_add_nuki: 'Nepodařilo se přidat Nuki'
+        failed_to_update_nuki: 'Nepodařilo se aktualizovat Nuki'
+        failed_to_edit_pin: 'Nepodařilo se změnit PIN'
+        failed_to_remove_nuki: 'Nepodařilo se odstranit Nuki'
+        nuki_pin_removed_successfully: 'Nuki PIN byl úspěšně odstraněn.'
+        failed_to_remove_nuki_pin: 'Nepodařilo se odstranit Nuki PIN'
+        pin_length_error_message: 'Délka PIN musí být větší nebo rovna 4 a menší nebo rovna 8.'
+        pin_required: 'Je vyžadován PIN'
+        incorrect_pin: 'Nesprávný PIN'
+        pin_must_be_configured: 'PIN musí být nakonfigurován'
+        too_many_tries: 'Příliš mnoho pokusů'
+        lock_not_available: 'Funkce zámku není na tomto Nuki povolena'
+        api_call_failed: 'DOCKontrol Nuki API není k dispozici'
+        nuki_error: 'Nuki chyba :'
+        unknown_error: 'Neznámá chyba :'
+        disable_biometric_confirmation: 'Opravdu chcete deaktivovat biometrii?'
+
+    api:
+      page_title: 'Nastavení | API'
+      api_keys: 
+        card_title: 'API klíče'
+        create_new_api_key: 'Vytvořit nový API klíč'
+        listing:
+          name: 'Název'
+          public_key: 'Veřejný klíč'
+          time_created: 'Čas vytvoření'
+          time_last_used: 'Poslední použití'
+          no_api_keys_found: 'Nejsou aktivní žádné API klíče.'
+        create_modal:
+          title: 'Vytvořit nový API klíč'
+          description: 'Zadejte název pro API klíč.'
+          incorrect_id_message: 'Zadali jste nesprávné ID.'
+          add_button: 'Přidat'
+        generate_api_keys_modal:
+          title: 'Generovat API klíče'
+          public_key_label: 'Veřejný klíč'
+          public_key_input_placeholder: 'Veřejný API klíč'
+          private_key_label: 'Soukromý klíč'
+          private_key_input_placeholder: 'Tajný API klíč'
+          description: 'Zadejte počet API klíčů, které chcete vygenerovat.'
+          copy_to_clipboard_tooltip: 'Zkopírovat do schránky'
+          warning_message:
+            important: 'Důležité:'
+            text: 'Soukromý klíč bude zobrazen pouze jednou. Před uzavřením tohoto okna si ho prosím zkopírujte.'
+        delete_modals:
+          title: 'Smazat API klíč'
+          description: 'Následující API klíč bude smazán:'
+          warning_message: 'Jste si jisti, že chcete pokračovat?'
+        messages:
+          dont_have_permission_to_create_api_keys: 'Nemáte oprávnění vytvářet API klíč.'
+          api_key_created: 'API klíč byl úspěšně vytvořen.'
+          api_key_deleted: 'API klíč byl úspěšně smazán.'
+          public_key_copied: 'Veřejný klíč zkopírován do schránky.'
+          private_key_copied: 'Soukromý klíč zkopírován do schránky.'
+      actions:
+        card_title: 'Povolené akce'
+        listing:
+          action_id: 'ID akce'
+          action_name: 'Akční přátelský název'
+          action_type: 'Typ akce'
+          allow_1min_open: 'Nechte 1 minutu otevřeno'
+          has_camera: 'Má fotoaparát'
+        action_type:
+          enter: 'Vstupte'
+          exit: 'Výstup'
+
+    custom_sorting:
+      page_title: 'Nastavení | Vlastní řazení'
+      create_new_sorting_group_button: 'Vytvořit novou třídicí skupinu'
+      disable_button: 'Zakázat'
+      enable_button: 'Povolit'
+      save_custom_sorting_button: 'Uložit vlastní třídění'
+      custom_sorting_disable_message: 'Vlastní třídění je na vašem účtu zakázáno. Pro přístup k této funkci jej prosím povolte.'
+      only_mobile_view_message: 'Tato stránka je dostupná pouze na počítačích.'
+      new_page_title: 'Nový | Vlastní třídicí skupina'
+      info_page:
+        title: 'jak to funguje'
+        description: 'Tento nástroj vám pomáhá organizovat a spravovat tlačítka ve vlastních skupinách. Zde jsou základní principy:'
+        customizable_groups:
+          title: 'Přizpůsobitelné skupiny:'
+          description: 'Skupiny mohou mít 1, 2 nebo 3 sloupce podle vašich preferencí rozložení.'
+        button_placement:
+          title: 'Umístění tlačítek:'
+          description: 'Tlačítka můžete umístit do skupin pro lepší organizaci.'
+        sorting:
+          title: 'Třídění:'
+          description: 'Můžete řadit skupiny a tlačítka podle potřeby.'
+        drag_and_drop:
+          title: 'Přetáhnout a pustit:'
+          description: 'Pomocí přetažení můžete přesouvat tlačítka mezi skupinami nebo je v rámci skupiny přeuspořádat.'
+        warning_message:
+          title: 'Poznámka:'
+          description: 'Změny provedené zde se přímo projeví na hlavní stránce. Sekvence a seskupení tlačítek v tomto rozhraní určují, jak se zobrazí na hlavní stránce.'
+      create_custom_sorting_group_modal:
+        title: 'Vytvořit vlastní třídicí skupinu'
+        name: 'Název'
+        column_size: 'Velikost sloupce'
+        save_button: 'Uložit'
+      delete_custom_sorting_group_modal:
+        title: 'Smazat vlastní skupinu řazení'
+        description: 'Následující skupina řazení bude smazána:'
+        warning_message: 'Jste si jisti, že chcete pokračovat?'
+      edit_button_modal:
+        custom_button_name: 'Vlastní název tlačítka'
+        custom_button_name_placeholder: 'Zadejte název'
+        custom_color: 'Vlastní barva'
+        allow_1_min_open: 'Povolit otevření na 1 minutu'
+        configure_modal_buttons:
+          title: 'Nastavit tlačítka modálního okna'
+          add_button: 'Přidat řádek'
+          column_size: 'Velikost sloupce'
+          listing:
+            buttons: 'Tlačítka'
+            name: 'Název'
+            style: 'Styl'
+          buttons_placeholder: 'Prosím vyberte tlačítko'
+          style:
+            default: 'Výchozí'
+            blue: 'MODRÁ'
+            red: 'ČERVENÁ'
+          allow_1_min_open_option:
+            yes: 'Ano'
+            no: 'Ne'
+          allow_1_min_open_tooltip: 'Nadřazené tlačítko neumožňuje 1minutové otevření'
+      messages:
+        updated_custom_sorting_group: 'Vlastní třídění bylo úspěšně aktualizováno.'
+        sorting_group_updated_failed: 'Nepodařilo se aktualizovat vlastní třídicí skupinu'
+
+    gdpr:
+      page_title: 'Nastavení | GDPR'
+      account_deletion_btn: 'Požádejte o trvalé smazání účtu'
+      delete_account_modal:
+        description: 'Následující účet bude smazán:'
+        info_text: 'Pro potvrzení zadejte svou e-mailovou adresu.'
+      request_sent: 'Byl odeslán e-mail pro ověření vašeho požadavku na smazání účtu.'
+      request_sent_error: 'Při odesílání ověřovacího e-mailu došlo k chybě.'
+      delete_account_success: 'Váš požadavek na smazání účtu byl úspěšně vytvořen.'
+      delete_account_failed: 'Nepodařilo se vytvořit požadavek na smazání účtu.'
+      last_updated: "Poslední aktualizace"
+      introduction: "Tato stránka poskytuje transparentní informace o tom, jaké osobní údaje o vás uchováváme. V souladu s obecným nařízením o ochraně osobních údajů (GDPR) máte právo na přístup ke svým osobním údajům, jejich opravu a výmaz."
+      data_overview: "Níže je uveden souhrn typů osobních údajů, které shromažďujeme a uchováváme:"
+      data_basic_info: "Vaše základní osobní údaje (jméno, e-mail, telefon a identifikace jednotky)"
+      data_access_logs: "Nedávné přístupy zobrazující, kdy jste použili aplikaci k otevření bran nebo garážových vrat"
+      convenience_text: 'Pro vaše pohodlí nabízíme také možnosti:'
+      download_complete_data: 'Stáhnout kompletní data'
+      download_complete_data_info: 'Získejte přístup ke všem svým historickým přístupovým protokolům a osobním informacím ve formátu CSV'
+      update_personal_data: 'Aktualizovat informace'
+      update_personal_data_info: 'Opravte všechny nepřesné osobní údaje <a href="%go_to_profile_link%">přejděte na můj profil</a>.'
+      delete_account: 'Smazat účet'
+      delete_account_info: 'Trvale odstraňte všechna vaše data z našeho systému'
+      contact_info: 'Máte-li jakékoli dotazy týkající se vašich údajů nebo potřebujete pomoc s uplatněním vašich práv GDPR, kontaktujte nás prostřednictvím informací uvedených v nastavení aplikace.'
+      privacy_policy_text: 'Veškeré zpracování údajů probíhá v souladu s našimi <a href="%privacy_policy_link%">Zásady ochrany osobních údajů</a>, které si můžete kdykoli prohlédnout v aplikaci.'
+      personal_data_in_dockontrol: "Vaše osobní údaje v DOCKontrol"
+      personal_info:
+        full_name: 'Celé jméno'
+        email: 'E-mail'
+        phone_number: 'Telefonní číslo'
+        building: 'Budova'
+        apartment: 'Byt'
+        account_creation_date: 'Datum vytvoření účtu'
+      access_summary:
+        recent_activity_logs: 'Nedávná aktivita'
+        recent_activity_logs_table:
+          header_action: 'Akce'
+          header_status: 'Stav'
+          header_time_start: 'Čas zahájení'
+          header_time_executed: 'Čas provedení'
+          no_result: 'Nebyl nalezen žádný výsledek.'
+        recent_camera_access_logs: 'Nedávné záznamy přístupu k fotoaparátu'
+        recent_camera_access_logs_table:
+          header_camera: 'Fotoaparát'
+          header_time: 'Čas'
+      associated_accounts:
+        title: 'Přidružené účty'
+      download_camera_log_btn: 'Stáhnout historii fotoaparátu'
+      download_action_log_btn: 'Stáhnout si historii akcí'
+
+  guest_pass:
+    guest_pass: 'Přístup pro hosty'
+    create_new_guest_pass_button: 'Vytvořit nový hostovský přístup'
+    listing:
+      created_time: 'Čas vytvoření'
+      expires: 'Vyprší'
+      note: 'Poznámka'
+      last_used: 'Poslední použití'
+      remaining_action: 'Zbývající akce'
+      default_language: 'Výchozí jazyk'
+      actions: 'Akce'
+      no_active_guest_passes: 'Nejsou aktivní žádné hostovské přístupy.'
+    form:
+      new_page_title: 'Nový | Hostovský přístup'
+      edit_page_title: 'Upravit | Hostovský přístup'
+      page_title: 'Vytvořit hostovský přístup'
+      description: 'Hosté mohou otevírat stejná vstupní místa jako vy, nemají přístup ke kamerám a jejich přístup může být omezen jak časem, tak počtem akcí (odemknutí/otevření).'
+      expires: 'Vyprší'
+      maximum_number_of_actions: 'Maximální počet akcí'
+      default_language: 'Výchozí jazyk'
+      note: 'Poznámka'
+      create_guest_pass_button: 'Vytvořit hostovský přístup'
+    delete_modal:
+      title: 'Smazat hostovský přístup'
+      description: 'Následující host bude smazán:'
+      warning_message: 'Jste si jisti, že chcete pokračovat?'
+      no_button: 'Ne'
+      yes_button: 'Ano'
+    messages:
+      deleted_guest_pass: 'Hostovský přístup byl úspěšně smazán.'
+      now_allowed_create_guest_pass: 'Nemáte oprávnění vytvářet hostovské přístupy.'
+      pass_created_and_link_copied: 'Hostovský přístup vytvořen, odkaz zkopírován do schránky!'
+      link_copied_to_clipboard: 'Odkaz zkopírován do schránky!'
+      failed_to_create_guest_hash: 'Nepodařilo se vygenerovat hash pro hostovský přístup'
+      failed_delete_guest: 'Nepodařilo se smazat hostovský přístup'
+
+  security:
+    login:
+      login: 'Přihlásit se'
+      email: 'E-mail'
+      password: 'Heslo'
+      forgot_password: 'Zapomenuté heslo?'
+      return_to_control_panel: 'Vraťte se do ovládacího panelu'
+    messages:
+      mails_sent_your_respective_email: 'E-mail byl odeslán na vaši adresu.'
+      failed_to_send_email: 'Nepodařilo se odeslat mail.'
+      password_link_expired: 'Odkaz pro resetování hesla vypršel. Prosím zkuste to znovu.'
+      password_updated_successfully: 'Heslo bylo úspěšně aktualizováno.'
+      failed_generate_camera_action: 'Nepodařilo se vytvořit kamerovou relaci.'
+      no_camera_provide: 'Není k dispozici žádná kamera.'
+      new_email_verification_link_has_been_sent_to_your_email: 'Nový ověřovací odkaz byl odeslán na vaši e-mailovou adresu.'
+      failed_to_send_verification_email: 'Nepodařilo se odeslat ověřovací e-mail.'
+    forgot_password:
+      title: 'Obnovte své heslo'
+      info: 'Zadejte svůj e-mail a my vám na váš e-mail zašleme pokyny, jak obnovit heslo.'
+      button_text: 'Vyžádejte si odkaz na obnovení hesla'
+      return_login_text: 'Vraťte se na přihlašovací stránku'
+    reset_password:
+      title: 'Obnovit heslo'
+      new_password: 'Nové heslo'
+      repeat_new_password: 'Opakujte nové heslo'
+      btn_text: 'Obnovit heslo'
+    email_confirmation:
+      title: 'Potvrzení e-mailem'
+      success: 'Úspěch'
+      error: 'Chyba'
+      control_panel_text: 'Přejděte na Ovládací panely'
+      messages:
+        invalid_uuid: 'Neplatné UUID'
+        expired_link: 'Platnost ověřovacího odkazu vypršela.'
+        invalid_link: 'Neplatný ověřovací odkaz.'
+        success: 'Váš e-mail byl úspěšně ověřen.'
+        failed: 'Ověření e-mailu se nezdařilo.'
+    email_verification:
+      messages:
+        success: 'Váš e-mail byl ověřen.'
+        failed: 'Ověření e-mailu se nezdařilo'
+
+  footer:
+    menu:
+      home: 'Domů'
+      full_view: 'Plné zobrazení'
+      impersonated_by: 'Přihlášen přes'
+      admin_panel: 'Panel administrátora'
+      settings: 'Nastavení'
+      guest_pass: 'Hostovský přístup'
+      exit_impersonation: 'Ukončit impersonaci'
+      logout: 'Odhlásit se'
+      guest_of: 'Host uživatele'
+      expires: 'Vyprší'
+      github_repo: 'GitHub Repo'
+      android_app: 'Android Aplikace'
+      switch_to_dark_mode: 'Přepnout na tmavý režim'
+      switch_to_light_mode: 'Přepnout na světlý režim'
+      terms_of_service: 'Podmínky služby'
+
+  error:
+    401:
+      title: 'Neoprávněné (401)'
+      message: 'Jejda! Neoprávněný přístup'
+      description: 'K zobrazení této stránky nemáte oprávnění. Zkontrolujte prosím své přihlašovací údaje nebo kontaktujte správce.'
+
+    403:
+      title: 'Přístup odepřen (403)'
+      message: 'Přístup odepřen.'
+      description: 'Nemáte oprávnění pro přístup k této stránce. Pokud se domníváte, že se jedná o chybu, kontaktujte prosím administrátora.'
+
+    404:
+      title: 'Stránka nenalezena (404)'
+      message: 'Jejda! Stránka nenalezena'
+      description: 'Stránka, kterou hledáte, mohla být odstraněna, její název byl změněn nebo je dočasně nedostupná.'
+
+    500:
+      title: 'Interní chyba serveru (500)'
+      message: 'Něco se pokazilo.'
+      description: 'Máme nějaké technické problémy. Zkuste to znovu později.'
+
+    guest_401:
+      account_disabled: 'Váš účet byl deaktivován.'
+      token_expired: 'Platnost vaší karty pro hosty vypršela.'
+      invalid_hash: 'Neplatný hash hosta.'

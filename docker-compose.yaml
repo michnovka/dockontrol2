@@ -1,0 +1,30 @@
+services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: meilisearch
+    env_file:
+      - .env
+      - .env.local
+    ports:
+      - "${MEILISEARCH_LISTEN_IP}:${MEILISEARCH_LISTEN_PORT}:7700"
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_API_KEY}
+    volumes:
+      - meilisearch_data:/meili_data
+    restart: unless-stopped
+
+  dockontrol_redis:
+    image: valkey/valkey:8
+    container_name: redis-server
+    env_file:
+      - .env
+      - .env.local
+    ports:
+      - "${REDIS_LISTEN_IP}:${REDIS_LISTEN_PORT}:6379"
+    command: ["valkey-server", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - redis_data:/redis_data
+
+volumes:
+  meilisearch_data:
+  redis_data:

@@ -1,0 +1,41 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Camera Logs | Logs{% endblock %}
+{% set active = 'camera_logs' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Logs', 'link': path('cp_logs')
+    },
+    {
+        'title': 'Camera Logs'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/logs/camera_logs/filter.html.twig' %}
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>{{ knp_pagination_sortable(cameraLogs, 'ID', 'cl.id') }}</th>
+                    <th>{{ knp_pagination_sortable(cameraLogs, 'Time', 'cl.time') }}</th>
+                    <th>User</th>
+                    <th>Camera Name</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for cameraLog in cameraLogs %}
+                    {% include 'cp/logs/camera_logs/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="4">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': cameraLogs}) }}
+
+    </div>
+{% endblock %}

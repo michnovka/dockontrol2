@@ -1,0 +1,10 @@
+{% extends 'bundles/TwigBundle/Exception/base_error.html.twig' %}
+
+{% set title = 'dockontrol.error.404.title'|trans %}
+{% set status_code = 404 %}
+{% set message = 'dockontrol.error.404.message'|trans %}
+{% set description = 'dockontrol.error.404.description'|trans %}
+
+{% block error_icon %}
+    <i class="bi bi-emoji-frown"></i>
+{% endblock %}

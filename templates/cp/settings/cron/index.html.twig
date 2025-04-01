@@ -1,0 +1,126 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}CRONS | Settings{% endblock %}
+{% set active = 'crons' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'CRONS'
+    }
+] %}
+
+{% block content %}
+    {% set cronType = enum("\\App\\Entity\\Enum\\CronType") %}
+
+    <div class="card">
+        <div class="card-header p-2">
+            <h5 class="text-center card-title  mb-0">Last Executed CRONS</h5>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive rounded">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>Cron Type</th>
+                        <th>Last Execution Time</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cronGroup, cronGroupHealthStatus  in lastExecuteActionQueueCron %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('cp_logs_cron_logs', {cron_log_filter: {
+                                    'cronType': cronType.ACTION_QUEUE.value,
+                                    'cronGroup': cronGroup
+                                }}) }}">Action Queue {{ cronGroup }}</a></td>
+                            <td>{{ cronGroupHealthStatus.lastRun is not empty ? cronGroupHealthStatus.lastRun|format('Y-m-d H:i:s') : 'NEVER' }}</td>
+                            <td>
+                                {% if cronGroupHealthStatus.isHealthy is defined and cronGroupHealthStatus.isHealthy %}
+                                    <span class="badge rounded-pill bg-success text-white">Ok</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-danger text-white">Not Ok</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr>
+                        <td>
+                            <a href="{{ path('cp_logs_cron_logs', {cron_log_filter: {
+                                'cronType': cronType.MONITOR.value,
+                            }}) }}">Monitor</a></td>
+                        <td>{{ lastExecuteMonitorCron.lastRun is not empty ? lastExecuteMonitorCron.lastRun|format('Y-m-d H:i:s') : 'NEVER' }}</td>
+                        <td>
+                            {% if lastExecuteMonitorCron.isHealthy is defined and lastExecuteMonitorCron.isHealthy %}
+                                <span class="badge rounded-pill bg-success text-white">Ok</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-danger text-white">Not Ok</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td>
+                            <a href="{{ path('cp_logs_cron_logs', {cron_log_filter: {
+                                'cronType': cronType.DB_CLEANUP.value,
+                            }}) }}">DB Cleanup</a></td>
+                        <td>{{ lastExecuteDBCleanupCron.lastRun is not empty ? lastExecuteDBCleanupCron.lastRun|format('Y-m-d H:i:s') : 'NEVER' }}</td>
+                        <td>
+                            {% if lastExecuteDBCleanupCron.isHealthy is defined and lastExecuteDBCleanupCron.isHealthy %}
+                                <span class="badge rounded-pill bg-success text-white">Ok</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-danger text-white">Not Ok</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12 mt-2">
+            <div class="card mb-2">
+                <div class="card-header p-2 d-flex justify-content-between align-items-center">
+                    <h5 class="text-center card-title  mb-0">Cron Tab Examples</h5>
+                </div>
+                <div class="card-body">
+                    {% for cronGroup, cronGroupHealthStatus  in lastExecuteActionQueueCron %}
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <code>
+                                        {{ cronType.ACTION_QUEUE|cron_tab(projectDir, cronGroup) }}
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <code>
+                                    {{ cronType.DB_CLEANUP|cron_tab(projectDir) }}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <code>
+                                    {{ cronType.MONITOR|cron_tab(projectDir) }}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

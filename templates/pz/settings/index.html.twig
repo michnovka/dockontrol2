@@ -1,0 +1,122 @@
+{% extends 'pz/pz_base.html.twig' %}
+{% block title %}
+    {% set titleMap = {
+        'my_profile': ('dockontrol.settings.my_profile.page_title'|trans),
+        'nuki': ('dockontrol.settings.nuki.page_title'|trans),
+        'apartment': ('dockontrol.settings.apartment.page_title'|trans),
+        'api_keys': ('dockontrol.settings.api.page_title'|trans),
+        'custom_sorting': ('dockontrol.settings.custom_sorting.page_title'|trans),
+        'gdpr': ('dockontrol.settings.gdpr.page_title'|trans)
+    } %}
+
+    {{ titleMap[tab] ?? 'Settings' }}
+{% endblock %}
+{% set pageTitle = 'dockontrol.settings.setting'|trans %}
+
+
+{% block content %}
+<div class="card border-0 shadow-none">
+    <div class="card-header pt-1 pb-1 d-flex justify-content-around px-2">
+        <div class="d-lg-flex justify-content-center flex-row w-100 m-auto container">
+            <ul class="nav pz-nav-pills nav-pills nav-fill card-header-pills mb-0">
+                <li class="nav-item"><a href="{{ path('dockontrol_settings_my_profile') }}" class="nav-link cursor-pointer {% if tab == "my_profile" %} active {% endif %}">{{ 'dockontrol.settings.options.my_profile'|trans }}</a></li>
+                {% if is_granted('ROLE_LANDLORD') %}
+                    {% if app.user.apartment is not empty %}
+                        <li class="nav-item"><a href="{{ path('dockontrol_settings_apartment') }}" class="nav-link cursor-pointer {% if tab == "apartment" %} active {% endif %}">{{ 'dockontrol.settings.options.apartment'|trans }}</a></li>
+                    {% endif %}
+                {% endif %}
+                <li class="nav-item"><a href="{{ path('dockontrol_settings_nuki') }}" class="nav-link cursor-pointer {% if tab == "nuki" %} active {% endif %}">{{ 'dockontrol.settings.options.nuki'|trans }}</a></li>
+                <li class="nav-item"><a href="{{ path('dockontrol_settings_api') }}" class="nav-link cursor-pointer {% if tab == "api_keys" %} active {% endif %}">{{ 'dockontrol.settings.options.api'|trans }}</a></li>
+                <li class="nav-item"><a href="{{ path('dockontrol_settings_custom_sorting') }}" class="nav-link cursor-pointer {% if tab == "custom_sorting" %} active {% endif %}">{{ 'dockontrol.settings.options.custom_sorting'|trans }}</a></li>
+                <li class="nav-item"><a href="{{ path('dockontrol_settings_gdpr') }}" class="nav-link cursor-pointer {% if tab == "gdpr" %} active {% endif %}">{{ 'dockontrol.settings.options.gdpr'|trans }}</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body container px-2">
+        {% include 'pz/common/messages.html.twig' %}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="tab-content border-top-0 rounded-top-0 mb-0">
+                    {% if tab == "my_profile" %}
+                        <div class="tab-pane fade show active" id="my-profile">
+                            {{ include('pz/settings/sections/my_profile.html.twig') }}
+                        </div>
+                    {% elseif tab == 'apartment' and is_granted('ROLE_LANDLORD') %}
+                        <div class="tab-pane fade show active" id="apartment">
+                            {{ include('pz/settings/sections/apartment.html.twig') }}
+                        </div>
+                    {% elseif tab == 'nuki' %}
+                        <div class="tab-pane fade show active" id="change_password">
+                            {{ include('pz/settings/sections/nuki.html.twig') }}
+                        </div>
+                    {% elseif tab == 'api_keys' %}
+                        <div class="tab-pane fade show active" id="api-keys">
+                            {{ include('pz/settings/sections/api.html.twig') }}
+                        </div>
+                    {% elseif tab == 'custom_sorting' %}
+                        <div class="tab-pane fade show active" id="custom-sorting">
+                            {{ include('pz/settings/sections/custom_sorting.html.twig') }}
+                        </div>
+                    {% elseif tab == 'gdpr' %}
+                        <div class="tab-pane fade show active" id="gdpr">
+                            {{ include('pz/settings/sections/gdpr.html.twig') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header text-white" id="dock-toast">
+            <strong class="me-auto">DOCKontrol</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <span id="message"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        function sendRequest(requestURI, data, el) {
+            fetch(requestURI, {
+                method: 'POST',
+                body: data
+            }).then((response) => {
+                return response.json();
+            }).then((result) => {
+                let headerClass;
+                let message;
+                if (result.success) {
+                    headerClass = 'bg-success';
+                } else {
+                    headerClass = 'bg-danger';
+                }
+                message = result.message;
+                showToast(headerClass, message);
+                if (result.success) {
+                    el.closest('tr').remove();
+                }
+            });
+        }
+
+        function showToast(headerClass, message)
+        {
+            let baseClasses = ['toast-header', 'text-white'];
+            document.getElementById('dock-toast').classList.forEach((elClass) => {
+                if (!baseClasses.includes(elClass)) {
+                    document.getElementById('dock-toast').classList.remove(elClass);
+                }
+            });
+            document.getElementById('dock-toast').classList.add(headerClass);
+            document.getElementById('message').innerText = message;
+            let toastEl = document.getElementById('liveToast');
+            new bootstrap.Toast(toastEl).show();
+        }
+    </script>
+{% endblock %}

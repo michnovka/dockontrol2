@@ -1,0 +1,19 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}New | Building{% endblock %}
+{% set active = 'buildings' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_building'),
+        'title': 'Buildings'
+    },
+    {
+        'title': 'New'
+    }
+] %}
+{% block content %}
+    {% include 'cp/settings/building/form.html.twig' %}
+{% endblock %}

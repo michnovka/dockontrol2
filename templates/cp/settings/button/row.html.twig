@@ -1,0 +1,38 @@
+<tr>
+    <td>{{ button.id }}</td>
+    <td>
+        {% set isButtonTextTranslatable = button.name|is_button_text_translatable %}
+        {% if not isButtonTextTranslatable %}
+            <span class="bg-danger"> {{ button.name }}</span>
+        {% else %}
+            <span> {{ button.name }}</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if button.nameSpecification %}
+            {% set buttonTextWithSpec = button.name ~ ' ' ~ button.nameSpecification %}
+            {% set isBUttonWithSpecIsTranslatable = buttonTextWithSpec|is_button_text_translatable %}
+            {% if not isBUttonWithSpecIsTranslatable %}
+                <span class="bg-danger"> {{ button.nameSpecification }}</span>
+            {% else %}
+                <span> {{ button.nameSpecification }}</span>
+            {% endif %}
+        {% else %}
+            <span>N/A</span>
+        {% endif %}
+    </td>
+    <td>{{ button.type.readable }}</td>
+    <td>{{ button.action is defined ? button.action.friendlyName : 'N/A' }}</td>
+    <td>{{ button.permission ? button.permission.name : 'N/A' }}</td>
+    <td>
+        <span class="badge rounded-pill bg-{{ button.allow1MinOpen ? 'success' : 'danger' }}">{{ button.allow1MinOpen ? 'Yes' : 'No' }}</span>
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_settings_button_edit', {'id': button.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-button-btn" data-button-id="{{ button.id }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

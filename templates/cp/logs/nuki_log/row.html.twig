@@ -1,0 +1,20 @@
+{% set nukiStatus = enum("\\App\\Entity\\Enum\\NukiStatus") %}
+
+<tr>
+    <td>{{ nukiLog.id }}</td>
+    <td>{{ nukiLog.time.format('Y-m-d H:i:s') }}</td>
+    <td>{{ nukiLog.nuki.user.name }}</td>
+    <td>{{ nukiLog.nuki.name }}</td>
+    <td>
+        {% if nukiLog.status == nukiStatus.OK %}
+            <span class="badge rounded-pill bg-success">{{ nukiLog.status.readable }}</span>
+        {% elseif nukiLog.status == nukiStatus.INCORRECT_PIN %}
+            <span class="badge rounded-pill bg-warning">{{ nukiLog.status.readable }}</span>
+        {% elseif nukiLog.status == nukiStatus.ERROR %}
+            <span class="badge rounded-pill bg-danger">{{ nukiLog.status.readable }}</span>
+        {% elseif nukiLog.status == nukiStatus.INCORRECT_PASSWORD1 %}
+            <span class="badge rounded-pill bg-secondary">{{ nukiLog.status.readable }}</span>
+        {% endif %}
+    </td>
+    <td>{{ nukiLog.action.readable }}</td>
+</tr>

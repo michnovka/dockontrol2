@@ -1,0 +1,15 @@
+<tr>
+    <td>
+        <a href="{{ path('cp_stats_queue', {
+            action_queue_filter: {
+                'user': actionQueue.user.id
+            }
+        }) }}" class="nav-link show-underline-hover px-2 text-primary"> {{ actionQueue.user.name }} {% if actionQueue.guest is not null %} (Guest {{ actionQueue.guest.hash }}) {% endif %}  </a>
+    </td>
+
+    <td>{{ actionQueue.action.friendlyName }}</td>
+    <td>{{ actionQueue|action_queue_status_badge }}</td>
+    <td>{{ actionQueue.timeStart|format('Y-m-d H:i:s') }}</td>
+
+    <td>{{ actionQueue.timeExecuted is not empty ? actionQueue.timeExecuted|format('Y-m-d H:i:s') : 'N/A' }}</td>
+</tr>

@@ -1,0 +1,169 @@
+{% extends 'pz/pz_base.html.twig' %}
+{% block title %} {{ 'dockontrol.guest_pass.guest_pass'|trans }}{% endblock %}
+{% set pageTitle = 'dockontrol.guest_pass.guest_pass'|trans %}
+
+{% block content %}
+    <div class="card border-0 shadow-none container">
+        {% include 'pz/common/messages.html.twig' %}
+        <div class="d-flex justify-content-end top-0 end-0">
+            <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success text-white">
+                    <strong class="me-auto">{{ 'dockontrol.logo'|trans }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <span id="toast_msg"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between w-100">
+            <div id="toast-container" class="align-items-center justify-content-start"></div>
+            <a href="{{ path('dockontrol_guest_pass_create') }}" class="btn btn-primary mt-2 mb-2">{{ 'dockontrol.guest_pass.create_new_guest_pass_button'|trans }}</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ 'dockontrol.guest_pass.listing.created_time'|trans }}</th>
+                        <th>{{ 'dockontrol.guest_pass.listing.expires'|trans }}</th>
+                        <th>{{ 'dockontrol.guest_pass.listing.note'|trans }}</th>
+                        <th>{{ 'dockontrol.guest_pass.listing.last_used'|trans }}</th>
+                        <th>{{ 'dockontrol.guest_pass.listing.remaining_action'|trans }}</th>
+                        <th>{{ 'dockontrol.guest_pass.listing.default_language'|trans }}</th>
+                        <th class="text-end">{{ 'dockontrol.guest_pass.listing.actions'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for guestPass in guestPasses %}
+                        {% include 'pz/guest_pass/row.html.twig' %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7">{{ 'dockontrol.guest_pass.listing.no_active_guest_passes'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete_guest_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_guest_form">
+                    <div class="modal-header bg-info">
+                        <h6 class="card-title text-white">
+                            {{ 'dockontrol.guest_pass.delete_modal.title'|trans }}
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>{{ 'dockontrol.guest_pass.delete_modal.description'|trans }}</p>
+                        <strong>
+                            <ul>
+                                <li id="delete_guest_hash"></li>
+                            </ul>
+                        </strong>
+                        <p>{{ 'dockontrol.guest_pass.delete_modal.warning_message'|trans }}</p>
+                        <input type="hidden" class="_csrf_token_guest" name="_csrf_token_guest" id="_csrf_token_guest" value="{{ csrf_token("guestcsrf") }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'dockontrol.guest_pass.delete_modal.no_button'|trans }}</button>
+                        <button type="submit" class="btn bg-info approve-the-deletion-for-guest text-white">{{ 'dockontrol.guest_pass.delete_modal.yes_button'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let copyLinkElements = document.querySelectorAll('.copy-to-clipboard');
+
+            copyLinkElements.forEach((el) => {
+                el.addEventListener('click', () => {
+                    let contentToCopy = el.getAttribute('data-link');
+                    let row = el.closest('tr');
+                    copyURLToClipboard(contentToCopy, row);
+                });
+            });
+
+            {% if newGuestPassCreated %}
+            let guestPassURL = "{{ app.request.schemeAndHttpHost ~ path('dockontrol_guest_access', {'hash': newGuestPass}) }}";
+            let newRow = document.querySelector('tbody tr:first-child'); // Assuming the new row is first
+            copyURLToClipboard(guestPassURL, newRow, true);
+
+            {% endif %}
+
+            async function copyURLToClipboard(contentToCopy, row, isNew = false) {
+                try {
+                    await navigator.clipboard.writeText(contentToCopy);
+                    showSuccessAnimation(row, isNew);
+                } catch (err) {
+                    console.error('Clipboard copy error:', err);
+                }
+            }
+
+            let deleteGuestButtonElements = document.querySelectorAll('.delete-guest-pass');
+            let deleteGuestModal = new bootstrap.Modal(document.getElementById('delete_guest_modal'), {});
+            let deleteGuestForm = document.getElementById('delete_guest_form');
+
+            deleteGuestButtonElements.forEach((el) => {
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    let guestId = el.getAttribute('data-id');
+                    let guestHash = el.getAttribute('data-hash');
+                    document.getElementById('delete_guest_hash').innerText = guestHash;
+                    deleteGuestModal.show();
+
+                    deleteGuestForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        let deleteGuestURL = '{{ path('dockontrol_guest_pass_delete', {'id': '__ID__'}) }}';
+                        deleteGuestURL = deleteGuestURL.replace('__ID__', guestId);
+
+                        let formData = new FormData();
+                        formData.append('_csrf', document.getElementById('_csrf_token_guest').value);
+
+                        fetch(deleteGuestURL, {
+                            method: 'POST',
+                            body: formData
+                        }).then ((response) => {
+                            return response.json();
+                        }).then(() => {
+                            deleteGuestModal.hide();
+                            location.reload();
+                        })
+                    });
+                })
+            });
+
+            function showSuccessAnimation(row, isNew) {
+                if (!row) return;
+
+                row.classList.add('table-highlight', 'table-success');
+                let toastContainer = document.getElementById('toast-container');
+                let messageBox = document.createElement('div');
+                messageBox.classList.add('success-message');
+                let passCreatedAndLinkCopiedMessage = '{{ 'dockontrol.guest_pass.messages.pass_created_and_link_copied'|trans }}';
+                let linkCopiedMessage = '{{ 'dockontrol.guest_pass.messages.link_copied_to_clipboard'|trans }}';
+                messageBox.innerText = isNew ? passCreatedAndLinkCopiedMessage : linkCopiedMessage;
+
+                toastContainer.innerHTML = "";
+                toastContainer.append(messageBox);
+                setTimeout(() => {
+                    messageBox.classList.add('fade-out');
+                    row.classList.remove('table-highlight', 'table-success');
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 3000);
+            }
+
+        });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,232 @@
+{% extends 'cp/admin_base.html.twig' %}
+{% block title %}Edit | User{% endblock %}
+{% set active = 'users' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Access Management', 'link': path('cp_access_management')
+    },
+    {
+        'link': path('cp_access_management_users'), 'title': 'Users'
+    },
+    {
+        'title': user.name
+    },
+    {
+        'title': 'Edit'
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/access_management/user/form.html.twig' with {'show_submit_label' : 'Save Changes'} %}
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+        <div class="modal fade" id="verify_email_modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form action="" method="post" id="verify_email_form">
+                        <div class="modal-header bg-primary">
+                            <h6 class="card-title text-white" id="modal_title"></h6>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p id="information_text"></p>
+                            <strong>
+                                <ul>
+                                    <li id="user_email"></li>
+                                </ul>
+                            </strong>
+                            <p>Are you sure you want to <span id="action_text"></span> this e-mail?</p>
+                            <span class="validation-invalid-label incorrect_code d-none">Incorrect e-mail address entered.</span>
+                            <span class="validation-invalid-label generic_error d-none">An error occurred. Please try again.</span>
+                            <input type="hidden" class="_csrf_token_user" name="_csrf_token_user" id="_csrf_token_user" value="{{ csrf_token('usercsrf') }}">
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn bg-primary text-white confirm-verification-action">Confirm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="verify_phone_modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form action="" method="post" id="verify_phone_form">
+                        <div class="modal-header bg-primary">
+                            <h6 class="card-title text-white" id="phone_modal_title"></h6>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p id="phone_information_text"></p>
+                            <strong>
+                                <ul>
+                                    <li id="user_phone"></li>
+                                </ul>
+                            </strong>
+                            <p>Are you sure you want to <span id="phone_action_text"></span> this phone number?</p>
+                            <span class="validation-invalid-label incorrect_code d-none">Incorrect phone number entered.</span>
+                            <span class="validation-invalid-label generic_error d-none">An error occurred. Please try again.</span>
+                            <input type="hidden" class="_csrf_token_user_phone" name="_csrf_token_user_phone" id="_csrf_token_user_phone" value="{{ csrf_token('usercsrf') }}">
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn bg-primary text-white confirm-verification-action">Confirm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+    {% if user is defined and user is not null and user.customCarEnterDetails %}
+        {% include 'cp/settings/car_enter_detail/car_enter_details_add_modal.html.twig' with {
+            'allActions': allActions,
+            'carEnterDetailsActionLabel': 'Select action for user: ' ~ user.name,
+            'carEnterDetailsCount': carEnterDetails | length,
+            'csrfToken': csrf_token("carenterdetailscsrf")
+        }
+        %}
+
+        {% include 'cp/settings/car_enter_detail/car_enter_details_remove.html.twig' with {
+            'csrfToken': csrf_token("carenterdetailscsrf")
+        } %}
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let verifyEmailModal = new bootstrap.Modal(document.getElementById('verify_email_modal'));
+            let verifyEmailForm = document.getElementById('verify_email_form');
+            let deverifyUserEmailBtn = document.getElementById('deverify-user');
+            let verifyUserEmailBtn = document.getElementById('verify-user');
+            let modalTitle = document.getElementById('modal_title');
+            let informationText = document.getElementById('information_text');
+            let actionText = document.getElementById('action_text');
+            let userEmail = document.getElementById('verify_email_modal').querySelector('#user_email');
+            let userId;
+            let toggleVerificationURL;
+
+            const showVerificationModal = (email, action) => {
+                let isVerify = action === 'verify';
+                modalTitle.textContent = isVerify ? "Verify User E-mail" : "Unverify User E-mail";
+                informationText.textContent = `You are about to ${isVerify ? "verify" : "unverify"} the following e-mail:`;
+                userEmail.textContent = email;
+                actionText.textContent = isVerify ? "verify" : "unverify";
+                verifyEmailModal.show();
+            };
+
+            if (verifyUserEmailBtn) {
+                verifyUserEmailBtn.addEventListener('click', () => {
+                    userId = verifyUserEmailBtn.dataset.userId;
+                    toggleVerificationURL = "{{ path('cp_access_management_user_email_verification_on_or_off', {'id': '__ID__', 'onOrOff': 'on'}) }}";
+                    showVerificationModal(verifyUserEmailBtn.dataset.email, 'verify');
+                });
+            }
+
+            if (deverifyUserEmailBtn) {
+                deverifyUserEmailBtn.addEventListener('click', () => {
+                    userId = deverifyUserEmailBtn.dataset.userId;
+                    toggleVerificationURL = "{{ path('cp_access_management_user_email_verification_on_or_off', {'id': '__ID__', 'onOrOff': 'off'}) }}";
+                    showVerificationModal(deverifyUserEmailBtn.dataset.email, 'unverify');
+                });
+            }
+
+            verifyEmailForm.addEventListener('submit', (e) => {
+               e.preventDefault();
+               let csrfToken = verifyEmailForm.querySelector('#_csrf_token_user').value;
+               toggleVerificationURL = toggleVerificationURL.replace('__ID__', userId);
+
+               let formData = new FormData();
+               formData.append('_csrf', csrfToken);
+
+               fetch(toggleVerificationURL, {
+                   method: 'POST',
+                   body: formData
+               }).then((res) => {
+                   return res.json();
+               }).then((response) => {
+                   if (response.status) {
+                       location.reload();
+                   } else {
+                       verifyEmailForm.querySelector('.generic_error').innerHTML = response.errorMessage;
+                       verifyEmailForm.querySelector('.generic_error').classList.remove('d-none');
+                       setTimeout(function() {
+                           verifyEmailForm.querySelector('.generic_error').classList.add('d-none');
+                       }, 2500);
+                   }
+               });
+            })
+
+            let verifyPhoneModal = new bootstrap.Modal(document.getElementById('verify_phone_modal'));
+            let verifyPhoneForm = document.getElementById('verify_phone_form');
+            let verifyUserPhoneBtn = document.getElementById('verify-phone');
+            let deverifyUserPhoneBtn = document.getElementById('deverify-phone');
+            let userPhone = document.getElementById('verify_phone_modal').querySelector('#user_phone');
+            let phoneModalTitle = document.getElementById('phone_modal_title');
+            let phoneInformationText = document.getElementById('phone_information_text');
+            let phoneActionText = document.getElementById('phone_action_text');
+            let phoneToggleVerificationURL;
+
+            const showPhoneVerificationModal = (phone, action) => {
+                let isVerify = action === 'verify';
+                phoneModalTitle.textContent = isVerify ? "Verify User Phone Number" : "Unverify User Phone Number";
+                phoneInformationText.textContent = `You are about to ${isVerify ? "verify" : "unverify"} the following phone number:`;
+                userPhone.textContent = phone;
+                phoneActionText.textContent = isVerify ? "verify" : "unverify";
+                verifyPhoneModal.show();
+            };
+
+            if (verifyUserPhoneBtn) {
+                verifyUserPhoneBtn.addEventListener('click', () => {
+                    userId = verifyUserPhoneBtn.dataset.userId;
+                    phoneToggleVerificationURL = "{{ path('cp_access_management_user_phone_verification_on_or_off', {'id': '__ID__', 'onOrOff': 'on'}) }}";
+                    showPhoneVerificationModal(verifyUserPhoneBtn.dataset.phone, 'verify');
+                });
+            }
+
+            if (deverifyUserPhoneBtn) {
+                deverifyUserPhoneBtn.addEventListener('click', () => {
+                    userId = deverifyUserPhoneBtn.dataset.userId;
+                    phoneToggleVerificationURL = "{{ path('cp_access_management_user_phone_verification_on_or_off', {'id': '__ID__', 'onOrOff': 'off'}) }}";
+                    showPhoneVerificationModal(deverifyUserPhoneBtn.dataset.phone, 'unverify');
+                });
+            }
+
+            verifyPhoneForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let csrfTokenForPhone = verifyPhoneForm.querySelector('#_csrf_token_user_phone').value;
+                phoneToggleVerificationURL = phoneToggleVerificationURL.replace('__ID__', userId);
+
+                let formData = new FormData();
+                formData.append('_csrf', csrfTokenForPhone);
+
+                fetch(phoneToggleVerificationURL, {
+                    method: 'POST',
+                    body: formData
+                }).then((res) => {
+                    return res.json();
+                }).then((response) => {
+                    if (response.status) {
+                        location.reload();
+                    } else {
+                        verifyEmailForm.querySelector('.generic_error').innerHTML = response.errorMessage;
+                        verifyEmailForm.querySelector('.generic_error').classList.remove('d-none');
+                        setTimeout(function() {
+                            verifyEmailForm.querySelector('.generic_error').classList.add('d-none');
+                        }, 2500);
+                    }
+                });
+            })
+        });
+    </script>
+    {% endif %}
+{% endblock %}
+
+
+

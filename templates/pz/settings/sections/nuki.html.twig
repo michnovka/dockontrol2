@@ -1,0 +1,531 @@
+<div class="row">
+    <p class="text-justify">
+        {{ 'dockontrol.settings.nuki.title_description'|trans({'%bridge%': '<a href="https://github.com/michnovka/dockontrol-nuki-api">dockontrol-nuki-api</a>'})|raw }}
+    </p>
+    <p class="text-justify">{{ 'dockontrol.settings.nuki.nuki_description_first'|trans }}</p>
+    <p class="text-justify">{{ 'dockontrol.settings.nuki.nuki_description_second'|trans }}</p>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{{ 'dockontrol.settings.nuki.listing.id'|trans }}</th>
+                    <th>{{ 'dockontrol.settings.nuki.listing.nuki_name'|trans }}</th>
+                    <th>{{ 'dockontrol.settings.nuki.listing.api_url'|trans }}</th>
+                    <th>{{ 'dockontrol.settings.nuki.listing.username'|trans }}</th>
+                    <th>{{ 'dockontrol.settings.nuki.listing.password1'|trans }}</th>
+                    <th>{{ 'dockontrol.settings.nuki.listing.password2'|trans }}</th>
+                    <th>{{ 'dockontrol.settings.nuki.listing.pin'|trans }}</th>
+                    <th>{{ 'dockontrol.settings.nuki.listing.can_lock'|trans }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nuki in app.user.nukis %}
+                    <tr>
+                        <td>#{{ nuki.id }}</td>
+                        <td>{{ nuki.name }}</td>
+                        <td>{{ nuki.dockontrolNukiApiServer|lower }}</td>
+                        <td>{{ nuki.username|lower }}</td>
+                        <td>
+                            <span class="badge {{ nuki.password1 is defined and nuki.password1 is not null ? 'bg-success' : 'bg-danger' }}">
+                                {{ nuki.password1 is defined and nuki.password1 is not null ? 'SET' : 'NOT SET' }}
+                            </span>
+                        </td>
+                        <td id="nuki_{{ nuki.id }}_password2">
+                            <script>
+                                if (localStorage.getItem('nuki_{{ nuki.id }}_password')) {
+                                    document.write('<span class="badge bg-success">SET</span>');
+                                } else {
+                                    document.write('<span class="badge bg-danger">NOT SET</span>');
+                                }
+                            </script>
+                        </td>
+                        <td id="nuki_{{ nuki.id }}_pin">
+                        <span class="badge {{ nuki.pin is defined and nuki.pin is not null ? 'bg-success' : 'bg-danger' }}">
+                            {{ nuki.pin is defined and nuki.pin is not null ? 'SET' : 'NOT SET' }}
+                        </span>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-{{ nuki.canLock ? 'success' : 'danger' }}">{{ nuki.canLock ? 'Yes' : 'No' }}</span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ path('dockontrol_nuki_edit', {id: nuki.id}) }}" class="text-decoration-none fs-6 text-body" data-bs-toggle="tooltip" data-bs-original-title="{{ 'dockontrol.global.edit_button_tooltip'|trans }}">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="#" class="text-decoration-none fs-6 text-success add-pin-btn" data-nuki-id="{{ nuki.id }}" data-is-lock="{{ nuki.canLock ? '1' : '0' }}" data-bs-toggle="tooltip" data-nuki-pin-set="{{ nuki.pin is defined and nuki.pin is not null ? '1' : '0' }}" data-bs-original-title="{{ 'dockontrol.settings.nuki.listing.security'|trans }}">
+                                <i class="bi bi-shield-lock"></i>
+                            </a>
+                            <a href="#" class="text-decoration-none fs-6 text-danger delete-nuki-btn" data-nuki-id="{{ nuki.id }}" data-nuki-name="{{ nuki.name }}" data-bs-toggle="tooltip" data-bs-original-title="{{ 'dockontrol.global.delete_button_tooltip'|trans }}">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="9">No records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="hidden" id="nukiCSRF" value="{{ csrf_token('nukicsrf') }}">
+        <a href="{{ path('dockontrol_nuki_new') }}" class="btn btn-primary w-100 btn-lg mt-2">{{ 'dockontrol.settings.nuki.add_nuki_button'|trans }}</a>
+    </div>
+</div>
+
+<div class="modal fade" id="security-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h6 class="card-title text-white m-0">
+                    {{ 'dockontrol.settings.nuki.listing.security'|trans }}
+                </h6>
+                <button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="modal-body m-0 p-2">
+                <div class="card">
+                    <div class="card-header m-0  p-2">
+                        <h6 class="card-title text-body mb-0">
+                            {{ 'dockontrol.settings.nuki.configure_pin_modal.title'|trans }}
+                        </h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <form action="" method="post" id="add_pin_form">
+                            <input type="password" id="confirm-password1" class="confirm-password1 form-control" autocomplete="new-password" placeholder="Password1" required/>
+                            <input type="number" id="nuki_pin" class="nuki_pin form-control mt-2" placeholder="{{ 'dockontrol.settings.nuki.configure_pin_modal.pin_placeholder'|trans }}" minlength="4" maxlength="8">
+
+                            <span class="validation-invalid-label incorrect_code d-none">{{ 'dockontrol.settings.nuki.configure_pin_modal.incorrect_password1_or_password2'|trans }}</span>
+                            <span class="validation-invalid-label incorrect_pin d-none">{{ 'dockontrol.settings.nuki.configure_pin_modal.pin_length_error_message'|trans }}</span>
+                            <span class="validation-invalid-label generic_error d-none">{{ 'dockontrol.global.modals.some_went_wrong'|trans }}</span>
+                            <input type="hidden" class="_csrf_token_nuki_pin" name="_csrf_token_nuki_pin" id="_csrf_token_nuki_pin" value="{{ csrf_token("nukicsrf") }}">
+                            <div class="text-end mt-2">
+                                <button type="submit" class="btn bg-primary text-white" id="save-nuki">{{ 'dockontrol.global.save_changes_button'|trans }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-2">
+                    <div class="card-header m-0 p-2">
+                        <h6 class="card-title text-body mb-0">
+                            {{ 'dockontrol.settings.nuki.setup_password2_modal.title'|trans }}
+                        </h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <form id="add_password2_form">
+                            <p class="text-muted">
+                                {{ 'dockontrol.settings.nuki.setup_password2_modal.description'|trans }}
+                            </p>
+                            <div class="mb-2">
+                                <input type="password" id="password2" class="form-control"
+                                       placeholder="{{ 'dockontrol.settings.nuki.setup_password2_modal.password2'|trans }}"
+                                       autocomplete="new-password" required>
+                            </div>
+                            <div>
+                                <input type="password" id="repeat_password2" class="form-control"
+                                       placeholder="{{ 'dockontrol.settings.nuki.setup_password2_modal.repeat_password2'|trans }}"
+                                       autocomplete="new-password" required>
+                            </div>
+                            <div>
+                                <span class="validation-invalid-label incorrect_password text-danger d-none">
+                                    {{ 'dockontrol.settings.nuki.messages.passwords_do_not_match'|trans }}
+                                </span>
+                                <span class="validation-invalid-label generic_error text-danger d-none">
+                                    {{ 'dockontrol.settings.nuki.messages.can_not_use_this_password_because_it_is_current_password'|trans }}
+                                </span>
+                            </div>
+                            <input type="hidden" id="password2_nuki_csrf" value="{{ csrf_token('nukicsrf') }}">
+                            <div class="text-end mt-2">
+                                <button type="submit" class="btn btn-primary text-end" id="savePassword">{{ 'dockontrol.settings.nuki.setup_password2_modal.save_button'|trans }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card mt-2 d-none" id="biometric-section">
+                    <div class="card-header m-0 p-2">
+                        <h6 class="card-title text-body mb-0">
+                            {{ 'dockontrol.settings.nuki.biometric.title'|trans }}
+                        </h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div id="enabled-biometric-section" class="d-none">
+                            <p class="text-muted">{{ 'dockontrol.settings.nuki.biometric.description_enabled'|trans }}
+                            <button class="btn btn-danger" id="disable-biometric-btn">{{ 'dockontrol.settings.nuki.biometric.disable_button'|trans }}</button>
+                        </div>
+
+                        <div id="disabled-biometric-section" class="d-none">
+                            <p class="text-muted">{{ 'dockontrol.settings.nuki.biometric.description_disabled'|trans }}
+                                <button class="btn btn-success" id="enable-biometric-btn">{{ 'dockontrol.settings.nuki.biometric.enable_button'|trans }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn bg-secondary text-white " data-bs-dismiss="modal">{{ 'dockontrol.settings.nuki.configure_pin_modal.close_button'|trans }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# incluse pin modal #}
+{% include 'pz/common/pin_modal.html.twig' %}
+{% include 'pz/common/floating_message_alert.html.twig' %}
+
+<div class="modal fade" id="delete-nuki-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="delete_nuki_form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-body m-0">
+                        {{ 'dockontrol.home.messages.delete_nuki_modal_title'|trans }}
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>{{ 'dockontrol.home.messages.delete_nuki_info_text'|trans }}:</p>
+                    <strong>
+                        <ul>
+                            <li id="delete_nuki_name"></li>
+                        </ul>
+                    </strong>
+                    <p>{{ 'dockontrol.home.messages.delete_nuki_confirm_msg'|trans }}</p>
+                    <span class="validation-invalid-label incorrect_code d-none">{{ 'dockontrol.home.messages.delete_nuki_error_msg1'|trans }}.</span>
+                    <span class="validation-invalid-label generic_error d-none">{{ 'dockontrol.home.messages.delete_nuki_error_msg2'|trans }}.</span>
+                    <input type="hidden" class="_csrf_token_nuki" name="_csrf_token_nuki" id="_csrf_token_nuki" value="{{ csrf_token("nukicsrf") }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.home.buttons.close'|trans }}</button>
+                    <button type="submit" class="btn bg-danger approve-the-deletion-for-nuki text-white">{{ 'dockontrol.home.buttons.approve_deletion'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="disable-nuki-bio-metrics-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="disable-nuki-bio-metrics-form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-body m-0">
+                        {{ 'dockontrol.settings.nuki.biometric.disable_button'|trans }}
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>{{ 'dockontrol.settings.nuki.messages.disable_biometric_confirmation'|trans }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">{{ 'dockontrol.home.buttons.close'|trans }}</button>
+                    <button type="submit" class="btn bg-danger approve-the-deletion-for-nuki text-white">{{ 'dockontrol.home.buttons.approve_deletion'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ asset('assets/js/pin-modal.js') }}"></script>
+<script src="{{ asset('assets/js/webauthn_common.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let deleteNukiButtons = document.querySelectorAll('.delete-nuki-btn');
+        let deleteNukiModal = new bootstrap.Modal(document.getElementById('delete-nuki-modal'), {});
+        let deleteNukiForm = document.getElementById('delete_nuki_form');
+        deleteNukiButtons.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                let nukiId = el.dataset.nukiId;
+                document.getElementById('delete_nuki_name').textContent = el.dataset.nukiName;
+                deleteNukiModal.show();
+                deleteNukiForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let nukiCSRF = document.getElementById('nukiCSRF').value;
+                    let deleteNukiURL = '{{ path('dockontrol_nuki_delete', {'id': '__ID__'}) }}';
+                    deleteNukiURL = deleteNukiURL.replace('__ID__', nukiId);
+                    let formData = new FormData();
+                    formData.append('_csrf', nukiCSRF);
+
+                    fetch(deleteNukiURL, {
+                        method: 'POST',
+                        body: formData
+                    }).then((response) => {
+                        return response.json();
+                    }).then((result) => {
+                        let headerClass;
+                        let message;
+                        if (result.success) {
+                            headerClass = 'bg-success';
+                        } else {
+                            headerClass = 'bg-danger';
+                        }
+                        message = result.message;
+                        deleteNukiModal.hide();
+                        showToast(headerClass, message);
+                        if (result.success) {
+                            el.closest('tr').remove();
+                        }
+                    });
+                });
+            });
+        });
+
+        document.getElementById('nuki_pin').addEventListener('keyup', (e) => {
+            let pin = e.target.value;
+            let errorElement = document.getElementById('pin-error-element');
+
+            if (pin.length === 0) {
+                if (errorElement !== null) {
+                    errorElement.remove();
+                }
+                document.getElementById('save-nuki').removeAttribute('disabled');
+            } else if (pin.length > 8 || pin.length < 4) {
+               let errorElement = document.createElement('div');
+               errorElement.className = 'invalid-feedback d-block';
+               errorElement.id = 'pin-error-element';
+               errorElement.innerHTML = '{{ 'dockontrol.settings.nuki.messages.pin_length_error_message'|trans }}';
+
+               if (document.getElementById('pin-error-element') === null) {
+                   document.getElementById('save-nuki').setAttribute('disabled', 'disabled');
+                   document.getElementById('nuki_pin').after(errorElement);
+               }
+           } else {
+               document.getElementById('save-nuki').removeAttribute('disabled');
+               if (document.getElementById('pin-error-element') !== null) {
+                   document.getElementById('pin-error-element').remove();
+               }
+           }
+        });
+
+        let addPinButtons = document.querySelectorAll('.add-pin-btn');
+        let securityModal = new bootstrap.Modal(document.querySelector('#security-modal'), {});
+        let addPinForm = document.getElementById('add_pin_form');
+        let password2Form = document.getElementById('add_password2_form');
+
+        let bioMetricSection = document.getElementById('biometric-section');
+        let enableBiometricSection = document.getElementById('enabled-biometric-section');
+        let disableBiometricSection = document.getElementById('disabled-biometric-section');
+        let enableBiometricBtn = document.getElementById('enable-biometric-btn');
+        let disableBiometricBtn = document.getElementById('disable-biometric-btn');
+        let disableBiometricsModal = new bootstrap.Modal(document.getElementById('disable-nuki-bio-metrics-modal'), {});
+        let disableBiometricsForm = document.getElementById('disable-nuki-bio-metrics-form');
+        let nukiId;
+        let nukiElement;
+        let checkPinIsSubmitted;
+
+        addPinButtons.forEach((el) => {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                nukiId = el.dataset.nukiId;
+                let isPinSet = Boolean(parseInt(el.dataset.nukiPinSet));
+                let isBiometricSet;
+                nukiElement = el;
+
+                if (isPinSet) {
+                    isBiometricSet = localStorage.getItem('nuki_' + nukiId + '_fingerprint') ?? false;
+                    isBiometricSet = Boolean(parseInt(isBiometricSet));
+                    bioMetricSection.classList.remove('d-none');
+                    if (isBiometricSet) {
+                        enableBiometricSection.classList.remove('d-none');
+                        disableBiometricSection.classList.add('d-none');
+                    } else {
+                        enableBiometricSection.classList.add('d-none');
+                        disableBiometricSection.classList.remove('d-none');
+                    }
+                } else {
+                    bioMetricSection.classList.add('d-none');
+                    enableBiometricSection.classList.add('d-none');
+                    disableBiometricSection.classList.add('d-none');
+                }
+                addPinForm.reset();
+                password2Form.reset();
+                securityModal.show();
+            });
+        });
+
+        enableBiometricBtn.addEventListener('click', (e) => {
+            securityModal.hide();
+            checkPinIsSubmitted = false;
+            showPinModal(enableBiometric, callbackModalClosed);
+        });
+
+        disableBiometricBtn.addEventListener('click', (e) => {
+            securityModal.hide();
+            disableBiometricsModal.show();
+            disableBiometricsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                localStorage.setItem('nuki_' + nukiId + '_fingerprint', '0');
+                disableBiometricsModal.hide();
+                showToast('bg-success', "{{ 'dockontrol.settings.nuki.biometric.description_disabled'|trans }}");
+            });
+        });
+
+        let enableBiometric = function()
+        {
+            let checkPinURL = "{{ path('dockontrol_nuki_check_pin', {'id': '__ID__'}) }}";
+            checkPinURL = checkPinURL.replace('__ID__', nukiId);
+            let csrfToken = document.getElementById('_csrf_token_nuki_pin').value;
+            let pin = pinInput.value;
+            let formData = new FormData();
+            formData.append('_csrf', csrfToken);
+            formData.append('pin', pin);
+            checkPinIsSubmitted = true;
+
+            fetch(checkPinURL, {
+                method: 'POST',
+                body: formData
+            }).then((res) => {
+               return res.json();
+            }).then((response) => {
+                if (response.status) {
+                    if (!window.fetch || !navigator.credentials || !navigator.credentials.create) {
+                        window.alert('Browser not supported.');
+                        return;
+                    }
+                    let webauthnCreateArgsURL = "{{ path('dockontrol_webauthn_create_args') }}";
+                    fetch(webauthnCreateArgsURL, {
+                        method: 'POST',
+                        cache: 'no-cache'
+                    }).then((response) => {
+                        return response.json();
+                    }).then((res) => {
+                        if (!res.status) {
+                            throw new Error(res);
+                        }
+                        let createdArgs = res.createdArgs;
+                        return recursiveBase64StrToArrayBuffer(createdArgs);
+                    }).then((createCredentialArgs) => {
+                        return navigator.credentials.create(createCredentialArgs);
+                    }).then((cred) => {
+                        return {
+                            clientDataJSON: cred.response.clientDataJSON  ? arrayBufferToBase64(cred.response.clientDataJSON) : null,
+                            attestationObject: cred.response.attestationObject ? arrayBufferToBase64(cred.response.attestationObject) : null
+                        };
+                    }).then(JSON.stringify).then(function(AuthenticatorAttestationResponse) {
+                        let webauthnProcessCreateURL = "{{ path('dockontrol_webauthn_process_create') }}";
+                        fetch(webauthnProcessCreateURL, {
+                            method: 'POST',
+                            body: AuthenticatorAttestationResponse,
+                            cache: 'no-cache'
+                        }).then((res) => {
+                            return res.json();
+                        }).then((response) => {
+                            if (response.success) {
+                                localStorage.setItem('nuki_' + nukiId + '_fingerprint', '1');
+                                showToast('bg-success', "{{ 'dockontrol.settings.nuki.biometric.description_enabled'|trans }}");
+                            } else {
+                                localStorage.setItem('nuki_' + nukiId + '_fingerprint', '0');
+                                showFloatingMessageAlert(response.message);
+                            }
+                            pinModal.hide();
+                        });
+                    })
+                } else {
+                    showFloatingMessageAlert(response.message);
+                }
+            });
+        }
+
+        let callbackModalClosed = function ()
+        {
+            if (!checkPinIsSubmitted) {
+                let operationCancelledMessage = "{{ 'dockontrol.home.messages.operation_cancelled'|trans }}";
+                showFloatingMessageAlert(operationCancelledMessage);
+            }
+        }
+
+        addPinForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let confirmPassword1 = document.getElementById('confirm-password1').value;
+            let pin = document.getElementById('nuki_pin').value;
+
+            if (pin !== '' && pin.length < 4 || pin.length > 8) {
+                document.querySelector('.validation-invalid-label.incorrect_pin').classList.remove('d-none');
+                setTimeout(function() {
+                    document.querySelector('.validation-invalid-label.incorrect_pin').classList.add('d-none')
+                }, 2500);
+            } else {
+                let savePinURL = '{{ path('dockontrol_nuki_add_pin', {'id': '__ID__'}) }}';
+                savePinURL = savePinURL.replace('__ID__', nukiId);
+                let csrfToken = document.getElementById('_csrf_token_nuki_pin').value;
+                let formData = new FormData();
+                formData.append('_csrf', csrfToken);
+                formData.append('pin', pin);
+                formData.append('password1', confirmPassword1);
+
+                fetch(savePinURL, {
+                    method: 'POST',
+                    body: formData
+                }).then((response) => {
+                    return response.json();
+                }).then((result) => {
+                    let headerClass;
+                    let message;
+                    if (result.success) {
+                        headerClass = 'bg-success';
+                        if (result.isPinRemoved) {
+                            nukiElement.removeAttribute('data-nuki-pin-set');
+                            document.getElementById('nuki_' + nukiId + '_pin').innerHTML = '<span class="badge bg-danger">NOT SET</span>';
+                        } else {
+                            nukiElement.setAttribute('data-nuki-pin-set', 1);
+                            document.getElementById('nuki_' + nukiId + '_pin').innerHTML = '<span class="badge bg-success">SET</span>';
+                        }
+                    } else {
+                        headerClass = 'bg-danger';
+                    }
+                    message = result.message;
+                    securityModal.hide();
+                    showToast(headerClass, message);
+                });
+            }
+        });
+
+        password2Form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            let password2Value = document.getElementById('password2').value;
+            let confirmPassword2 = document.getElementById('repeat_password2').value;
+
+            if (password2Value !== confirmPassword2) {
+                document.getElementById('security-modal').querySelector('.incorrect_password').classList.remove('d-none');
+                setTimeout(() => {
+                    document.getElementById('security-modal').querySelector('.incorrect_password').classList.add('d-none');
+                }, 2500);
+            } else {
+                let nukiCsrfToken = document.getElementById('password2_nuki_csrf').value;
+                let validatePassword2URL = "{{ path('pz_validate_nuki_password2') }}";
+                let formData = new FormData();
+                formData.append('_csrf', nukiCsrfToken);
+                formData.append('password2', password2Value);
+                let saveBtn = document.getElementById('security-modal').querySelector('#savePassword');
+                saveBtn.setAttribute('disabled', 'disabled');
+                let btnText = saveBtn.textContent;
+                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+                fetch(validatePassword2URL, {
+                    method: 'POST',
+                    body: formData
+                }).then((response) => {
+                    return response.json();
+                }).then((jsonRes) => {
+                    if (jsonRes.is_password_valid) {
+                        localStorage.setItem('nuki_'+ nukiId +'_password', password2Value);
+                        document.getElementById('nuki_' + nukiId + '_password2').innerHTML = '<span class="badge bg-success">SET</span>';
+                        showToast('bg-success', '{{ 'dockontrol.settings.nuki.messages.setup_password2_saved_message'|trans }}');
+                    } else {
+                        showToast('bg-danger', jsonRes.message);
+                    }
+                    securityModal.hide();
+                }).finally(() => {
+                    saveBtn.innerHTML = btnText;
+                    saveBtn.removeAttribute('disabled');
+                });
+            }
+        });
+    });
+</script>

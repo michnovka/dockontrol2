@@ -1,0 +1,32 @@
+{% extends "email/email_base.html.twig" %}
+
+{% block title %}Verify E-mail | DOCKontrol{% endblock %}
+{% block header %}Verify your e-mail address{% endblock %}
+{% block stylesheet %}
+    {{ parent() }}
+    <style>
+        .button-container a {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .button-container a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2>Hello {{ user.name }},</h2>
+    <p>Verify your e-mail address to help keep your account more secure and up-to-date.</p>
+
+    <div class="button-container">
+        <a href="{{ verifyEmailURL }}" target="_blank">Verify E-mail</a>
+    </div>
+    <p>This link will expire in 1 hour.</p>
+{% endblock %}

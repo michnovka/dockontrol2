@@ -1,0 +1,37 @@
+<div class="card-footer custom-pagination d-sm-flex justify-content-between align-items-center">
+
+    {{ knp_pagination_render(knp_result_set) }}
+
+    <span>Total Results : {{ knp_result_set.getTotalItemCount }}</span>
+
+    {% if pagination_disallow_dynamic_page_size is not defined or pagination_disallow_dynamic_page_size == false %}
+        <div class="row">
+            <div class="col-md-12 input-group">
+                <form>
+                    <label>
+                        <select name="numberOfRecords" id="number-of-records" class="form-select">
+                            <option value="10" {{ numberOfRecords == 10 ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ numberOfRecords == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ numberOfRecords == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ numberOfRecords == 100 ? 'selected' : '' }}>100</option>
+                            <option value="1000" {{ numberOfRecords == 1000 ? 'selected' : '' }}>1000</option>
+                        </select>
+                    </label>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', (e) => {
+                let numberOfRecordsPerPageElement = document.getElementById('number-of-records');
+                numberOfRecordsPerPageElement.onchange = (e) => {
+                    e.preventDefault();
+                    let selectedLimit = e.target.value;
+                    let currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('numberOfRecords', selectedLimit);
+                    window.location.href = currentUrl;
+                };
+            });
+        </script>
+    {% endif %}
+</div>

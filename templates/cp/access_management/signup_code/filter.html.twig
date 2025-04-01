@@ -1,0 +1,49 @@
+<div class="card">
+    {% set query_params = app.request.query.all['signup_code_filter'] is defined ? true : false %}
+
+    <div class="card-header bg-primary cursor-pointer {{ not query_params ? "collapsed" : "" }}" id="filter_header"  data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+        <h6 class="card-title text-white mb-0">Filter</h6>
+    </div>
+
+    <div id="collapseFilter" class="collapse {% if query_params is defined and query_params %} show {% endif %} ">
+        <div class="card-body p-2">
+            {{ form_start(signupCodeFilterType) }}
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form_row(signupCodeFilterType.hash) }}
+                </div>
+                {% if is_super_admin is defined and is_super_admin %}
+                    <div class="col-md-3">
+                        {{ form_row(signupCodeFilterType.admin) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(signupCodeFilterType.building) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(signupCodeFilterType.apartment) }}
+                    </div>
+                {% endif %}
+                <div class="col-md-3">
+                    {{ form_row(signupCodeFilterType.status) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(signupCodeFilterType.timeCreated) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(signupCodeFilterType.timeExpires) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(signupCodeFilterType.timeUsed) }}
+                </div>
+                <div class="offset-lg-8 col-md-2">
+                    <button class="btn btn-primary w-100" type="submit">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ path('cp_access_management_signup_code') }}" class="btn btn-light w-100">Clear</a>
+                </div>
+            </div>
+            {{ form_end(signupCodeFilterType) }}
+        </div>
+    </div>
+</div>
+

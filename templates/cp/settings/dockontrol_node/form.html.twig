@@ -1,0 +1,159 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(form) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_row(form.name) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.ip) }}
+            </div>
+            {% if form.status is defined %}
+                <div class="col-md-3">
+                    {{ form_row(form.status) }}
+                </div>
+            {% endif %}
+            <div class="col-md-3">
+                {{ form_row(form.comment) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.enabled) }}
+            </div>
+            <div class="col-md-3">
+                {{ form_row(form.building) }}
+            </div>
+            {% if node is not defined %}
+                <div class="col-md-6"></div>
+            {% else %}
+                <div class="col-md-8"></div>
+            {% endif %}
+            <div class="col-md-2 text-start">
+                <button class="btn btn-primary w-100">{{ show_submit_label|default('Create Node') }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+    {% if node is defined and node is not empty %}
+    <div class="card shadow-none mt-2">
+        <div class="card-header p-2">
+            <h6 class="fw-medium mb-0">Manage Users To Notify</h6>
+        </div>
+        {{ form_start(manageUserForm) }}
+        <div class="card-body p-2">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    {{ form_row(manageUserForm.notifyWhenStatusChange) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_row(manageUserForm.usersToNotifyWhenStatusChanges) }}
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">{{ show_submit_label|default('Create User') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="card shadow-none mt-2">
+            <div class="card-header p-2">
+                <h6 class="fw-medium mb-0">Credentials</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive rounded">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <td>Public key</td>
+                            <td>
+                                <span disabled id="public-key"> {{ node.apiPublicKey }} </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="javascript:void(0)" class="text-decoration-none fs-6 text-primary regenerate-api-keys-btn  text-primary " data-node-id="{{ node.id }}" data-node-name="{{ node.name }}" data-bs-toggle="tooltip" data-bs-original-title="Regenerate">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>Wireguard public key</td>
+                            <td>
+                                <span disabled id="wg-public-key"> {{ node.wireguardPublicKey }} </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="javascript:void(0)" class="text-decoration-none fs-6 text-primary regenerate-wg-keys-btn  text-primary " data-node-id="{{ node.id }}" data-node-name="{{ node.name }}" data-bs-toggle="tooltip" data-bs-original-title="Regenerate">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-2 shadow-none mb-2">
+            <div class="card-header p-2">
+                <h6 class="fw-medium mb-0">Additional Details</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive rounded">
+                    <table class="table table-striped">
+                        <tr>
+                            <td>Last command executed time</td>
+                            <td class="text-start">{{ node.lastCommandExecutedTime is not null ? node.lastCommandExecutedTime|date('y-m-d H:i:s') : 'N/A'}}</td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            {% set nodeStatus = enum("\\App\\Entity\\Enum\\DockontrolNodeStatus") %}
+                            <td class="text-start">
+                                {% if node.enabled %}
+                                    {% if node.status == nodeStatus.ONLINE %}
+                                        <span class="badge rounded-pill bg-success">ONLINE</span>
+                                    {% elseif node.status == nodeStatus.PINGABLE %}
+                                        <span class="badge rounded-pill bg-info">PINGABLE</span>
+                                    {% elseif node.status == nodeStatus.OFFLINE %}
+                                        <span class="badge rounded-pill bg-warning">OFFLINE</span>
+                                    {% elseif node.status == nodeStatus.INVALID_API_SECRET %}
+                                        <span class="badge rounded-pill bg-danger">INVALID API SECRET</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge rounded-pill bg-danger">DISABLED</span>
+                                {% endif %}
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>Ping</td>
+                            <td class="text-start">{{ node.ping|number_format(3) }} ms</td>
+                        </tr>
+                        <tr>
+                            <td>Last ping time</td>
+                            <td class="text-start">{{ node.lastPingTime is not null ? node.lastPingTime|date('Y-m-d H:i:s') : 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Last monitor check time</td>
+                            <td class="text-start">{{ node.lastMonitorCheckTime is not null ? node.lastMonitorCheckTime|date('Y-m-d H:i:s') : 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Kernel</td>
+                            <td class="text-start">{{ node.kernelVersion }}</td>
+                        </tr>
+                        <tr>
+                            <td>OS</td>
+                            <td class="text-start">{{ node.osVersion }}</td>
+                        </tr>
+                        <tr>
+                            <td>Uptime</td>
+                            <td class="text-start">{{ node.uptime is not null ? node.uptime|format_uptime : 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Device</td>
+                            <td class="text-start">{{ node.device }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+

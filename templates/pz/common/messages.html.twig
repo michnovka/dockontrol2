@@ -1,0 +1,8 @@
+{% for type, flashes in app.session.flashbag.all %}
+    {% for flash in flashes %}
+        <twig:Alert type="{{ type }}" message="{{ flash }}"></twig:Alert>
+    {% endfor %}
+    {% if flashes|length %}
+    {% endif %}
+{% endfor %}
+

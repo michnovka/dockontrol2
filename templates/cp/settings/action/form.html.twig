@@ -1,0 +1,263 @@
+<div class="card border-0 shadow-none">
+    {{ form_start(form) }}
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-4">
+                {{ form_row(form.name) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(form.friendlyName) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(form.type) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(form.actionQueueCronGroup) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(form.dockontrolNode) }}
+            </div>
+            <div class="col-md-4">
+                {{ form_row(form.actionPayload) }}
+            </div>
+
+            <div class="col-md-2 text-start">
+                <button class="btn btn-primary w-100">{{ show_submit_label|default('Create Action') }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+</div>
+
+{% if action is defined and action is not null %}
+<div class="modal fade" id="backup_action_modal" tabindex="-1" role="dialog" aria-labelledby="backup_action_modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h6 class="card-title text-white">
+                    Manage Backup Actions
+                </h6>
+                <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="modal-body p-2">
+                {{ form_start(actionBackupDockontrolNodeTypeForm) }}
+                {{ form_widget(actionBackupDockontrolNodeTypeForm) }}
+
+                <div class="col-md-12 text-end">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create Backup Action</button>
+                </div>
+                {{ form_end(actionBackupDockontrolNodeTypeForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="edit_backup_action_modal" tabindex="-1" role="dialog" aria-labelledby="backup_action_modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h6 class="card-title text-white">
+                    Edit Backup Actions
+                </h6>
+                <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="modal-body" id="edit-modal-form">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete_backup_action_modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post" id="delete_backup_action_form">
+                <div class="modal-header bg-danger">
+                    <h6 class="card-title text-white">
+                        Delete Backup Action
+                    </h6>
+                    <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>The following backup action is about to be deleted:</p>
+                    <strong>
+                        <ul>
+                            <li id="delete_backup_action_id"></li>
+                        </ul>
+                    </strong>
+                    <p>Are you sure you want to proceed?</p>
+                    <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                    <input type="hidden" class="delete_backup_action_csrf" name="delete_backup_action_csrf" id="delete_backup_action_csrf" value="{{ csrf_token('backupaction') }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn bg-danger text-white">Approve the Deletion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-none mb-2">
+    <div class="card-body p-2">
+        <div class="d-flex justify-content-between">
+            <p class="card-title">Backup Actions</p>
+            <button type="button" class="btn btn-sm btn-primary" id="add-backup-action-btn" data-toggle="modal" data-target="#backup_action_modal">
+                Create New Backup Action
+            </button>
+        </div>
+        <div class="table-responsive rounded">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>DOCKontrol Node</th>
+                        <th>Action Payload</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for actionBackup in action.actionBackupDockontrolNodes %}
+                        <tr>
+                            <td>{{ actionBackup.id }}</td>
+                            <td>{{ actionBackup.dockontrolNode.name }}</td>
+                            <td>{{ actionBackup.actionPayload|json_encode }}</td>
+                            <td class="text-end">
+                                <a href="#" class="text-decoration-none fs-6 text-body edit-backup-action-btn" data-action-backup-id="{{ actionBackup.id }}" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-backup-action-btn" data-action-backup-id="{{ actionBackup.id }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No result found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let backupActionModal = new bootstrap.Modal(document.getElementById('backup_action_modal'), {});
+        let addBackupActionBtn = document.getElementById('add-backup-action-btn');
+
+        addBackupActionBtn.addEventListener('click', (e) => {
+            backupActionModal.show();
+        });
+
+        let invalidFeedback = document.getElementById('backup_action_modal').querySelector('.invalid-feedback');
+
+        if (invalidFeedback !== null) {
+            let isVisible = window.getComputedStyle(invalidFeedback).getPropertyValue('display') !== 'none' &&
+                window.getComputedStyle(invalidFeedback).getPropertyValue('visibility') !== 'hidden';
+
+            if (isVisible) {
+                backupActionModal.show();
+            }
+        }
+
+        let deleteBackupActionBtns = document.querySelectorAll('.delete-backup-action-btn');
+        let deleteBackupActionModal = new bootstrap.Modal(document.getElementById('delete_backup_action_modal'), {});
+        let deleteBackupActionForm = document.getElementById('delete_backup_action_form');
+
+        deleteBackupActionBtns.forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let actionBackupId = el.getAttribute('data-action-backup-id');
+                let actionBackup = document.getElementById('delete_backup_action_id');
+                actionBackup.innerText = actionBackupId;
+                deleteBackupActionModal.show();
+
+                deleteBackupActionForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let csrfToken = document.getElementById('delete_backup_action_csrf').value;
+                    let deleteURL = "{{ path('cp_settings_backup_action_delete', {'id': '__ID__'}) }}";
+                    deleteURL = deleteURL.replace('__ID__', actionBackupId);
+                    let formData = new FormData();
+                    formData.append('_csrf', csrfToken);
+                    fetch(deleteURL, {
+                        body: formData,
+                        method: 'POST'
+                    }).then((response) => {
+                        return response.json();
+                    }).then((res) => {
+                        if (res.status) {
+                            deleteBackupActionModal.hide();
+                            window.location.reload();
+                        } else {
+                            document.querySelector('.generic_error').innerHTML = res.errorMessage;
+                            document.querySelector('.generic_error').classList.remove('d-none');
+                            setTimeout(function() {
+                                document.querySelector('.generic_error').classList.add('d-none');
+                            }, 2500)
+                        }
+                    });
+                });
+            });
+        });
+
+        let editBackupActionBtns = document.querySelectorAll('.edit-backup-action-btn');
+        let editBackupActionModal = new bootstrap.Modal(document.getElementById('edit_backup_action_modal'), {});
+
+        editBackupActionBtns.forEach((el) => {
+           el.addEventListener('click', (e) => {
+              e.preventDefault();
+              let actionBackupId = el.getAttribute('data-action-backup-id');
+              let formContent = document.getElementById('edit-modal-form');
+              formContent.innerHTML = '';
+              let formContentURL = "{{ path('cp_settings_backup_action_edit_popup', {'id': '__ID__'}) }}";
+              formContentURL = formContentURL.replace('__ID__', actionBackupId);
+              fetch(formContentURL).then((response) => {
+                  return response.json();
+              }).then((res) => {
+                  formContent.innerHTML = res.content;
+                  editBackupActionModal.show();
+                  const dockontrolNodeEl = document.querySelector('.edit-backup-action-dockontrol-node');
+                  new Choices(dockontrolNodeEl, {
+                      allowHTML: true,
+                      searchEnabled: false,
+                      searchChoices: false,
+                  })
+                  let editActionBackupForm = document.getElementById('edit-action-backup-form');
+                  editActionBackupForm.addEventListener('submit', (e) => {
+                      e.preventDefault();
+                      let formData = new FormData(e.target);
+                      let editActionBackupURL = "{{ path('cp_settings_backup_action_edit', {'id': '__ID__'}) }}";
+                      editActionBackupURL = editActionBackupURL.replace('__ID__', actionBackupId);
+                      fetch(editActionBackupURL, {
+                          'method': 'POST',
+                          'body': formData,
+                      }).then((response) => {
+                          return response.json();
+                      }).then((res) => {
+                          if (res.success) {
+                              location.reload();
+                          } else {
+                              document.getElementById('edit_backup_action_modal').querySelector('.generic_error').innerHTML = res.errorMessage;
+                              document.getElementById('edit_backup_action_modal').querySelector('.generic_error').classList.remove('d-none');
+                              setTimeout(function() {
+                                  document.querySelector('.generic_error').classList.add('d-none');
+                              }, 2500);
+                          }
+                      });
+                  });
+              })
+           });
+        });
+    });
+</script>
+{% endif %}

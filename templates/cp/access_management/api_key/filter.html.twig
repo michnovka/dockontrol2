@@ -1,0 +1,33 @@
+<div class="card">
+    {% set query_params = app.request.query.all['api_key_filter'] is defined ? true : false %}
+
+    <div class="card-header bg-primary cursor-pointer {{ not query_params ? "collapsed" : "" }}" id="filter_header"  data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+        <h6 class="card-title text-white mb-0">Filter</h6>
+    </div>
+
+    <div id="collapseFilter" class="collapse {% if query_params is defined and query_params %} show {% endif %} ">
+        <div class="card-body p-2">
+            {{ form_start(apiKeyFilterForm) }}
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(apiKeyFilterForm.timeCreated) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(apiKeyFilterForm.timeLastUsed) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(apiKeyFilterForm.user) }}
+                </div>
+                <div class="col-md-8"></div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" type="submit">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ path('cp_access_management_api_keys') }}" class="btn btn-light w-100">Clear</a>
+                </div>
+            </div>
+            {{ form_end(apiKeyFilterForm) }}
+        </div>
+    </div>
+</div>
+

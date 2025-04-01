@@ -1,0 +1,10 @@
+{% extends 'bundles/TwigBundle/Exception/base_error.html.twig' %}
+
+{% set title = 'dockontrol.error.500.title'|trans %}
+{% set status_code = 500 %}
+{% set message = 'dockontrol.error.500.message'|trans %}
+{% set description = 'dockontrol.error.500.description'|trans %}
+
+{% block error_icon %}
+    <i class="bi bi-server"></i>
+{% endblock %}

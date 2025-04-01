@@ -1,0 +1,54 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Api Logs | Logs{% endblock %}
+{% set active = 'dockontrol_node_succeeded_logs' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Logs', 'link': path('cp_logs')
+    },
+    {
+        'title': 'Api Logs'
+    },
+    {
+        'title': 'DOCKontrol Node API Logs'
+    },
+    {
+        'title': 'Succeeded Logs'
+    }
+] %}
+
+{% set actions = [
+    {
+        'link': path('cp_logs_dockontrol_node_api_failed_logs'),
+        'title': 'View Failed Logs',
+    }
+] %}
+
+{% block content %}
+    {% include 'cp/logs/api_logs/dockontrol_node/succeeded/filter.html.twig' %}
+    <div class="card mt-3 mb-2">
+        <div class="table-responsive rounded">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>{{ knp_pagination_sortable(apiLogs, 'ID', 'dnal.id') }}</th>
+                        <th>DOCKontrol Node</th>
+                        <th>{{ knp_pagination_sortable(apiLogs, 'Time', 'dnal.time') }}</th>
+                        <th>IP Address</th>
+                        <th>Api Action</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for apiLog in apiLogs %}
+                    {% include 'cp/logs/api_logs/dockontrol_node/succeeded/row.html.twig' %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">No records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ include('paginator/pagination_card_footer.html.twig', {'knp_result_set': apiLogs}) }}
+    </div>
+{% endblock %}

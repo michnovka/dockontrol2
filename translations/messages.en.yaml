@@ -1,0 +1,557 @@
+dockontrol:
+  logo: 'DOCKontrol'
+  global:
+    invalid_csrf_token: 'Invalid CSRF token.'
+    invalid_request: 'Invalid Request'
+    save_changes_button: 'Save Changes'
+    edit_button_tooltip: 'Edit'
+    delete_button_tooltip: 'Delete'
+    modals:
+      some_went_wrong: 'Something went wrong.'
+      close_button: 'Close'
+      approve_the_deletion_button: 'Approve the Deletion'
+
+  home:
+    home: 'Home'
+    gates: 'Gates'
+    entrances: 'Entrances'
+    custom: 'Custom'
+    multi: 'Multi'
+    nuki: 'NUKI'
+    announcement: 'Announcement!'
+    has_admin_been_notified:
+      title: 'Warning!'
+      message: 'Some buttons may not work. We are working on it.'
+    not_admin_been_notified:
+      title: 'Warning!'
+      message: 'Some components have unreported issues. Please notify admin so that it can be fixed.'
+    email_not_verified:
+      title: 'Warning!'
+      message: 'Your e-mail address has not been verified.'
+    has_missing_button: 'Some buttons are not shown as custom sorting is not configured completely.'
+    legenda:
+      heading: 'Legend'
+      description: 'You were granted a time-limited guest pass to the DOCK residential zone in Prague. All actions are logged and all entrances are under camera surveillance.'
+      car_enter_exit:
+        car_enter_exit: 'Car ENTER / EXIT'
+        message: 'Hold the button down for a while to Open both the big gate and garage door in correct timing, allowing vehicle entry / exit with one click.'
+      guest_and_entrances:
+        guest_and_entrances: 'Gates and entrances'
+        message: 'Hold the button down for a while to open pedestrian entrances.'
+    messages:
+      process_car_enter_exit: 'You are not allowed to execute this action.'
+      unsupported_action: 'Unsupported action: '
+      timout_message: 'Request timed out. Please try again.'
+      failed_to_execute_button_action: 'Failed to execute button action, '
+      cannot_request_full_admin_view_when_logged_in_as_guest: 'Cannot request full admin view when logged in as guest.'
+      cannot_request_full_admin_view_when_you_are_not_admin: 'Cannot request full admin view when you are not admin.'
+      pin_modal_title: 'Enter PIN'
+      delete_nuki_modal_title: 'Delete Nuki'
+      delete_nuki_info_text: 'The following nuki is about to be deleted'
+      delete_nuki_confirm_msg: 'Are you sure you want to continue?'
+      delete_nuki_error_msg1: 'You have entered an incorrect username'
+      delete_nuki_error_msg2: 'Something went wrong'
+      operation_cancelled: 'Operation cancelled'
+
+    buttons:
+      car_enter: 'Car Enter'
+      car_exit: 'Car Exit'
+      gate: 'Gate'
+      garage: 'Garage'
+      entrance: 'Entrance'
+      elevator: 'Elevator'
+      building: 'Building'
+      single_open: 'Single Open'
+      open_for_1_min: 'Open for 1 min'
+      lock: 'Lock'
+      unlock: 'Unlock'
+      del: 'Del'
+      ok: 'Ok'
+      close: 'Close'
+      approve_deletion: 'Approve the deletion'
+
+    tos_modal:
+      card_title: 'Terms of Service & Privacy Policy'
+      info_text: 'In order to use DOCKontrol, you need to read and accept'
+      accept: 'I accept'
+      do_not_accept: 'I do not accept'
+
+    btn_hold_info_modal:
+      title: 'Hold to Proceed'
+      info_text: 'You have to press and hold the button, not just click.'
+
+  settings:
+    setting: 'Settings'
+    options:
+      my_profile: 'My Profile'
+      apartment: 'Apartment'
+      nuki: 'NUKI'
+      api: 'API'
+      custom_sorting: 'Custom Sorting'
+      gdpr: 'GDPR'
+
+    my_profile:
+      page_title: 'Settings | My Profile'
+      email: 'E-mail'
+      account_since: 'Account Since'
+      building: 'Building'
+      apartment: 'Apartment'
+      theme:
+        switch_to_dark: 'Switch To Dark Theme'
+        switch_to_light: 'Switch To Light Theme'
+      save_button: 'Save Changes'
+      forms:
+        phone: 'Phone'
+        name: 'Name'
+        button_press_type: 'Button press type'
+      sections:
+        my_info: 'My information'
+        change_password: 'Change password'
+        change_email: 'Change e-mail'
+      messages:
+        contact_info_saved: 'Contact information saved successfully.'
+        not_allowed_to_edit_profile: 'You are not allowed to edit profile.'
+
+    apartment:
+      page_title: 'Settings | Apartment'
+      add_tenant: 'Add Tenant'
+      tenants_under_my_account: 'Tenants under my account'
+      other_accounts_related_to_this_apartment: 'Other accounts related to this apartment'
+      listing:
+        email: 'E-mail'
+        name: 'Name'
+        phone: 'Phone'
+        enabled: 'Enabled'
+        time_created: 'Time Created'
+        no_data: 'There are no tenants associated with your account.'
+        type: 'Type'
+      delete_tenant_modal:
+        title: 'Delete Tenant'
+        description: 'The following tenant is about to be deleted:'
+        confirmation_message: 'Are you sure you want to proceed?'
+        incorrect_email: 'You entered the incorrect e-mail address'
+        enter_email_info_label: 'Please enter the e-mail of the tenant, which you want to delete.'
+      create_and_edit_modal:
+        create_title: 'Create Tenant'
+        edit_title: 'Edit Tenant'
+        name: 'Name'
+        email: 'E-mail'
+        repeat_email: 'Repeat E-mail'
+        phone: 'Phone'
+        enabled: 'Enabled'
+        password: 'Password'
+        repeat_password: 'Repeat Password'
+        country_code: 'Prefix'
+        password_not_match: 'The password fields must match.'
+        email_not_match: 'The email fields must match.'
+        weak_password: 'The password is too weak. Please use a stronger password.'
+        save_btn: 'Save'
+      tenant:
+        messages:
+          successfully_deleted: 'Tenant deleted successfully.'
+          successfully_created: 'Tenant created successfully.'
+          successfully_updated: 'Tenant updated successfully.'
+          failed_to_create: 'Failed to create tenant: '
+          failed_to_update: 'Failed to update tenant: '
+          tenant_deleted_failed: 'Failed to delete tenant: '
+          do_not_have_permission_to_create: "You don't have permission to create tenant."
+          do_not_have_permission_to_edit: "You don't have permission to edit this tenant."
+          email_already_exist: 'The e-mail already exists in the system.'
+
+    change_email:
+      page_title: 'Settings | Change Email'
+      form:
+        email: 'Email'
+        repeated_email: 'Repeat new e-mail'
+        invalid_email_message: 'The e-mail fields must match.'
+      messages:
+        ip_address_and_browser_can_not_be_null: 'IP address or browser can not be null.'
+        email_change_request_created: 'A new e-mail change request has been created.'
+        verify_old_and_new_email_to_complete_change: "Please verify both your old and new e-mails to complete the change."
+        verify_new_email_to_complete_change: 'Please verify new e-mail to complete the change.'
+
+    change_password:
+      page_title: 'Settings | Change Password'
+      form:
+        current_password: 'Current password *'
+        current_password_place_holder: 'Current password'
+        current_password_invalid_message: 'Please enter valid current password.'
+        new_password: 'New password *'
+        new_password_place_holder: 'New password'
+        repeated_new_password: 'Repeat new password *'
+        repeated_new_password_place_holder: 'Repeat new password'
+        repeated_new_password_invalid_message: 'The password fields must match.'
+      messages:
+        now_allowed_to_change_password: 'You are not allowed to change password.'
+        password_reset_successfully: 'Password reset successfully.'
+
+    nuki:
+      page_title: 'Settings | Nuki'
+      title_description: 'You can add NUKI devices using %bridge% bridge to your CP.'
+      title_first: 'You can add NUKI devices using'
+      title_link: 'dockontrol-nuki-api'
+      title_last: 'bridge to your CP.'
+      nuki_description_first: 'Security is achieved through 2 passwords - one password is stored on the server and second password is saved in browser local cache. The passwords are used to generate TOTP codes, therefore not even the provider of the server is able to issue lock/unlock commands to your NUKI. Intercepting communication (which should be over HTTPS anyways) would only allow attacker to only unlock/lock door during the same 1 minute interval.'
+      nuki_description_second: 'In order to protect against stolen mobile devices, NUKI commands can be further protected with PIN code. This code will be required with every lock/unlock command and is rate-limited.'
+      add_nuki_button: 'Add Nuki'
+      listing:
+        id: 'ID'
+        nuki_name: 'Nuki Name'
+        api_url: 'API URL'
+        username: 'Username'
+        password1: 'Password1'
+        password2: 'Password2'
+        pin: 'Pin'
+        security: 'Security'
+        can_lock: 'Can Lock?'
+        remove_pin: 'Remove Pin'
+      form:
+        create_page_title: 'New | Nuki'
+        edit_page_title: 'Edit | Nuki'
+        title: 'Create Nuki'
+        edit_form_title: 'Edit Nuki'
+        nuki_name: 'Nuki name'
+        nuki_api_server: 'DOCKontrol nuki API server'
+        nuki_api_server_invalid_message: 'Nuki API server url is not valid.'
+        username: 'Username'
+        password: 'Password'
+        can_lock: 'Can Lock?'
+        pin: 'Pin'
+        save_changes_button: 'Save Changes'
+      setup_password2_modal:
+        title: 'Setup Password2'
+        description: 'Please enter password2 for this nuki device:'
+        password2: 'Password2'
+        repeat_password2: 'Repeat password2'
+        close_button: 'Close'
+        save_button: 'Save'
+      configure_pin_modal:
+        title: 'Configure PIN'
+        pin_placeholder: 'Leave empty to use without PIN'
+        incorrect_password1_or_password2: 'Incorrect password1 or passoword2.'
+        pin_length_error_message: 'Pin length must be greater than or equal to 4.'
+        close_button: 'Close'
+        save_button: 'Create Configure Pin'
+      remove_nuki_pin_modal:
+        title: 'Remove Nuki PIN'
+        description: 'Please enter password1 to continue removing the Nuki PIN.'
+        approve_button: 'Approve'
+      biometric:
+        title: 'Biometric'
+        description_enabled: 'Biometric authentication is enabled for this nuki device.'
+        description_disabled: 'Biometric authentication is disabled for this nuki device.'
+        enable_button: 'Enable Biometric'
+        disable_button: 'Disable Biometric'
+      messages:
+        nuki_created_message: 'Nuki created successfully.'
+        nuki_updated_message: 'Nuki updated successfully.'
+        nuki_removed_message: 'Nuki removed successfully.'
+        setup_password2_saved_message: 'Password2 setup successfully.'
+        passwords_do_not_match: 'Passwords do not match.'
+        can_not_use_this_password_because_it_is_current_password: 'You cannot use this password, for security reasons the passwords cannot match the current password.'
+        configure_pin_saved_message: 'Pin updated successfully.'
+        nuki_created_not_allowed_message: 'You are not allowed to create nuki.'
+        nuki_updated_not_allowed_message: 'You are not allowed to edit nuki.'
+        can_not_set_pin: 'You can not set pin, please setup password2 first'
+        password1_is_invalid: 'Password1 is invalid.'
+        failed_to_set_password2: 'Failed to set password2.'
+        failed_to_add_nuki: 'Failed to add nuki'
+        failed_to_update_nuki: 'Failed to update nuki'
+        failed_to_edit_pin: 'Failed to add pin'
+        failed_to_remove_nuki: 'Failed to remove nuki'
+        nuki_pin_removed_successfully: 'Nuki PIN removed successfully.'
+        failed_to_remove_nuki_pin: 'Failed to remove nuki pin'
+        pin_length_error_message: 'Pin length must be greater than or equal to 4 and less than or equal to 8.'
+        pin_required: 'PIN Required'
+        incorrect_pin: 'Incorrect PIN'
+        pin_must_be_configured: 'Pin must be configured'
+        too_many_tries: 'Too many tries'
+        lock_not_available: 'Lock feature not enabled on this Nuki'
+        api_call_failed: 'DOCKontrol Nuki API not available'
+        nuki_error: 'Nuki error :'
+        unknown_error: 'Unknown error :'
+        disable_biometric_confirmation: 'Are you sure you want to disable biometrics?'
+
+    api:
+      page_title: 'Settings | API'
+      api_keys:
+        card_title: 'API Keys'
+        create_new_api_key: 'Create New API Key'
+        listing:
+          name: 'Name'
+          public_key: 'Public Key'
+          time_created: 'Time Created'
+          time_last_used: 'Time Last Used'
+          no_api_keys_found: 'There are no active API keys.'
+        create_modal:
+          title: 'Create New API Key'
+          description: 'Please enter the name for API key.'
+          incorrect_id_message: 'You entered the incorrect ID.'
+          add_button: 'Add'
+        generate_api_keys_modal:
+          title: 'Generate API Keys'
+          public_key_label: 'Public key'
+          public_key_input_placeholder: 'Public API key'
+          private_key_label: 'Private key'
+          private_key_input_placeholder: 'Secret API key'
+          description: 'Please enter the number of API keys you want to generate.'
+          copy_to_clipboard_tooltip: 'Copy to clipboard'
+          warning_message:
+            important: 'Important:'
+            text: 'The private key will only be shown this one time. Please copy it before closing this window.'
+        delete_modals:
+          title: 'Delete API Key'
+          description: 'The following API key is about to be deleted:'
+          warning_message: 'Are you sure you want to proceed?'
+        messages:
+          dont_have_permission_to_create_api_keys: "You don't have permission to create API key."
+          api_key_created: 'API key created successfully.'
+          api_key_deleted: 'API key deleted successfully.'
+          public_key_copied: 'Public key copied to clipboard.'
+          private_key_copied: 'Private key copied to clipboard.'
+      actions:
+        card_title: 'Allowed Actions'
+        listing:
+          action_id: 'Action ID'
+          action_name: 'Action friendly name'
+          allow_1min_open: 'Allow 1 min open'
+        action_type:
+          enter: 'enter'
+          exit: 'exit'
+
+    custom_sorting:
+      page_title: 'Settings | Custom Sorting'
+      create_new_sorting_group_button: 'Create New Sorting Group'
+      disable_button: 'Disable'
+      enable_button: 'Enable'
+      save_custom_sorting_button: 'Save Custom Sorting'
+      custom_sorting_disable_message: 'Custom sorting is disabled on your account. Please enable it to access this feature.'
+      only_mobile_view_message: 'This page is only viewable on desktop devices.'
+      new_page_title: 'New | Custom Sorting Group'
+      info_page:
+        title: 'how it works'
+        description: 'This tool is designed to help you organize and manage buttons into customizable groups. Here are the basic principles:'
+        customizable_groups:
+          title: 'Customizable Groups:'
+          description: 'Groups can have 1, 2, or 3 columns depending on your layout preference.'
+        button_placement:
+          title: 'Button Placement:'
+          description: 'You can place buttons into groups for better organization.'
+        sorting:
+          title: 'Sorting:'
+          description: 'You can sort groups and buttons to rearrange them as needed.'
+        drag_and_drop:
+          title: 'Drag-and-Drop:'
+          description: 'Use drag-and-drop functionality to move buttons between groups or reorder them within a group.'
+        warning_message:
+          title: 'Note:'
+          description: 'The changes made here will reflect directly in the main page. The button sequence and grouping in this interface determine how they appear in the main page.'
+      create_custom_sorting_group_modal:
+        title: 'Create Custom Sorting Group'
+        name: 'Name'
+        column_size: 'Column size'
+        save_button: 'Save'
+      delete_custom_sorting_group_modal:
+        title: 'Delete Custom Sorting Group'
+        description: 'The following sorting group is about to be deleted:'
+        warning_message: 'Are you sure you want to proceed?'
+      edit_button_modal:
+        custom_button_name: 'Custom button name'
+        custom_button_name_placeholder: 'Enter name'
+        custom_color: 'Custom color'
+        allow_1_min_open: 'Allow 1 minute open'
+        configure_modal_buttons:
+          title: 'Configure Modal Buttons'
+          add_button: 'Add row'
+          column_size: 'Column size'
+          listing:
+            buttons: 'Buttons'
+            name: 'Name'
+            style: 'Style'
+          buttons_placeholder: 'Please select button'
+          style:
+            default: 'Default'
+            blue: 'BLUE'
+            red: 'RED'
+          allow_1_min_open_option:
+            yes: 'Yes'
+            no: 'No'
+          allow_1_min_open_tooltip: 'The parent button does not allow 1 min open action'
+      messages:
+        updated_custom_sorting_group: 'Custom sorting updated successfully.'
+        sorting_group_updated_failed: 'Failed to update custom sorting group'
+    gdpr:
+      page_title: 'Settings | GDRP'
+      account_deletion_btn: 'Request permanent account deletion'
+      delete_account_modal:
+        description: 'The following account is about to be deleted:'
+        info_text: 'Enter your e-mail address to confirm.'
+      request_sent: 'An e-mail has been sent to verify your account deletion request.'
+      request_sent_error: 'There was an error sending the verification email.'
+      delete_account_success: 'Your account deletion request created successfully.'
+      delete_account_failed: 'Failed to create account deletion request.'
+      last_updated: "Last Updated"
+      introduction: "This page provides transparency about what personal information we store about you. In accordance with the General Data Protection Regulation (GDPR), you have the right to access, correct, and delete your personal data."
+      data_overview: 'Below is a summary of the types of personal data we collect and store:'
+      data_basic_info: "Your basic personal information (name, email, phone, and unit identification)"
+      data_access_logs: "Recent access logs showing when you've used the app to open gates or garage doors"
+      convenience_text: 'For your convenience, we also provide options to:'
+      download_complete_data: 'Download Complete Data'
+      download_complete_data_info: 'Access all your historical access logs and personal information in CSV format'
+      update_personal_data: 'Update Information'
+      update_personal_data_info: 'Correct any inaccurate personal details <a href="%go_to_profile_link%">go to profile</a>.'
+      delete_account: 'Delete Account'
+      delete_account_info: 'Permanently remove all your data from our system'
+      contact_info: 'If you have any questions about your data or need assistance exercising your GDPR rights, please contact us through the information provided in the application settings.'
+      privacy_policy_text: 'All data processing is conducted in accordance with our <a href="%privacy_policy_link%">Privacy Policy</a>, which you can review at any time in the application.'
+      personal_data_in_dockontrol: "Your personal data in DOCKontrol"
+      personal_info:
+        full_name: 'Full name'
+        email: 'E-mail'
+        phone_number: 'Phone number'
+        building: 'Building'
+        apartment: 'Apartment'
+        account_creation_date: 'Account creation date'
+      access_summary:
+        recent_activity_logs: 'Recent activity'
+        recent_activity_logs_table:
+          header_action: 'Action'
+          header_status: 'Status'
+          header_time_start: 'Time start'
+          header_time_executed: 'Time executed'
+          no_result: 'No result found.'
+        recent_camera_access_logs: 'Recent camera access logs'
+        recent_camera_access_logs_table:
+          header_camera: 'Camera'
+          header_time: 'Time'
+      associated_accounts:
+        title: 'Associated Accounts'
+      download_camera_log_btn: 'Download Camera History'
+      download_action_log_btn: 'Download Action History'
+
+  guest_pass:
+    guest_pass: 'Guest Pass'
+    create_new_guest_pass_button: 'Create New Guest Pass'
+    listing:
+      created_time: 'Created Time'
+      expires: 'Expires'
+      note: 'Note'
+      last_used: 'Last Used'
+      remaining_action: 'Remaining Actions'
+      default_language: 'Default Language'
+      actions: 'Action'
+      no_active_guest_passes: 'There are no active guest passes.'
+    form:
+      new_page_title: 'New | Guest Pass'
+      edit_page_title: 'Edit | Guest Pass'
+      page_title: 'Create Guest Pass'
+      description: 'Guests can open the same entrances / gates like you, they have no camera access and their access can be limited by both time and number of actions (unlocks / opens) they can perform.'
+      expires: 'Expires'
+      maximum_number_of_actions: 'Maximum number of actions'
+      default_language: 'Default language'
+      note: 'Note'
+      create_guest_pass_button: 'Create Guest Pass'
+    delete_modal:
+      title: 'Delete Guest'
+      description: 'The following guest is about to be deleted:'
+      warning_message: 'Are you sure you want to proceed?'
+      no_button: 'No'
+      yes_button: 'Yes'
+    messages:
+      deleted_guest_pass: 'Guest pass deleted successfully.'
+      now_allowed_create_guest_pass: 'You are not allowed to create guests.'
+      pass_created_and_link_copied: 'Pass created, link copied to clipboard!'
+      link_copied_to_clipboard: 'Link copied to clipboard!'
+      failed_to_create_guest_hash: 'Failed to create guest hash'
+      failed_delete_guest: 'Failed to delete guest'
+
+  security:
+    login:
+      login: 'Login'
+      email: 'E-mail'
+      password: 'Password'
+      forgot_password: 'Forgot password?'
+      return_to_control_panel: 'Return to the control panel'
+    messages:
+      mails_sent_your_respective_email: 'Mail sent your respective e-mail address.'
+      failed_to_send_email: 'Failed to send Mail'
+      password_link_expired: 'Password reset link has been expired. Please try again.'
+      password_updated_successfully: 'Password updated successfully.'
+      failed_generate_camera_action: 'Failed to generate camera session.'
+      no_camera_provide: 'No cameras provided.'
+      new_email_verification_link_has_been_sent_to_your_email: 'A new e-mail verification link has been sent to your e-mail address.'
+      failed_to_send_verification_email: 'Failed to send verification e-mail.'
+
+    forgot_password:
+      title: 'Reset Your Password'
+      info: 'Enter your e-mail, and we will send instructions to your e-mail on how to reset your password.'
+      button_text: 'Request Password Reset Link'
+      return_login_text: 'Return to the Login Page'
+
+    reset_password:
+      title: 'Reset Password'
+      new_password: 'Password'
+      repeat_new_password: 'Repeat Password'
+      btn_text: 'Reset Password'
+
+    email_confirmation:
+      title: 'E-mail Confirmation'
+      success: 'Success'
+      error: 'Error'
+      control_panel_text: 'Go to Control Panel'
+
+      messages:
+        invalid_uuid: 'Invalid UUID'
+        expired_link: 'Verification link has expired.'
+        invalid_link: 'Invalid verification link.'
+        success: 'Your e-mail has been successfully verified.'
+        failed: 'E-mail verification failed.'
+
+    email_verification:
+      messages:
+        success: 'Your e-mail has been verified.'
+        failed: 'E-mail verification failed'
+
+  footer:
+    menu:
+      home: 'Home'
+      full_view: 'Full View'
+      impersonated_by: 'Impersonated By'
+      admin_panel: 'Admin Panel'
+      settings: 'Settings'
+      guest_pass: 'Guest Pass'
+      exit_impersonation: 'Exit impersonation'
+      logout: 'Logout'
+      guest_of: 'Guest of'
+      expires: 'Expires'
+      github_repo: 'GitHub Repo'
+      android_app: 'Android App'
+      switch_to_dark_mode: 'Switch to dark mode'
+      switch_to_light_mode: 'Switch to light mode'
+      terms_of_service: 'Terms of Service'
+
+  error:
+    401:
+      title: 'Unauthorized (401)'
+      message: 'Oops! Unauthorized access'
+      description: 'You are not authorized to view this page. Please check your login details or contact the administrator.'
+
+    403:
+      title: 'Access Denied (403)'
+      message: 'Access denied.'
+      description: 'You do not have permission to access this page. If you believe this is an error, please contact the administrator.'
+
+    404:
+      title: 'Page not found (404)'
+      message: 'Oops! Page not found'
+      description: 'The page you are looking for may have been removed, its name has changed, or it is temporarily unavailable.'
+
+    500:
+      title: 'Internal Server Error (500)'
+      message: 'Something went wrong.'
+      description: "We're having some technical difficulties. Please try again later."
+
+    guest_401:
+      account_disabled: 'Your account has been disabled.'
+      token_expired: 'Your guest pass has expired.'
+      invalid_hash: 'Invalid guest hash.'

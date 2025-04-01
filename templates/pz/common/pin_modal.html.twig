@@ -1,0 +1,37 @@
+<div class="modal fade" id="pin-modal" tabindex="-1" aria-labelledby="pinModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content pin-modal-content">
+            <div class="modal-header d-flex justify-content-center">
+                <h5 class="modal-title text-center" id="pinModalLabel">
+                    {{ 'dockontrol.home.messages.pin_modal_title'|trans }}
+                </h5>
+                <button type="button" class="btn-close position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h1 id="pin-display" style="min-height: 3.5rem; font-size: 22px"></h1>
+                <input type="hidden" id="pin-input">
+                <div class="row g-2">
+                    {% for i in 1..9 %}
+                        <div class="col-4">
+                            <button class="btn pin-btn w-100 pin-digit-btn" data-pin-value="{{ i }}">{{ i }}</button>
+                        </div>
+                    {% endfor %}
+                    <div class="col-4">
+                        <button class="btn pin-btn btn-danger border-danger hover-bg-red text-uppercase w-100" id="clear-pin">
+                            {{ 'dockontrol.home.buttons.del'|trans }}
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn pin-btn w-100 pin-digit-btn" data-pin-value="0">0</button>
+                    </div>
+                    <input type="hidden" name="nuki_csrf" value="{{ csrf_token('nukicsrf') }}" id="nuki_csrf_token">
+                    <div class="col-4">
+                        <button class="btn pin-btn btn-primary border-primary hover-bg-primary text-uppercase w-100" id="submit-pin">
+                            {{ 'dockontrol.home.buttons.ok'|trans }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

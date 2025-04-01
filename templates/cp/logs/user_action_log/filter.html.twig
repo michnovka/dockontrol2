@@ -1,0 +1,32 @@
+<div class="card">
+    {% set query_params = app.request.query.all['user_action_log_filter'] is defined ? true : false %}
+
+    <div class="card-header bg-primary cursor-pointer {{ not query_params ? "collapsed" : "" }}" id="filter_header"  data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+        <h6 class="card-title text-white mb-0">Filter</h6>
+    </div>
+
+    <div id="collapseFilter" class="collapse {% if query_params is defined and query_params %} show {% endif %} ">
+        <div class="card-body p-2">
+            {{ form_start(filterForm) }}
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(filterForm.time) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(filterForm.user) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(filterForm.keyword) }}
+                </div>
+                <div class="offset-lg-8 col-md-2">
+                    <button class="btn btn-primary w-100" type="submit">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ path('cp_logs_user_action_log') }}" class="btn btn-light w-100">Clear</a>
+                </div>
+            </div>
+            {{ form_end(filterForm) }}
+        </div>
+    </div>
+</div>
+

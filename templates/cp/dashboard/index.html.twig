@@ -1,0 +1,317 @@
+{% extends 'cp/admin_base.html.twig' %}
+{% block title %}Dashboard{% endblock %}
+{% set active = 'dashboard' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Dashboard'
+    }
+] %}
+{% block content %}
+    {% set actionQueueStatus = enum("\\App\\Entity\\Enum\\ActionQueueStatus") %}
+    {% if hasNodesWhichAreNotOnline and not hasAdminBeenNotified %}
+        <div class="alert alert-danger fade show mt-2" role="alert">
+            <strong>Warning!</strong> Some nodes are not online. Please notify admin so that it can be fixed.
+        </div>
+    {% endif %}
+    {% if hasAdminBeenNotified and is_granted('ROLE_SUPER_ADMIN') %}
+        <div class="alert alert-danger fade show" role="alert">
+            <strong>Warning!</strong> You have been notified about dockontrol node issues, and customers will not see error messages.
+            <a href="{{ path('cp_settings_config_option') }}">Change config</a>
+        </div>
+    {% endif %}
+    <div class="row">
+        {#  left side sections, last actions, announcement, latest users /#}
+        <div class="col-md-6 mb-sm-2 pe-md-0">
+            <div class="card mb-2">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                    <h6 class="mb-0">Last Actions</h6>
+                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                        <a href="{{ path('cp_stats_queue') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to action queue
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive rounded">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Time Start</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for actionQueue in lastFiveActions %}
+                                    <tr>
+                                        <td>{{ actionQueue.timeStart|format('Y-m-d H:i:s') }}</td>
+                                        <td>
+                                            {% if is_granted('ACTION_MANAGE', actionQueue.user) %}
+                                                {{ actionQueue.user.name }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ actionQueue.action.friendlyName }}</td>
+                                        <td>
+                                            {{ actionQueue|action_queue_status_badge }}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4">No actions found</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="card mb-2">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                        <h6 class="mb-0">Active Announcements</h6>
+                        <a href="{{ path('cp_settings_announcement') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            See all announcements
+                        </a>
+                    </div>
+                    <div class="card-body m-0 p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Building</th>
+                                    <th>Visibility</th>
+                                    <th>Announcement</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                {% for announcement in announcements %}
+                                    <tr>
+                                        <td>{{ announcement.building ? announcement.building.name : 'All buildings' }}</td>
+                                        <td>{{ announcement|announcement_visibility_badge(true) }}</td>
+                                        <td>
+                                            <strong>{{ announcement.subject }}</strong>
+                                            <p>{{ announcement.content|raw }}</p>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4">No announcements found</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% if hasExpiredOrPlannedAnnouncements %}
+                        <div class="card-footer m-0 p-2">
+                            There are some expired or planned announcements not shown here
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="card mb-2">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                    <h6 class="mb-0">Latest Users</h6>
+                    <a href="{{ path('cp_access_management_users') }}"
+                       class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                        Take me to users
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive rounded">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th>Time Created</th>
+                                <th>Apartment</th>
+                                <th>Name</th>
+                                <th>E-mail</th>
+                            </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                            {% for user in lastFiveUsers %}
+                                <tr>
+                                    <td>{{ user.createdTime|time_tooltip }}</td>
+                                    <td>{{ user.apartment ? user.apartment.name ~ ' (' ~ user.apartment.building.name ~ ')' : 'N/A' }}</td>
+                                    <td>
+                                        <a href="{{ path('cp_access_management_user_edit', {'id': user.id}) }}" class="nav-link show-underline-hover px-2 text-primary">
+                                            {{ user.name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# right side section, 1. node overview, 2.user deletion requests, 3. crons       #}
+        <div class="col-md-6 mb-sm-2">
+            <div class="card mb-2">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2 px-2">
+                    <h6 class="mb-0">Nodes Overview</h6>
+                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                        <a href="{{ path('cp_access_management_users') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to nodes
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive rounded">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Last Ping Time</th>
+                                <th>Last Command Time</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if allNodesAreOnline %}
+                                <tr>
+                                    <td colspan="4">All nodes {{ allNodesCount }}/{{ onlineNodesCount }} are online and operational.</td>
+                                </tr>
+                            {% else %}
+                                {% set nodeStatus = enum("\\App\\Entity\\Enum\\DockontrolNodeStatus") %}
+                                {% for node in nodesWhichAreNotActive %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ path('cp_settings_node_edit', {'id': node.id}) }}" class="nav-link show-underline-hover px-2 text-primary">
+                                                {{ node.name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ node|dockontrol_node_status_badge }}</td>
+                                        <td>{{ node.lastPingTime|format('Y-m-d H:i:s') }}</td>
+                                        <td>{{ node.lastCommandExecutedTime|format('Y-m-d H:i:s') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                <div class="card mb-2">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                        <h6 class="mb-0">Last User Deletion Requests</h6>
+                        <a href="{{ path('cp_access_management_user_deletion_requests') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to User Deletion Request
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive rounded">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>User role</th>
+                                    <th>Apartment</th>
+                                    <th>Time created</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                {% for lastFiveUserDeletionRequest in lastFiveUserDeletionRequests %}
+                                    {% set user = lastFiveUserDeletionRequest.user %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ path('cp_access_management_user_edit', {'id': user.id }) }}">
+                                                {{ user.name }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge {{ user.role.badgeClass }}">{{ user.role.readable }}</span>
+                                        </td>
+                                        <td>
+                                            {{ user.apartment is not empty ? user.apartment.name : 'N/A' }}
+                                        </td>
+                                        <td>{{ lastFiveUserDeletionRequest.time|format('Y-m-d H:is') }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4">No user deletion request found.</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-2">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2 px-2">
+                        <h6 class="mb-0">CRONs</h6>
+                        <a href="{{ path('cp_settings_cron') }}"
+                           class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">
+                            Take me to crons
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive rounded">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Cron Type</th>
+                                    <th>Last Execution Time</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for cronGroup, cronGroupHealthStatus  in lastExecuteActionQueueCron %}
+                                    <tr>
+                                        <td>Action Queue {{ cronGroup }}</td>
+                                        <td>{{ cronGroupHealthStatus.lastRun is not empty ? cronGroupHealthStatus.lastRun|format('Y-m-d H:i:s') : 'NEVER' }}</td>
+                                        <td>
+                                            {% if cronGroupHealthStatus.isHealthy is defined and cronGroupHealthStatus.isHealthy %}
+                                                <span class="badge rounded-pill bg-success text-white">Ok</span>
+                                            {% else %}
+                                                <span class="badge rounded-pill bg-danger text-white">Not Ok</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td>Monitor Last Executed Time</td>
+                                    <td>{{ lastExecuteMonitorCron.lastRun is not empty ? lastExecuteMonitorCron.lastRun|format('Y-m-d H:i:s') : 'NEVER' }}</td>
+                                    <td>
+                                        {% if lastExecuteMonitorCron.isHealthy is defined and lastExecuteMonitorCron.isHealthy %}
+                                            <span class="badge rounded-pill bg-success">Ok</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill bg-danger">Not Ok</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>DB Cleanup Last Executed Time</td>
+                                    <td>{{ lastExecuteDBCleanupCron.lastRun is not empty ? lastExecuteDBCleanupCron.lastRun|format('Y-m-d H:i:s') : 'NEVER' }}</td>
+                                    <td>
+                                        {% if lastExecuteDBCleanupCron.isHealthy is defined and lastExecuteDBCleanupCron.isHealthy %}
+                                            <span class="badge rounded-pill bg-success">Ok</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill bg-danger">Not Ok</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

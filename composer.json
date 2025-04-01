@@ -1,0 +1,149 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.4",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "ext-pcntl": "*",
+        "ext-redis": "*",
+        "ext-sodium": "*",
+        "ext-sysvmsg": "*",
+        "ext-sysvsem": "*",
+        "ext-sysvshm": "*",
+        "beberlei/doctrineextensions": "^1.5",
+        "doctrine/dbal": "^4.2",
+        "doctrine/doctrine-bundle": "^2.13",
+        "doctrine/doctrine-migrations-bundle": "^3.4",
+        "doctrine/orm": "^3.3",
+        "elao/enum": "^2.5",
+        "knplabs/knp-paginator-bundle": "^6.6",
+        "lbuchs/webauthn": "^2.2",
+        "meilisearch/meilisearch-php": "^1.12",
+        "meilisearch/search-bundle": "^0.15.6",
+        "michnovka/openwebnet-php": "^1.1",
+        "nesbot/carbon": "^3.8",
+        "nyholm/psr7": "^1.8",
+        "php-http/discovery": "^1.20",
+        "psr/http-factory-implementation": "*",
+        "spomky-labs/otphp": "^11.3",
+        "symfony/asset": "7.2.*",
+        "symfony/console": "7.2.*",
+        "symfony/dotenv": "7.2.*",
+        "symfony/expression-language": "7.2.*",
+        "symfony/flex": "^2",
+        "symfony/form": "7.2.*",
+        "symfony/framework-bundle": "7.2.*",
+        "symfony/http-client": "7.2.*",
+        "symfony/intl": "7.2.*",
+        "symfony/lock": "^7.2",
+        "symfony/mailer": "7.2.*",
+        "symfony/mime": "7.2.*",
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/notifier": "7.2.*",
+        "symfony/process": "7.2.*",
+        "symfony/property-access": "7.2.*",
+        "symfony/property-info": "7.2.*",
+        "symfony/rate-limiter": "7.2.*",
+        "symfony/runtime": "7.2.*",
+        "symfony/security-bundle": "7.2.*",
+        "symfony/serializer": "7.2.*",
+        "symfony/string": "7.2.*",
+        "symfony/translation": "7.2.*",
+        "symfony/twig-bundle": "7.2.*",
+        "symfony/uid": "7.2.*",
+        "symfony/ux-twig-component": "^2.23",
+        "symfony/validator": "7.2.*",
+        "symfony/web-link": "7.2.*",
+        "symfony/yaml": "7.2.*",
+        "twig/extra-bundle": "^3.19",
+        "twig/twig": "^3.19"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*",
+        "symfony/polyfill-php83": "*",
+        "symfony/polyfill-php84": "*"
+    },
+    "scripts": {
+        "install-hooks": ["[ $COMPOSER_DEV_MODE -eq 0 ] || sh ./scripts/setup-pre-commit-hooks.sh"],
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts",
+            "@install-hooks"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts",
+            "@install-hooks"
+        ],
+        "psalm": "vendor/bin/psalm --config=psalm.xml",
+        "phpcs": "vendor/bin/phpcs",
+        "test": [
+          "php bin/console cache:clear --env=test",
+          "php bin/console doctrine:schema:drop --force --env=test",
+          "php bin/console doctrine:schema:update --force --env=test",
+          "php bin/console doctrine:fixtures:load -n --group=test --env=test",
+          "./vendor/bin/simple-phpunit --testdox"
+        ],
+        "docker-compose-up": "docker compose --env-file .env --env-file .env.local up -d",
+        "docker-compose-down": "docker compose --env-file .env --env-file .env.local down"
+    },
+    "conflict": {
+        "symfony/symfony": "*",
+        "knplabs/knp-paginator-bundle": "6.6.0"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "require": "7.2.*",
+            "docker": true
+        }
+    },
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4",
+        "phpunit/phpunit": "^12",
+        "psalm/plugin-phpunit": "^0.19",
+        "psalm/plugin-symfony": "^5.2",
+        "slevomat/coding-standard": "^8.15",
+        "squizlabs/php_codesniffer": "^3.11",
+        "symfony/browser-kit": "7.2.*",
+        "symfony/css-selector": "7.2.*",
+        "symfony/debug-bundle": "7.2.*",
+        "symfony/maker-bundle": "^1.0",
+        "symfony/phpunit-bridge": "^7.2",
+        "symfony/stopwatch": "7.2.*",
+        "symfony/web-profiler-bundle": "7.2.*",
+        "vimeo/psalm": "^6.5",
+        "wp-coding-standards/wpcs": "^3"
+    }
+}

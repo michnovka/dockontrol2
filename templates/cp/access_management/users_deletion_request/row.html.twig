@@ -1,0 +1,12 @@
+<tr>
+    <td>{{ userDeletionRequest.id }}</td>
+    <td>{{ userDeletionRequest.time|format('Y-m-d H:i:s') }}</td>
+    <td>
+        <a href="{{ path('cp_access_management_user_edit', {'id': userDeletionRequest.user.id}) }}" class="nav-link show-underline-hover text-primary"> {{ userDeletionRequest.user.name }} </a>
+    </td>
+    <td class="text-end">
+        <a href="javascript:void(0)" data-user-email="{{ userDeletionRequest.user.email }}" data-user-account-deletion-id="{{ userDeletionRequest.id }}" class="text-body text-decoration-none fs-6 process-delete-account-request" data-bs-toggle="tooltip" data-bs-original-title="Process">
+            <i class="bi bi-fast-forward-circle-fill"></i>
+        </a>
+    </td>
+</tr>

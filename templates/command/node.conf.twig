@@ -1,0 +1,10 @@
+[Interface]
+PrivateKey = {{ dockontrolNode.wireguardPrivateKey }}
+Address = {{ dockontrolNode.ip }}/32
+
+# {{ dockontrolNode.name }}
+[Peer]
+PublicKey = {{ serverPublicKey }}
+Endpoint = {{ serverPublicIp }}:{{ serverPort }}
+AllowedIps = {{ serverVpnIp }}/{{ serverSubnet }}
+PersistentKeepalive = 25

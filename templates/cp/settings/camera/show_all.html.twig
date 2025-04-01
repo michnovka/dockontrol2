@@ -1,0 +1,33 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Cameras | Settings{% endblock %}
+{% set active = 'cameras' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'link': path('cp_settings_camera'),
+        'title': 'Cameras'
+    },
+    {
+        'title': 'Show All'
+    }
+] %}
+
+{% block content %}
+    <div class="row">
+        {% for camera in cameras %}
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 my-2">
+                <div class="card">
+                    <div class="card-header">
+                        {{ camera.nameId }}
+                    </div>
+                    <div class="card-bod">
+                        <img src="{{ path('dockontrol_camera_view', {'cameraSessionId': cameraSessionId, 'cameraId': camera.nameId}) }}" alt="Camera {{ camera.nameId }}" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

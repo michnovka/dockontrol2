@@ -1,0 +1,23 @@
+<tr>
+    <td>{{ cronLog.id }}</td>
+    <td>{{ cronLog.type.readable }}</td>
+    <td>{{ cronLog.timeStart|format('Y-m-d H:i:s') }}</td>
+    <td>{{ cronLog.timeEnd|format('Y-m-d H:i:s') }}</td>
+    <td>{{ cronLog.actionQueueCronGroup ? cronLog.actionQueueCronGroup.name : 'N/A' }}</td>
+    <td>
+        {% if cronLog.success %}
+            <span class="badge rounded-pill bg-success">OK</span>
+        {% else %}
+            <span class="badge rounded-pill bg-danger">Failed</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if cronLog.output|length > 25 %}
+            <span data-id="{{ cronLog.id }}" class="cron-log-output cursor-pointer" data-bs-toggle="tooltip" data-bs-original-title="Show output">
+                {{ cronLog.output|slice(0, 25) }} ...
+            </span>
+        {% else %}
+            {{ cronLog.output }}
+        {% endif %}
+    </td>
+</tr>

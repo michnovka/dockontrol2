@@ -1,0 +1,33 @@
+<tr>
+    <td>{{ group.group.name }}</td>
+    <td>
+        {% if group.users > 0 %}
+            <a href="{{ path('cp_access_management_users', {
+                user_filter: {
+                    'group': group.group.id
+                }
+            }) }}" class="nav-link show-underline-hover px-2 text-primary">{{ group.users }}</a>
+        {% else %}
+            N/A
+        {% endif %}
+    </td>
+    <td>
+        {% if group.buildings > 0 %}
+            <a href="{{ path('cp_settings_building', {
+                building_filter: {
+                    'defaultGroup': group.group.id
+                }
+            }) }}" class="nav-link show-underline-hover px-2 text-primary">{{ group.buildings }}</a>
+        {% else %}
+            N/A
+        {% endif %}
+    </td>
+    <td class="text-end">
+        <a href="{{ path('cp_access_management_group_edit', {'id': group.group.id}) }}" class="fs-6 text-decoration-none text-body" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="#" class="delete-group-btn text-danger text-decoration-none fs-6" data-id="{{ group.group.id }}" data-name="{{ group.group.name }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>

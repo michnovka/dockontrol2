@@ -1,0 +1,144 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Logs{% endblock %}
+{% set active = 'camera_logs' %}
+{% set breadcrumbs = [
+    {
+          'title': 'Logs',
+    }
+] %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">User Action Logs</h6>
+                    <a href="{{ path('cp_logs_user_action_log') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to User Action Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The User Action Logs track and manage all actions taken by users, such as system settings changes and user management. This log helps ensure transparency, accountability, and supports security and compliance.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">API2 Logs</h6>
+                    <a href="{{ path('cp_logs_api2_succeeded_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to API2 Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The API2 Logs section tracks and reviews API calls, including success and failure logs for different API types. It focuses on authentication events using private and public keys, helping administrators identify issues, troubleshoot failures, and ensure secure API usage.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Node API Call Logs</h6>
+                    <a href="{{ path('cp_logs_dockontrol_node_api_succeeded_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Node API Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The DOCKontrol Node API Call Logs track API calls for node actions and monitoring, including success and failure logs. It helps administrators monitor node performance, identify issues, troubleshoot failures, and ensure smooth system operations.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Legacy API Logs</h6>
+                    <a href="{{ path('cp_logs_legacy_api_succeeded_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Legacy API Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The Legacy API Logs track API calls for legacy authentication using e-mail and password, including success and failure logs. It helps administrators identify issues, track login attempts, and ensure the security of legacy API interactions.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Camera Logs</h6>
+                    <a href="{{ path('cp_logs_camera_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Camera Logs</a>
+                </div>
+                <div class="card-body p-3">
+                   <p class="text-muted">
+                       The Camera Logs section tracks camera activities like access, streaming, and errors. It helps administrators monitor performance, troubleshoot issues, and ensure the system works properly, while also providing insights into user interactions for better security and accountability.
+                   </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">E-mail Logs</h6>
+                    <a href="{{ path('cp_logs_email_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to e-mail Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The e-mail Logs section tracks sent e-mails, including delivery status, recipients, and timestamps. It helps administrators troubleshoot delivery issues, ensure reliable communication, and maintain an audit trail of all system-generated e-mails.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Login Logs</h6>
+                    <a href="{{ path('cp_logs_succeeded_login_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Login Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The Login Logs section records all login attempts, including user details, login status, timestamps, and associated IP addresses or devices. It helps administrators monitor activity, detect suspicious behavior, and ensure system security by providing insights into access patterns and potential unauthorized attempts.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Nuki Logs</h6>
+                    <a href="{{ path('cp_logs_nuki_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Nuki Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The Nuki Logs section tracks actions related to Nuki smart locks, including lock/unlock events and errors. It helps administrators monitor usage, troubleshoot issues, and ensure secure and smooth operation of access control via Nuki devices.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Cron Logs</h6>
+                    <a href="{{ path('cp_logs_cron_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Cron Logs</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The Cron Logs section tracks the execution status and output of all cron jobs. It helps administrators monitor performance, identify errors, and troubleshoot issues, ensuring smooth management of automated tasks within the system.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">E-mail Change Logs</h6>
+                    <a href="{{ path('cp_logs_email_change_logs') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to e-mail Change Logs</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The e-mail Change Log records all e-mail updates, including old and new addresses. Users must verify both e-mails for changes, ensuring secure updates while allowing administrators to monitor and troubleshoot as needed.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

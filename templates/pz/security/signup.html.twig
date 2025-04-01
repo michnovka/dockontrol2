@@ -1,0 +1,153 @@
+{% extends 'pz/pz_base.html.twig' %}
+
+{% block title %}Sign up{% endblock %}
+
+{% block logincontent %}
+<div class="page-content">
+    <div class="content container pt-0">
+            <h1 class="text-center">DOCKontrol {{ signupCode.apartment.building.name }} Sign-up</h1>
+        <p class="text-center">You have been invited to create an account by <strong>{{ signupCode.adminUser.name }}</strong>. This signup link is valid until <strong>{{ signupCode.expires | date('Y-m-d H:i:s') }}</strong>.</p>
+        <div class="card border-0 shadow-none">
+            {% include 'pz/common/messages.html.twig' %}
+            {{ form_start(signupForm) }}
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ form_row(signupForm.name) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(signupForm.password.first) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(signupForm.password.second) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(signupForm.email.first) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(signupForm.email.second) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_label(signupForm.phone) }}
+                        <div class="input-group phone-with-prefix">
+                            {{ form_widget(signupForm.phoneCountryPrefix) }}
+                            {{ form_widget(signupForm.phone) }}
+                        </div>
+                        {{ form_errors(signupForm.phoneCountryPrefix) }}
+                        {{ form_errors(signupForm.phone) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(signupForm.apartment, {attr: {placeholder: signupCode.apartment.building.name ~ '.XXX '}}) }}
+                    </div>
+
+                    <div class="col-md-12 text-start">
+                        <button type="submit" class="btn btn-primary w-100" id="submit-btn">Signup</button>
+                    </div>
+                    {{ form_end(signupForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/phone-with-prefix.js') }}"></script>
+    <script>
+        initPhoneInput();
+        document.addEventListener('DOMContentLoaded', (e) => {
+            document.getElementById('signup_password_first').addEventListener('keyup', (e) => {
+                let passwordStrength = checkPasswordStrength(e.target.value);
+                if (passwordStrength < 5) {
+                    if (document.getElementById('weak-password-element') === null) {
+                        let errorElement = document.createElement('div');
+                        errorElement.innerHTML = 'The password strength is too low. Please use a stronger password.';
+                        errorElement.className = 'invalid-feedback d-block';
+                        errorElement.id = 'weak-password-element';
+                        document.getElementById('signup_password_first').after(errorElement);
+                        document.getElementById('submit-btn').classList.add('disabled');
+                    }
+                } else {
+                    if (document.getElementById('weak-password-element') !== null) {
+                        document.getElementById('weak-password-element').remove();
+                        document.getElementById('submit-btn').classList.remove('disabled');
+                    }
+                }
+            });
+
+            document.getElementById('signup_password_second').addEventListener('keyup', (e) => {
+               let firstPassword = document.getElementById('signup_password_first').value;
+               if (e.target.value !== firstPassword) {
+                   if (document.getElementById('second-password-error-element') === null) {
+                       let errorElement = document.createElement('div');
+                       errorElement.innerHTML = 'Password does not match';
+                       errorElement.className = 'invalid-feedback d-block';
+                       errorElement.id = 'second-password-error-element';
+                       document.getElementById('signup_password_second').after(errorElement);
+                       document.getElementById('submit-btn').classList.add('disabled');
+                   }
+               } else {
+                   if (document.getElementById('second-password-error-element') !== null) {
+                       document.getElementById('second-password-error-element').remove();
+                       document.getElementById('submit-btn').classList.remove('disabled');
+                   }
+               }
+            });
+
+            document.getElementById('signup_email_second').addEventListener('keyup', (e) => {
+                let firstEmail = document.getElementById('signup_email_first').value;
+                if (e.target.value !== firstEmail) {
+                    if (document.getElementById('second-email-error-element') === null) {
+                        let errorElement = document.createElement('div');
+                        errorElement.innerHTML = 'E-mail does not match';
+                        errorElement.className = 'invalid-feedback d-block';
+                        errorElement.id = 'second-email-error-element';
+                        document.getElementById('signup_email_second').after(errorElement);
+                        document.getElementById('submit-btn').classList.add('disabled');
+                    }
+                } else {
+                    if (document.getElementById('second-email-error-element') !== null) {
+                        document.getElementById('second-email-error-element').remove();
+                        document.getElementById('submit-btn').classList.remove('disabled');
+                    }
+                }
+            });
+
+            function checkPasswordStrength(passwordText)
+            {
+                let score = 0;
+
+                // Check if contains lowercase
+                if (/[a-z]/.test(passwordText)) {
+                    score++;
+                }
+
+                // Check if contains uppercase
+                if (/[A-Z]/.test(passwordText)) {
+                    score++;
+                }
+
+                // Check if contains numbers
+                if (/\d/.test(passwordText)) {
+                    score++;
+                }
+
+                // Check if contains special characters
+                if (/\W/.test(passwordText)) {
+                    score++;
+                }
+
+                // Add points based on length (1 point for every 3 characters)
+                score += Math.floor(passwordText.length / 3);
+
+                return Math.min(score, 10);
+            }
+
+            function validateApartmentMask(buildingName, apartmentMask)
+            {
+                const regex = new RegExp('^' + buildingName + '\\.[A-Za-z0-9]+(?:\\.[A-Za-z0-9]+)*$');
+                return regex.test(apartmentMask);
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "email/email_base.html.twig" %}
+
+{% block title %}Change E-mail | DOCKontrol{% endblock %}
+{% block header %}Change E-mail Request{% endblock %}
+
+{% block stylesheet %}
+    {{ parent() }}
+    <style>
+        .content .confirm-btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .content .confirm-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2>Hello {{ user.name }},</h2>
+    <p>We received a request to change the e-mail for your account. If this was you, please click the button below to update your e-mail.</p>
+
+    <p>If you did not request a change e-mail, please ignore this e-mail or contact support if you have concerns.</p>
+
+    <div class="button-container">
+        <a class="confirm-btn" href="{{ url('dockontrol_confirm_email_change', {hash: hash, oldOrNew: oldOrNew}) }}" target="_blank">Confirm Change E-mail</a>
+    </div>
+
+    <p>This e-mail change link will expire in 1 hour.</p>
+    <p>Additional details:</p>
+    <ul>
+        <li>Old E-mail: {{ oldEmail }}</li>
+        <li>New E-mail: {{ newEmail }}</li>
+        <li>IP Address: {{ ipAddress }}</li>
+        <li>Browser: {{ browserInfo }}</li>
+        <li>Requested Time: {{ requestedTime }}</li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% use "bootstrap_5_layout.html.twig" %}
+
+{% block date_range_widget %}
+    <div class="input-group">
+        {{- block('form_widget_simple') -}}
+        {% if show_clear_button is defined and show_clear_button %}
+            <div class="input-group-text cursor-pointer date_range_reset" id="date_range_reset" data-bs-id="{{ id }}">
+                <i class="bi bi-x-circle text-danger"></i>
+            </div>
+        {% endif %}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function (){
+            let dp = document.getElementById('{{ id }}');
+
+            let timeFormat = "{{ is_datetime ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'}}";
+            let timePicker = {% if is_datetime %}true{% else %}false{% endif %};
+
+            new DateRangePicker(
+                dp,
+                {
+                    timePicker: timePicker,
+                    timePicker24Hour: true,
+                    locale: {
+                        format: timeFormat,
+                        cancelLabel: 'Clear'
+                    },
+                    autoUpdateInput: false
+                },
+                function (startDate, endDate) {
+                    dp.value = startDate.format(timeFormat) + ' - ' + endDate.format(timeFormat)
+                }
+            );
+
+            window.addEventListener('cancel.daterangepicker', function () {
+                dp.value = '';
+            });
+
+            document.getElementById('date_range_reset').addEventListener('click', () => {
+                dp.value = '';
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block datetime_widget %}
+    <div class="input-group">
+        {{- block('form_widget_simple') -}}
+        {% if show_clear_button is defined and show_clear_button %}
+            <div class="input-group-text cursor-pointer bg-transparent" id="date_range_reset" onclick="clearFormField('{{ id }}')">
+                <i class="bi bi-x-circle text-danger"></i>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let dp = document.getElementById('{{ id }}');
+            dp.addEventListener('focus', () => {
+                let isReadOnly = dp.getAttribute('readonly') === 'readonly';
+                let dateTimePickerOptions = {
+                    singleDatePicker: true,
+                    timePicker: true,
+                    timePickerSeconds: true,
+                    timePicker24Hour: true,
+                    autoUpdateInput: false,
+                    locale: {
+                        format: 'YYYY-MM-DD HH:mm:ss'
+                    },
+                };
+
+                function setDropDirection(element) {
+                    if (checkSpaceForDateRangePickerSingle(element, 'down')) {
+                        dateTimePickerOptions = Object.assign({}, dateTimePickerOptions, {
+                            drops: 'down'
+                        });
+                    } else {
+                        dateTimePickerOptions = Object.assign({}, dateTimePickerOptions, {
+                            drops: 'up'
+                        });
+                    }
+                }
+
+                if (!isReadOnly) {
+                    console.log(dateTimePickerOptions)
+                    new DateRangePicker(dp, dateTimePickerOptions);
+                    setDropDirection(dp);
+                }
+
+                window.addEventListener('resize', function() {
+                    setDropDirection(dp);
+                });
+
+                window.addEventListener('cancel.daterangepicker', function () {
+                    dp.value = '';
+                });
+
+                window.addEventListener('apply.daterangepicker', function (e) {
+                    dp.value = e.detail.startDate.format('YYYY-MM-DD HH:mm:ss');
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block checkbox_widget %}
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-2">
+        {{ form_label(form) }}
+        <div class="form-check form-switch">
+            <input type="checkbox" {{ block('widget_attributes') }} class="form-check-input" id="{{ id }}" {% if value is defined %} value="{{ value }}"{% endif %} {% if checked %} checked="checked"{% endif %} />
+            <label class="form-check-label" for="{{ id }}">{{ label|trans({}, translation_domain) }}</label>
+        </div>
+        {{ form_errors(form) }}
+    </div>
+{% endblock checkbox_widget %}
+
+{% block searchable_entity_widget %}
+    {{- block('choice_widget') -}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var choiceElement = document.getElementById("{{ id }}");
+            let isReadOnly = choiceElement.getAttribute('readonly') === 'readonly';
+            if (!isReadOnly) {
+                let choicesOptions = {
+                    searchEnabled: (choiceElement.getAttribute('data-choices-search-enabled') !== null && choiceElement.getAttribute('data-choices-search-enabled').toLowerCase() === "true"),
+                    searchChoices: (choiceElement.getAttribute('data-choices-search-choices') !== null && choiceElement.getAttribute('data-choices-search-choices').toLowerCase() === "true"),
+                    removeItems: (choiceElement.getAttribute('data-choices-remove-items') !== null && choiceElement.getAttribute('data-choices-remove-items').toLowerCase() === "true"),
+                    placeholder: choiceElement.getAttribute('data-choice-placeholder') !== null,
+                    placeholderValue: choiceElement.getAttribute('data-choices-placeholder'),
+                    removeItemButton: (choiceElement.getAttribute('data-choices-remove-item-button') !== null && choiceElement.getAttribute('data-choices-remove-item-button').toLowerCase() === "true"),
+                    allowHTML: true,
+                }
+                let clearChoices = (choiceElement.getAttribute('data-clear-choices') !== null && choiceElement.getAttribute('data-clear-choices').toLowerCase() === "true");
+                let searchableChoices = new Choices(choiceElement, choicesOptions);
+                let searchElement = choiceElement.closest('.choices').querySelector('input[name="search_terms"]');
+                if (clearChoices) {
+                    searchableChoices.clearChoices();
+                }
+                var delayInAjaxCall = (function () {
+                    var timer = 0;
+                    return function (callback, milliseconds) {
+                        clearTimeout(timer);
+                        timer = setTimeout(callback, milliseconds);
+                    };
+                })();
+
+                if (searchElement !== null) {
+                    searchElement.addEventListener('keyup', function (e) {
+                        delayInAjaxCall(function () {
+                            let url = '{{ path(search_api_path, {'searchText': '__SEARCH_TEXT__'}) }}';
+                            url = url.replace('__SEARCH_TEXT__', e.target.value)
+                            fetch(url).then(function (response) {
+                                return response.json();
+                            }).then(function (response) {
+                                let selectedValues = searchableChoices.getValue(true);
+                                if (typeof  selectedValues !== "object") {
+                                    selectedValues = [selectedValues];
+                                }
+                                let choices = [];
+                                response.items.map((val) => {
+                                    if (selectedValues.indexOf(val.id) === -1) {
+                                        choices.push(val);
+                                    }
+                                });
+                                searchableChoices.setChoices(choices, 'id', 'text', true);
+                            });
+                        }, {{ ajax_delay }});
+                    });
+                }
+            } else {
+                choiceElement.classList.add('readonly');
+            }
+        });
+    </script>
+{% endblock %}

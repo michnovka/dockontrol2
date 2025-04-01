@@ -1,0 +1,26 @@
+control_panel:
+    resource: ../src/Controller/CP/
+    prefix: /admin
+    type: attribute
+
+public_zone:
+    resource: ../src/Controller/PZ/
+    prefix: /
+    type: attribute
+
+guest_access:
+    resource: ../src/Controller/Guest/
+    type: attribute
+
+camera_access:
+    resource: ../src/Controller/Camera/
+    type: attribute
+
+api:
+    resource: ../src/Controller/API
+    prefix: /api
+    type: attribute
+
+legacy_api:
+    path: /api.php
+    controller: App\Controller\API\LegacyAPIController::index

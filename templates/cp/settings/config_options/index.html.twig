@@ -1,0 +1,120 @@
+{% extends 'cp//admin_base.html.twig' %}
+
+{% block title %}Config Options | Settings{% endblock %}
+{% set active = 'system_setting' %}
+{% set breadcrumbs = [
+    {
+         'title': 'Settings', 'link': path('cp_settings')
+    },
+    {
+        'title': 'Config Options'
+    }
+] %}
+
+
+{% block content %}
+    <div class="card mb-2">
+        <div class="card-header p-2">
+            <h5 class="card-title  mb-0">General Configs</h5>
+        </div>
+        <div class="card-body m-0 p-0">
+            <div class="table-responsive rounded">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th style="width: 70%">Key</th>
+                            <th style="width: 20%">Value</th>
+                            <th class="text-end" style="width: 10%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% set configTypeEnum = enum("\\App\\Entity\\Enum\\ConfigType") %}
+                    {% for config in generalConfigs %}
+                        {% include 'cp/settings/config_options/row.html.twig' with {
+                            'forms': generalConfigForms
+                        } %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-header p-2">
+            <h5 class="card-title  mb-0">DB cleanup config</h5>
+        </div>
+        <div class="card-body m-0 p-0">
+            <div class="table-responsive rounded">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th style="width: 70%">Key</th>
+                        <th style="width: 20%">Value</th>
+                        <th class="text-end" style="width: 10%">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set configTypeEnum = enum("\\App\\Entity\\Enum\\ConfigType") %}
+                    {% for config in logsConfigs %}
+                        {% include 'cp/settings/config_options/row.html.twig' with {
+                            'forms': logConfigForms
+                        } %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="position-absolute top-0 end-0 p-3" style="z-index: 11">
+        <div id="copy_link_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="bg-success toast-header text-white" id="dock-toast">
+                <strong class="me-auto">DOCKontrol</strong>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <span id="message"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete_config_modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="" method="post" id="delete_config_form">
+                    <div class="modal-header bg-primary">
+                        <h6 class="card-title text-white">
+                            Reset Config
+                        </h6>
+                        <button type="button" aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>The following configuration is about to be reset:</p>
+                        <strong>
+                            <ul>
+                                <li id="config_name"></li>
+                            </ul>
+                        </strong>
+                        <p>Are you sure you want to proceed?</p>
+                        <span class="validation-invalid-label generic_error d-none">Something went wrong.</span>
+                        <input type="hidden" class="_csrf_token_config_setting" name="_csrf_token_config_setting" id="_csrf_token_config_setting" value="{{ csrf_token('settingcsrf') }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn bg-primary approve-the-deletion-for-car-enter_details text-white">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        {% include 'cp/settings/config_options/config.js.twig' %}
+    </script>
+{% endblock %}

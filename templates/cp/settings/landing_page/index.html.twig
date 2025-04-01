@@ -1,0 +1,178 @@
+{% extends 'cp/admin_base.html.twig' %}
+
+{% block title %}Settings{% endblock %}
+{% set active = 'action' %}
+{% set breadcrumbs = [
+    {
+        'title': 'Settings', 'link': path('cp_settings')
+    }
+] %}
+
+{% block content %}
+    <div class="row">
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Action Queue Cron Group</h6>
+                    <a href="{{ path('cp_settings_action_cron_group') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Action Queue Cron Group</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The Action Queue Cron Group section simplifies action execution by grouping multiple actions into one cron job. This reduces administrative overhead, enhances efficiency, and ensures simultaneous task execution without managing separate cron jobs.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Actions</h6>
+                    <a href="{{ path('cp_settings_action') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Actions</a>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted">
+                        The Actions section allows you to manage platform actions, such as adding, updating, and viewing them. It tracks frontend actions like open_gate_rw1 and supports backup actions for reliable execution from alternative nodes, ensuring continuous operation.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Announcements</h6>
+                    <a href="{{ path('cp_settings_announcement') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Announcements</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The Announcement section streamlines communication by allowing administrators to create and manage important updates in one place. This ensures timely information delivery, reduces manual effort, and keeps users informed without the need for separate notifications.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Apartments</h6>
+                    <a href="{{ path('cp_settings_apartment') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Apartments</a>
+
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The Apartments section allows you to manage apartments by adding, updating, and viewing entries. It tracks the number of users per apartment, helping monitor occupancy and ensure details are up to date.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Buildings</h6>
+                    <a href="{{ path('cp_settings_building') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Buildings</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The Buildings section lets you manage building information, including adding new buildings and updating details. It provides insights into the number of apartments per building, ensuring up-to-date building details and tracking apartment distribution.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Buttons</h6>
+                    <a href="{{ path('cp_settings_button') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Buttons</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The Button Configuration section lets you customize buttons for actions like controlling elevators and gates. Each button can be linked to an action (e.g., open_gate_r1) and assigned up to four cameras, streamlining action management and improving user control.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Cameras</h6>
+                    <a href="{{ path('cp_settings_camera') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Cameras</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The Camera Management section allows you to create, edit, and delete cameras. Access is permission-based, with only authorized users able to view cameras. Each camera is linked to a Node and action payload for secure authentication, ensuring system integrity.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Config Options</h6>
+                    <a href="{{ path('cp_settings_config_option') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Config Options</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The System Settings section lets you configure key parameters for managing system logs, including retention periods for login attempts. You can set log lifetimes to automatically purge old data, ensuring optimal performance and compliance, while giving administrators control over log management.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">Crons</h6>
+                    <a href="{{ path('cp_settings_cron') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Crons</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The Cron Management section displays the last executed time and health status of each cron job, helping administrators monitor performance. It also provides example cron tab configurations for easy setup, ensuring smooth job execution and simplified task configuration.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">E-mail Settings</h6>
+                    <a href="{{ path('cp_settings_email_setting') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to e-mail Settings</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The e-mail Configuration section lets you set up and manage e-mail notifications and SMTP settings, including server details and authentication. A test e-mail feature ensures the configuration works correctly, verifying smooth communication before sending notifications.
+                    </p>
+                </div>
+            </div>
+        </div>
+       <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+           <div class="card">
+               <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                   <h6 class="mb-0">Nodes</h6>
+                   <a href="{{ path('cp_settings_node') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to Nodes</a>
+               </div>
+               <div class="card-body">
+                   <p class="text-muted">
+                       The Node Management section allows you to add, update, and delete system nodes, which are essential for executing actions, viewing cameras, and other tasks. It helps administrators ensure proper system configuration and efficient node operation for smooth task execution.
+                   </p>
+               </div>
+           </div>
+       </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 d-flex mt-3">
+            <div class="card">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 px-3">
+                    <h6 class="mb-0">System Overview</h6>
+                    <a href="{{ path('cp_settings_system_overview') }}" class="btn btn-link text-decoration-none show-underline-hover text-primary p-0">Take me to System Overview</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The System Health section displays key performance metrics like CPU usage, memory, disk space, and the status of Redis and Meilisearch services. It helps administrators monitor system performance in real-time, ensuring efficient resource use and identifying issues before they affect stability.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

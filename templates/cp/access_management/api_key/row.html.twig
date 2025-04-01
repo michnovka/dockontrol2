@@ -1,0 +1,13 @@
+<tr>
+    <td><a href="{{ path('cp_access_management_user_edit', {'id': apiKey.user.id}) }}" class="nav-link show-underline-hover text-primary">{{ apiKey.user.name }}</a></td>
+    <td>{{ apiKey.publicKey }}</td>
+    <td>{{ apiKey.name }}</td>
+    <td>{{ apiKey.timeCreated|time_tooltip }}</td>
+    <td>{{ apiKey.timeLastUsed ? apiKey.timeLastUsed|time_tooltip : 'N/A' }}</td>
+
+    <td class="text-end">
+        <a href="javascript:void(0)" class="text-decoration-none fs-6 text-danger delete-api-key-btn" data-api-key-hash="{{ apiKey.publicKey }}" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>
